@@ -1,8 +1,20 @@
 local urlparse = require("socket.url")
 
+local item_dir = os.getenv('item_dir')
+local item_name = os.getenv("item_name")
+local warc_file_base = os.getenv('warc_file_base')
+
 local url_count = 0
 local tries = 0
 local downloaded = {}
+
+local urls = {}
+for url in string.gmatch(item_name, "([^\n]+)") do
+  urls[url] = true
+end
+
+local current_url = nil
+local bad_urls = {}
 
 bad_code = function(status_code)
   return status_code == 0
@@ -23,6 +35,10 @@ end
 
 wget.callbacks.httploop_result = function(url, err, http_stat)
   status_code = http_stat["statcode"]
+
+  if urls[url["url"]] then
+    current_url = url["url"]
+  end
   
   url_count = url_count + 1
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
@@ -51,7 +67,8 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       io.stdout:write("Skipping URL...\n")
       io.stdout:flush()
       tries = 0
-      return wget.actions.ABORT
+      bad_urls[current_url] = true
+      return wget.actions.EXIT
     else
       os.execute("sleep " .. math.floor(math.pow(2, tries)))
       tries = tries + 1
@@ -68,5 +85,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   end
 
   return wget.actions.NOTHING
+end
+
+wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total_downloaded_bytes, total_download_time)
+  local file = io.open(item_dir .. '/' .. warc_file_base .. '_bad-urls.txt', 'w')
+  for url, _ in pairs(bad_urls) do
+    file:write(url .. "\n")
+  end
+  file:close()
 end
 

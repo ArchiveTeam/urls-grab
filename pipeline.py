@@ -49,7 +49,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20201031.05'
+VERSION = '20201031.06'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'trackerproxy.archiveteam.org'
@@ -119,7 +119,8 @@ class PrepareDirectories(SimpleTask):
         ])
 
         open('%(item_dir)s/%(warc_file_base)s.warc.gz' % item, 'w').close()
-        open('%(item_dir)s/%(warc_file_base)s_data.txt' % item, 'w').close()
+        open('%(item_dir)s/%(warc_file_base)s_bad-urls.txt' % item, 'w').close()
+
 
 class MoveFiles(SimpleTask):
     def __init__(self):
@@ -128,10 +129,22 @@ class MoveFiles(SimpleTask):
     def process(self, item):
         os.rename('%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
               '%(data_dir)s/%(warc_file_base)s.warc.gz' % item)
-        os.rename('%(item_dir)s/%(warc_file_base)s_data.txt' % item,
-              '%(data_dir)s/%(warc_file_base)s_data.txt' % item)
 
         shutil.rmtree('%(item_dir)s' % item)
+
+
+class SetBadUrls(SimpleTask):
+    def __init__(self):
+        SimpleTask.__init__(self, 'SetBadUrls')
+
+    def process(self, item):
+        item['item_name_original'] = item['item_name']
+        items = item['item_name'].split('\0')
+        with open('%(item_dir)s/%(warc_file_base)s_bad-urls.txt' % item, 'r') as f:
+            for url in f:
+                url = url.strip()
+                items.remove(url)
+        item['item_name'] = '\0'.join(items)
 
 
 def get_hash(filename):
@@ -180,6 +193,7 @@ class WgetArgs(object):
         ]
 
         items = item['item_name']
+        item['item_name_newline'] = item['item_name'].replace('\0', '\n')
 
         for url in items.split('\0'):
             wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+url])
@@ -217,8 +231,14 @@ pipeline = Pipeline(
     WgetDownload(
         WgetArgs(),
         max_tries=1,
-        accept_on_exit_code=[0, 4, 8]
+        accept_on_exit_code=[0, 4, 8],
+        env={
+            'item_dir': ItemValue('item_dir'),
+            'item_name': ItemValue('item_name_newline'),
+            'warc_file_base': ItemValue('warc_file_base')
+        }
     ),
+    SetBadUrls(),
     PrepareStatsForTracker(
         defaults={'downloader': downloader, 'version': VERSION},
         file_groups={
@@ -237,8 +257,7 @@ pipeline = Pipeline(
             downloader=downloader,
             version=VERSION,
             files=[
-                ItemInterpolation('%(data_dir)s/%(warc_file_base)s.warc.gz'),
-                ItemInterpolation('%(data_dir)s/%(warc_file_base)s_data.txt')
+                ItemInterpolation('%(data_dir)s/%(warc_file_base)s.warc.gz')
             ],
             rsync_target_source_path=ItemInterpolation('%(data_dir)s/'),
             rsync_extra_args=[
