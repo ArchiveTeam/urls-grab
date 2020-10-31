@@ -5,7 +5,8 @@ local tries = 0
 local downloaded = {}
 
 bad_code = function(status_code)
-  return status_code == 401
+  return status_code == 0
+    or status_code == 401
     or status_code == 403
     or status_code == 407
     or status_code == 408
@@ -50,7 +51,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       io.stdout:write("Skipping URL...\n")
       io.stdout:flush()
       tries = 0
-      return wget.actions.EXIT
+      return wget.actions.ABORT
     else
       os.execute("sleep " .. math.floor(math.pow(2, tries)))
       tries = tries + 1
