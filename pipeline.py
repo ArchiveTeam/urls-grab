@@ -49,7 +49,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20201101.03'
+VERSION = '20201101.04'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'trackerproxy.archiveteam.org'
@@ -148,6 +148,13 @@ class SetBadUrls(SimpleTask):
                 items.pop(index)
                 items_lower.pop(index)
         item['item_name'] = '\0'.join(items)
+
+
+class MaybeSendDoneToTracker(SendDoneToTracker):
+    def enqueue(self, item):
+        if len(item['item_name']) == 0:
+            self.complete_item(item)
+        return super(MaybeSendDoneToTracker, self).enqueue(item)
 
 
 def get_hash(filename):
@@ -273,7 +280,7 @@ pipeline = Pipeline(
             ]
         ),
     ),
-    SendDoneToTracker(
+    MaybeSendDoneToTracker(
         tracker_url='http://%s/%s' % (TRACKER_HOST, TRACKER_ID),
         stats=ItemValue('stats')
     )
