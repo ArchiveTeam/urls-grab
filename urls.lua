@@ -10,7 +10,7 @@ local downloaded = {}
 
 local urls = {}
 for url in string.gmatch(item_name, "([^\n]+)") do
-  urls[url] = true
+  urls[string.lower(url)] = true
 end
 
 local current_url = nil
@@ -36,7 +36,7 @@ end
 wget.callbacks.httploop_result = function(url, err, http_stat)
   status_code = http_stat["statcode"]
 
-  if urls[url["url"]] then
+  if urls[string.lower(url["url"])] then
     current_url = url["url"]
   end
   
@@ -67,7 +67,11 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       io.stdout:write("Skipping URL...\n")
       io.stdout:flush()
       tries = 0
-      bad_urls[current_url] = true
+      if current_urls then
+        bad_urls[current_url] = true
+      else
+        bad_urls[url["url"]] = true
+      end
       return wget.actions.EXIT
     else
       os.execute("sleep " .. math.floor(math.pow(2, tries)))
