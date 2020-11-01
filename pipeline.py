@@ -49,7 +49,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20201101.01'
+VERSION = '20201101.02'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'trackerproxy.archiveteam.org'
@@ -140,10 +140,11 @@ class SetBadUrls(SimpleTask):
     def process(self, item):
         item['item_name_original'] = item['item_name']
         items = item['item_name'].split('\0')
+        items_lower = [s.lower() for s in items]
         with open('%(item_dir)s/%(warc_file_base)s_bad-urls.txt' % item, 'r') as f:
             for url in f:
                 url = url.strip()
-                items.remove(url)
+                items.pop(items_lower.index(url))
         item['item_name'] = '\0'.join(items)
 
 

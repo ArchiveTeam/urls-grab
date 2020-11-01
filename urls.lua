@@ -5,7 +5,6 @@ local item_name = os.getenv("item_name")
 local warc_file_base = os.getenv('warc_file_base')
 
 local url_count = 0
-local tries = 0
 local downloaded = {}
 
 local urls = {}
@@ -37,7 +36,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   status_code = http_stat["statcode"]
 
   if urls[string.lower(url["url"])] then
-    current_url = url["url"]
+    current_url = string.lower(url["url"])
   end
   
   url_count = url_count + 1
@@ -47,7 +46,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   if status_code >= 300 and status_code <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
     if downloaded[newloc] then
-      tries = 0
       return wget.actions.EXIT
     end
   end
@@ -61,26 +59,15 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   end
 
   if bad_code(status_code) then
-    io.stdout:write("Server returned " .. http_stat.statcode .. " (" .. err .. "). Sleeping.\n")
+    io.stdout:write("Server returned " .. http_stat.statcode .. " (" .. err .. ").\n")
     io.stdout:flush()
-    if tries >= 3 then
-      io.stdout:write("Skipping URL...\n")
-      io.stdout:flush()
-      tries = 0
-      if current_urls then
-        bad_urls[current_url] = true
-      else
-        bad_urls[url["url"]] = true
-      end
-      return wget.actions.EXIT
+    if current_url ~= nil then
+      bad_urls[current_url] = true
     else
-      os.execute("sleep " .. math.floor(math.pow(2, tries)))
-      tries = tries + 1
-      return wget.actions.CONTINUE
+      bad_urls[string.lower(url["url"])] = true
     end
+    return wget.actions.EXIT
   end
-
-  tries = 0
 
   local sleep_time = 0
 
