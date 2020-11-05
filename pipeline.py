@@ -2,14 +2,8 @@
 import datetime
 from distutils.version import StrictVersion
 import hashlib
-import os.path
+import os
 import random
-from seesaw.config import realize, NumberConfigValue
-from seesaw.externalprocess import ExternalProcess
-from seesaw.item import ItemInterpolation, ItemValue
-from seesaw.task import SimpleTask, LimitConcurrent
-from seesaw.tracker import GetItemFromTracker, PrepareStatsForTracker, \
-    UploadWithTracker, SendDoneToTracker
 import shutil
 import socket
 import subprocess
@@ -17,11 +11,18 @@ import sys
 import time
 import string
 
+import requests
 import seesaw
+from seesaw.config import realize, NumberConfigValue
 from seesaw.externalprocess import WgetDownload
+from seesaw.item import ItemInterpolation, ItemValue
 from seesaw.pipeline import Pipeline
 from seesaw.project import Project
+from seesaw.task import SimpleTask, LimitConcurrent
+from seesaw.tracker import GetItemFromTracker, PrepareStatsForTracker, \
+    UploadWithTracker, SendDoneToTracker
 from seesaw.util import find_executable
+import zstandard
 
 if StrictVersion(seesaw.__version__) < StrictVersion('0.8.5'):
     raise Exception('This pipeline needs seesaw version 0.8.5 or higher.')
@@ -49,7 +50,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20201104.03'
+VERSION = '20201104.04'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'trackerproxy.archiveteam.org'
@@ -118,7 +119,7 @@ class PrepareDirectories(SimpleTask):
             time.strftime('%Y%m%d-%H%M%S')
         ])
 
-        open('%(item_dir)s/%(warc_file_base)s.warc.gz' % item, 'w').close()
+        open('%(item_dir)s/%(warc_file_base)s.warc.zst' % item, 'w').close()
         open('%(item_dir)s/%(warc_file_base)s_bad-urls.txt' % item, 'w').close()
 
 
@@ -127,8 +128,8 @@ class MoveFiles(SimpleTask):
         SimpleTask.__init__(self, 'MoveFiles')
 
     def process(self, item):
-        os.rename('%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
-              '%(data_dir)s/%(warc_file_base)s.warc.gz' % item)
+        os.rename('%(item_dir)s/%(warc_file_base)s.warc.zst' % item,
+            '%(data_dir)s/%(warc_file_base)s.%(dict_project)s.%(dict_id)s.warc.zst' % item)
 
         shutil.rmtree('%(item_dir)s' % item)
 
@@ -175,6 +176,41 @@ def stats_id_function(item):
     return d
 
 
+class ZstdDict(object):
+    created = 0
+    data = None
+
+    @classmethod
+    def get_dict(cls):
+        if cls.data is not None and time.time() - cls.created < 1800:
+            return cls.data
+        response = requests.get(
+            'http://trackerproxy.archiveteam.org:25654/dictionary',
+            params={
+                'project': TRACKER_ID
+            }
+        )
+        response.raise_for_status()
+        response = response.json()
+        if cls.data is not None and response['id'] == cls.data['id']:
+            cls.created = time.time()
+            return cls.data
+        print('Downloading latest dictionary.')
+        response_dict = requests.get(response['url'])
+        response_dict.raise_for_status()
+        raw_data = response_dict.content
+        if hashlib.sha256(raw_data).hexdigest() != response['sha256']:
+            raise ValueError('Hash of downloaded dictionary does not match.')
+        if raw_data[:4] == b'\x28\xB5\x2F\xFD':
+            raw_data = zstandard.ZstdDecompressor().decompress(raw_data)
+        cls.data = {
+            'id': response['id'],
+            'dict': raw_data
+        }
+        cls.created = time.time()
+        return cls.data
+
+
 class WgetArgs(object):
     def realize(self, item):
         wget_args = [
@@ -200,9 +236,20 @@ class WgetArgs(object):
             '--warc-header', 'x-wget-at-project-version: ' + VERSION,
             '--warc-header', 'x-wget-at-project-name: ' + TRACKER_ID,
             '--warc-dedup-url-agnostic',
+            '--warc-compression-use-zstd',
+            '--warc-zstd-dict-no-include',
             '--header', 'Connection: keep-alive',
             '--header', 'Accept-Language: en-US;q=0.9, en;q=0.8'
         ]
+
+        dict_data = ZstdDict.get_dict()
+        with open(os.path.join(item['item_dir'], 'zstdict'), 'wb') as f:
+            f.write(dict_data['dict'])
+        item['dict_id'] = dict_data['id']
+        item['dict_project'] = TRACKER_ID
+        wget_args.extend([
+            '--warc-zstd-dict', ItemInterpolation('%(item_dir)s/zstdict'),
+        ])
 
         items = item['item_name']
         item['item_name_newline'] = item['item_name'].replace('\0', '\n')
@@ -255,7 +302,7 @@ pipeline = Pipeline(
         defaults={'downloader': downloader, 'version': VERSION},
         file_groups={
             'data': [
-                ItemInterpolation('%(item_dir)s/%(warc_file_base)s.warc.gz')
+                ItemInterpolation('%(item_dir)s/%(warc_file_base)s.warc.zst')
             ]
         },
         id_function=stats_id_function,
@@ -269,7 +316,7 @@ pipeline = Pipeline(
             downloader=downloader,
             version=VERSION,
             files=[
-                ItemInterpolation('%(data_dir)s/%(warc_file_base)s.warc.gz')
+                ItemInterpolation('%(data_dir)s/%(warc_file_base)s.%(dict_project)s.%(dict_id)s.warc.zst')
             ],
             rsync_target_source_path=ItemInterpolation('%(data_dir)s/'),
             rsync_extra_args=[
