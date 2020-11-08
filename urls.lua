@@ -65,6 +65,10 @@ queue_new_urls = function(url)
   if newurl ~= url then
     queued_urls[newurl] = true
   end
+  newurl = string.gsub(url, "([?&])amp;", "%1")
+  if newurl ~= url then
+    queued_urls[newurl] = true
+  end
 end
 
 wget.callbacks.write_to_warc = function(url, http_stat)
