@@ -75,7 +75,7 @@ report_bad_url = function(url)
   if current_url ~= nil then
     bad_urls[current_url] = true
   else
-    bad_urls[url] = true
+    bad_urls[string.lower(url)] = true
   end
 end
 
