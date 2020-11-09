@@ -65,9 +65,17 @@ queue_new_urls = function(url)
   if newurl ~= url then
     queued_urls[newurl] = true
   end
-  newurl = string.gsub(url, "([?&])amp;", "%1")
+  newurl = string.gsub(url, "([%?&])amp;", "%1")
   if newurl ~= url then
     queued_urls[newurl] = true
+  end
+end
+
+report_bad_url = function(url)
+  if current_url ~= nil then
+    bad_urls[current_url] = true
+  else
+    bad_urls[url] = true
   end
 end
 
@@ -88,7 +96,9 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 
   if status_code >= 300 and status_code <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
-    if downloaded[newloc] then
+    if downloaded[newloc]
+      or string.match(newloc, "^https?://[^/]*google%.com/sorry") then
+      report_bad_url(url["url"])
       return wget.actions.EXIT
     end
   end
@@ -108,11 +118,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   if bad_code(status_code) then
     io.stdout:write("Server returned " .. http_stat.statcode .. " (" .. err .. ").\n")
     io.stdout:flush()
-    if current_url ~= nil then
-      bad_urls[current_url] = true
-    else
-      bad_urls[string.lower(url["url"])] = true
-    end
+    report_bad_url(url["url"])
     return wget.actions.EXIT
   end
 
