@@ -23,6 +23,17 @@ end
 local current_url = nil
 local bad_urls = {}
 local queued_urls = {}
+local bad_params = {}
+
+for param in io.open("bad-params", "r"):lines() do
+  local param = string.gsub(
+    param, "([a-zA-Z])",
+    function(c)
+      return "[" .. string.lower(c) .. string.upper(c) .. "]"
+    end
+  )
+  table.insert(bad_params, param)
+end
 
 bad_code = function(status_code)
   return status_code == 0
@@ -37,35 +48,37 @@ bad_code = function(status_code)
     or status_code >= 500
 end
 
-remove_param = function(url, param)
-  url = string.gsub(url, "([%?&])" .. param .. "=[^%?&]*[%?&]?", "%1")
-  return string.match(url, "^(.-)[%?&]?$")
+remove_param = function(url, param_pattern)
+  local newurl = url
+  repeat
+    url = newurl
+    newurl = string.gsub(url, "([%?&;])" .. param_pattern .. "=[^%?&;]*[%?&;]?", "%1")
+  until newurl == url
+  return string.match(newurl, "^(.-)[%?&;]?$")
 end
 
 queue_new_urls = function(url)
-  local newurl = remove_param(url, "utm_source")
-  newurl = remove_param(newurl, "utm_medium")
-  newurl = remove_param(newurl, "utm_campaign")
-  newurl = remove_param(newurl, "utm_term")
-  newurl = remove_param(newurl, "utm_content")
-  newurl = remove_param(newurl, "utm_adgroup")
-  newurl = remove_param(newurl, "ref")
-  newurl = remove_param(newurl, "refsrc")
-  newurl = remove_param(newurl, "referrer_id")
-  newurl = remove_param(newurl, "referrerid")
-  newurl = remove_param(newurl, "src")
-  newurl = remove_param(newurl, "i")
-  newurl = remove_param(newurl, "s")
-  newurl = remove_param(newurl, "ts")
-  newurl = remove_param(newurl, "feature")
+  if string.match(url, "^https?://[^/]+/%(S%([a-z0-9A-Z]+%)%)") then
+    return nil
+  end
+  local newurl = string.gsub(url, "([%?&;])amp;", "%1")
+  if url == current_url then
+    if newurl ~= url then
+      queued_urls[newurl] = true
+    end
+  end
+  for _, param_pattern in pairs(bad_params) do
+    newurl = remove_param(newurl, param_pattern)
+  end
+  for s in string.gmatch(string.lower(newurl), "([a-f0-9]+)") do
+    if string.len(s) == 32 then
+      return nil
+    end
+  end
   if newurl ~= url then
     queued_urls[newurl] = true
   end
-  newurl = string.match(url, "^([^%?&]+)")
-  if newurl ~= url then
-    queued_urls[newurl] = true
-  end
-  newurl = string.gsub(url, "([%?&])amp;", "%1")
+  newurl = string.match(newurl, "^([^%?&]+)")
   if newurl ~= url then
     queued_urls[newurl] = true
   end
@@ -77,6 +90,15 @@ report_bad_url = function(url)
   else
     bad_urls[string.lower(url)] = true
   end
+end
+
+strip_url = function(url)
+  url = string.match(url, "^https?://(.+)$")
+  newurl = string.match(url, "^www%.(.+)$")
+  if newurl then
+    url = newurl
+  end
+  return url
 end
 
 wget.callbacks.write_to_warc = function(url, http_stat)
@@ -96,6 +118,11 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 
   if status_code >= 300 and status_code <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
+    
+    --[[if strip_url(url["url"]) == strip_url(newloc) then
+      queued_urls[newloc] = true
+      return wget.actions.EXIT
+    end]]
     if downloaded[newloc]
       or string.match(newloc, "^https?://[^/]*google%.com/sorry") then
       report_bad_url(url["url"])
