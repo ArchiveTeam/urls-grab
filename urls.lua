@@ -24,6 +24,7 @@ local current_url = nil
 local bad_urls = {}
 local queued_urls = {}
 local bad_params = {}
+local bad_patterns = {}
 
 for param in io.open("bad-params", "r"):lines() do
   local param = string.gsub(
@@ -33,6 +34,10 @@ for param in io.open("bad-params", "r"):lines() do
     end
   )
   table.insert(bad_params, param)
+end
+
+for pattern in io.open("bad-patterns", "r"):lines() do
+  table.insert(bad_patterns, pattern)
 end
 
 bad_code = function(status_code)
@@ -160,11 +165,22 @@ end
 
 wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total_downloaded_bytes, total_download_time)
   local newurls = nil
+  local is_bad = false
   for url, _ in pairs(queued_urls) do
-    if newurls == nil then
-      newurls = url
-    else
-      newurls = newurls .. "\0" .. url
+    for _, pattern in pairs(bad_patterns) do
+      is_bad = string.match(url, pattern)
+      if is_bad then
+        break
+      end
+    end
+    if not is_bad then
+      io.stdout:write("Queuing URL " .. url .. ".\n")
+      io.stdout:flush()
+      if newurls == nil then
+        newurls = url
+      else
+        newurls = newurls .. "\0" .. url
+      end
     end
   end
 
