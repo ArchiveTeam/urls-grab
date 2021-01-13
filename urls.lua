@@ -130,7 +130,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     end]]
     if downloaded[newloc]
       or string.match(newloc, "^https?://[^/]*google%.com/sorry")
-      or string.match(newloc, "^https://www%.instagram%.com/accounts/login/") then
+      or string.match(newloc, "^https?://www%.instagram%.com/accounts/login/") then
       report_bad_url(url["url"])
       return wget.actions.EXIT
     end
