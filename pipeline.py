@@ -50,10 +50,10 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20201123.01'
+VERSION = '20210131.01'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
-TRACKER_HOST = 'trackerproxy.archiveteam.org'
+TRACKER_HOST = 'legacy-api.arpa.li'
 MULTI_ITEM_SIZE = 20
 
 ###########################################################################
@@ -282,7 +282,7 @@ project = Project(
 
 pipeline = Pipeline(
     CheckIP(),
-    GetItemFromTracker('http://{}/{}/multi={}/'
+    GetItemFromTracker('https://{}/{}/multi={}/'
         .format(TRACKER_HOST, TRACKER_ID, MULTI_ITEM_SIZE),
         downloader, VERSION),
     PrepareDirectories(warc_prefix='urls'),
@@ -311,7 +311,7 @@ pipeline = Pipeline(
         name='shared:rsync_threads', title='Rsync threads',
         description='The maximum number of concurrent uploads.'),
         UploadWithTracker(
-            'http://%s/%s' % (TRACKER_HOST, TRACKER_ID),
+            'https://%s/%s' % (TRACKER_HOST, TRACKER_ID),
             downloader=downloader,
             version=VERSION,
             files=[
@@ -329,7 +329,7 @@ pipeline = Pipeline(
         ),
     ),
     MaybeSendDoneToTracker(
-        tracker_url='http://%s/%s' % (TRACKER_HOST, TRACKER_ID),
+        tracker_url='https://%s/%s' % (TRACKER_HOST, TRACKER_ID),
         stats=ItemValue('stats')
     )
 )
