@@ -37,7 +37,7 @@ if StrictVersion(seesaw.__version__) < StrictVersion('0.8.5'):
 
 WGET_AT = find_executable(
     'Wget+AT',
-    ['GNU Wget 1.20.3-at.20201030.01'],
+    ['GNU Wget 1.20.3-at.20210212.01'],
     [
          './wget-at',
          '/home/warrior/data/wget-at'
@@ -53,7 +53,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20210221.02' # YES I SET THIS IN THE FUTURE, JUST MAKE IT HIGHER
+VERSION = '20210221.03' # YES I SET THIS IN THE FUTURE, JUST MAKE IT HIGHER
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
