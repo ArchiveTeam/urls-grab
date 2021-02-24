@@ -1,5 +1,6 @@
 local urlparse = require("socket.url")
 local http = require("socket.http")
+JSON = (loadfile "JSON.lua")()
 
 local item_dir = os.getenv('item_dir')
 local item_name = os.getenv("item_name")
@@ -107,7 +108,55 @@ strip_url = function(url)
 end
 
 wget.callbacks.write_to_warc = function(url, http_stat)
-  return not bad_code(http_stat["statcode"])
+  if bad_code(http_stat["statcode"]) then
+    return false
+  elseif http_stat["statcode"] ~= 200 then
+    return true
+  end
+  if http_stat["len"] > 5 * 1024 * 1024 then
+    io.stdout:write("Data larger than 5 MB. Checking with Wayback Machine.\n")
+    io.stdout:flush()
+    while true do
+      local body, code, headers, status = http.request(
+        "https://web.archive.org/__wb/calendarcaptures/2"
+          .. "?url=" .. urlparse.escape(url["url"])
+          .. "&date=20"
+      )
+      if code ~= 200 then
+        io.stdout:write("Got " .. tostring(code) .. " from the Wayback Machine.\n")
+        io.stdout:flush()
+        os.execute("sleep 10")
+      else
+        data = JSON:decode(body)
+        if not data["items"] or not data["colls"] then
+          return true
+        end
+        for _, item in pairs(data["items"]) do
+          if item[2] == 200 then
+            local coll_id = item[3] + 1
+            if not coll_id then
+              io.stdout:write("Could get coll ID.\n")
+              io.stdout:flush()
+            end
+            local collections = data["colls"][coll_id]
+            if not collections then
+              io.stdout:write("Could not get collections.\n")
+              io.stdout:flush()
+            end
+            for _, collection in pairs(collections) do
+              if collection == "archivebot"
+                or string.find(collection, "archiveteam") then
+                io.stdout:write("Archive Team got this URL before.\n")
+                return false
+              end
+            end
+          end
+        end
+        break
+      end
+    end
+  end
+  return true
 end
 
 wget.callbacks.httploop_result = function(url, err, http_stat)
