@@ -113,6 +113,9 @@ wget.callbacks.write_to_warc = function(url, http_stat)
   elseif http_stat["statcode"] ~= 200 then
     return true
   end
+  if true then
+    return true
+  end
   if http_stat["len"] > 5 * 1024 * 1024 then
     io.stdout:write("Data larger than 5 MB. Checking with Wayback Machine.\n")
     io.stdout:flush()
