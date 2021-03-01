@@ -147,7 +147,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  queue_url(url)
+  --queue_url(url)
+
   return false
 end
 
