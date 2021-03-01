@@ -2,9 +2,9 @@ local urlparse = require("socket.url")
 local http = require("socket.http")
 JSON = (loadfile "JSON.lua")()
 
-local item_dir = os.getenv('item_dir')
+local item_dir = os.getenv("item_dir")
 local item_name = os.getenv("item_name")
-local warc_file_base = os.getenv('warc_file_base')
+local warc_file_base = os.getenv("warc_file_base")
 
 local url_count = 0
 local downloaded = {}
@@ -30,8 +30,16 @@ local bad_urls = {}
 local queued_urls = {}
 local bad_params = {}
 local bad_patterns = {}
+local duplicate_urls = {}
 
-for param in io.open("bad-params", "r"):lines() do
+local dupes_file = io.open("duplicate-urls.txt", "r")
+for url in dupes_file:lines() do
+  duplicate_urls[url] = true
+end
+dupes_file:close()
+
+local bad_params_file = io.open("bad-params.txt", "r")
+for param in bad_params_file:lines() do
   local param = string.gsub(
     param, "([a-zA-Z])",
     function(c)
@@ -40,10 +48,13 @@ for param in io.open("bad-params", "r"):lines() do
   )
   table.insert(bad_params, param)
 end
+bad_params_file:close()
 
-for pattern in io.open("bad-patterns", "r"):lines() do
+local bad_patterns_file = io.open("bad-patterns.txt", "r")
+for pattern in bad_patterns_file:lines() do
   table.insert(bad_patterns, pattern)
 end
+bad_patterns_file:close()
 
 bad_code = function(status_code)
   return status_code == 0
@@ -56,6 +67,12 @@ bad_code = function(status_code)
     or status_code == 429
     or status_code == 451
     or status_code >= 500
+end
+
+queue_url = function(url)
+  if not duplicate_urls[url] then
+    queued_urls[url] = true
+  end
 end
 
 remove_param = function(url, param_pattern)
@@ -74,7 +91,7 @@ queue_new_urls = function(url)
   local newurl = string.gsub(url, "([%?&;])amp;", "%1")
   if url == current_url then
     if newurl ~= url then
-      queued_urls[newurl] = true
+      queue_url(newurl)
     end
   end
   for _, param_pattern in pairs(bad_params) do
@@ -86,11 +103,11 @@ queue_new_urls = function(url)
     end
   end
   if newurl ~= url then
-    queued_urls[newurl] = true
+    queue_url(newurl)
   end
   newurl = string.match(newurl, "^([^%?&]+)")
   if newurl ~= url then
-    queued_urls[newurl] = true
+    queue_url(newurl)
   end
 end
 
@@ -130,7 +147,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  queued_urls[url] = true
+  queue_url(url)
   return false
 end
 
@@ -247,6 +264,7 @@ end
 wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total_downloaded_bytes, total_download_time)
   local newurls = nil
   local is_bad = false
+  local dup_urls = io.open(item_dir .. '/' .. warc_file_base .. '_duplicate-urls.txt', 'w')
   for url, _ in pairs(queued_urls) do
     for _, pattern in pairs(bad_patterns) do
       is_bad = string.match(url, pattern)
@@ -257,6 +275,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     if not is_bad then
       io.stdout:write("Queuing URL " .. url .. ".\n")
       io.stdout:flush()
+      dup_urls:write(url .. "\n")
       if newurls == nil then
         newurls = url
       else
@@ -264,6 +283,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       end
     end
   end
+  dup_urls:close()
 
   if newurls ~= nil then
     local tries = 0

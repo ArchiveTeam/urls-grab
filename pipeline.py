@@ -8,6 +8,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import threading
 import time
 import string
 
@@ -26,6 +27,8 @@ import zstandard
 
 if StrictVersion(seesaw.__version__) < StrictVersion('0.8.5'):
     raise Exception('This pipeline needs seesaw version 0.8.5 or higher.')
+
+LOCK = threading.Lock()
 
 
 ###########################################################################
@@ -53,11 +56,12 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20210301.03'
+VERSION = '20210301.04'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
 MULTI_ITEM_SIZE = 100
+MAX_DUPES_LIST_SIZE = 10000
 
 ###########################################################################
 # This section defines project-specific tasks.
@@ -121,8 +125,12 @@ class PrepareDirectories(SimpleTask):
             time.strftime('%Y%m%d-%H%M%S')
         ])
 
+        if not os.path.isfile('duplicate-urls.txt'):
+            open('duplicate-urls.txt', 'w').close()
+
         open('%(item_dir)s/%(warc_file_base)s.warc.zst' % item, 'w').close()
         open('%(item_dir)s/%(warc_file_base)s_bad-urls.txt' % item, 'w').close()
+        open('%(item_dir)s/%(warc_file_base)s_duplicate-urls.txt' % item, 'w').close()
 
 
 class MoveFiles(SimpleTask):
@@ -151,6 +159,27 @@ class SetBadUrls(SimpleTask):
                 items.pop(index)
                 items_lower.pop(index)
         item['item_name'] = '\0'.join(items)
+
+
+class SetDuplicateUrls(SimpleTask):
+    def __init__(self):
+        SimpleTask.__init__(self, 'SetNewDuplicates')
+
+    def process(self, item):
+        with LOCK:
+            self._process(item)
+
+    def _process(self, item):
+        with open('duplicate-urls.txt', 'r') as f:
+            duplicates = {s.strip() for s in f}
+        with open('%(item_dir)s/%(warc_file_base)s_duplicate-urls.txt' % item, 'r') as f:
+            for url in f:
+                duplicates.add(url.strip())
+        with open('duplicate-urls.txt', 'w') as f:
+            # choose randomly, to cycle periodically popular URLs
+            duplicates = list(duplicates)
+            random.shuffle(duplicates)
+            f.write('\n'.join(duplicates[:MAX_DUPES_LIST_SIZE]))
 
 
 class MaybeSendDoneToTracker(SendDoneToTracker):
@@ -301,6 +330,7 @@ pipeline = Pipeline(
         }
     ),
     SetBadUrls(),
+    SetDuplicateUrls(),
     PrepareStatsForTracker(
         defaults={'downloader': downloader, 'version': VERSION},
         file_groups={
