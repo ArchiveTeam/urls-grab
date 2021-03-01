@@ -21,6 +21,10 @@ for url in string.gmatch(item_name, "([^\n]+)") do
   urls[string.lower(url)] = true
 end
 
+local status_code = nil
+
+local redirect_urls = {}
+
 local current_url = nil
 local bad_urls = {}
 local queued_urls = {}
@@ -107,6 +111,17 @@ strip_url = function(url)
   return url
 end
 
+wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_parsed, iri, verdict, reason)
+  local url = urlpos["url"]["url"]
+  local parenturl = parent["url"]
+
+  if redirect_urls[parent["url"]] then
+    return true
+  end
+
+  queued_urls[url] = true
+end
+
 wget.callbacks.write_to_warc = function(url, http_stat)
   if bad_code(http_stat["statcode"]) then
     return false
@@ -175,7 +190,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 
   if status_code >= 300 and status_code <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
-    
+    redirect_urls[url["url"]] = true
     --[[if strip_url(url["url"]) == strip_url(newloc) then
       queued_urls[newloc] = true
       return wget.actions.EXIT
