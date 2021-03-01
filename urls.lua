@@ -119,7 +119,19 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return true
   end
 
+  local tested = {}
+  for s in string.gmatch(url, "([^/]+)") do
+    if not tested[s] then
+      tested[s] = 0
+    end
+    tested[s] = tested[s] + 1
+    if tested[s] == 3 then
+      return false
+    end
+  end
+
   queued_urls[url] = true
+  return false
 end
 
 wget.callbacks.write_to_warc = function(url, http_stat)
