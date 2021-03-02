@@ -145,6 +145,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return true
   end
 
+  if not verdict then
+    return false
+  end
+
   local tested = {}
   for s in string.gmatch(url, "([^/]+)") do
     s = string.lower(s)
@@ -157,7 +161,31 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  --queue_url(url)
+  local _, count = string.gsub(url, "/", "")
+  if count >= 15 then
+    return false
+  end
+
+  if string.len(url) == string.len(parenturl) then
+    local index1, index2
+    temp_url = string.match(url, "^https?://(.+)$")
+    temp_parenturl = string.match(parenturl, "^https?://(.+)$")
+    local start_index = 1
+    repeat
+      index1 = string.find(temp_url, "/", start_index)
+      index2 = string.find(temp_parenturl, "/", start_index)
+      if index1 ~= index2 then
+        queue_url(url)
+        break
+      end
+      if index1 then
+        start_index = index1 + 1
+      end
+    until not index1 or not index2
+    return false
+  end
+
+  queue_url(url)
 
   return false
 end
