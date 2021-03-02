@@ -147,6 +147,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   local tested = {}
   for s in string.gmatch(url, "([^/]+)") do
+    s = string.lower(s)
     if not tested[s] then
       tested[s] = 0
     end
