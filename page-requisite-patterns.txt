@@ -1,0 +1,15 @@
+%.apng
+%.avif
+%.gif
+%.jpe?g
+%.jfif
+%.pjpeg
+%.pjp
+%.png
+%.svg
+%.webp
+%.bmp
+%.ico
+%.cur
+%.tif
+%.tiff

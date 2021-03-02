@@ -30,6 +30,7 @@ local bad_urls = {}
 local queued_urls = {}
 local bad_params = {}
 local bad_patterns = {}
+local page_requisite_patterns = {}
 local duplicate_urls = {}
 
 local dupes_file = io.open("duplicate-urls.txt", "r")
@@ -55,6 +56,12 @@ for pattern in bad_patterns_file:lines() do
   table.insert(bad_patterns, pattern)
 end
 bad_patterns_file:close()
+
+local page_requisite_patterns_file = io.open("page-requisite-patterns.txt", "r")
+for pattern in page_requisite_patterns_file:lines() do
+  table.insert(page_requisite_patterns, pattern)
+end
+page_requisite_patterns_file:close()
 
 bad_code = function(status_code)
   return status_code == 0
@@ -149,10 +156,6 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  if true then
-    return false
-  end
-
   local tested = {}
   for s in string.gmatch(url, "([^/]+)") do
     s = string.lower(s)
@@ -171,6 +174,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   if string.len(url) == string.len(parenturl) then
+    local good_url = false
     local index1, index2
     temp_url = string.match(url, "^https?://(.+)$")
     temp_parenturl = string.match(parenturl, "^https?://(.+)$")
@@ -179,19 +183,29 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       index1 = string.find(temp_url, "/", start_index)
       index2 = string.find(temp_parenturl, "/", start_index)
       if index1 ~= index2 then
-        queue_url(url)
+        good_url = true
         break
       end
       if index1 then
         start_index = index1 + 1
       end
     until not index1 or not index2
+    if not good_url then
+      return false
+    end
+  end
+
+  if urlpos["link_refresh_p"] then
+    queue_url(url)
     return false
   end
 
-  queue_url(url)
-
-  return false
+  for _, pattern in pairs(page_requisite_patterns) do
+    if string.match(url, pattern) then
+      queue_url(url)
+      return false
+    end
+  end
 end
 
 wget.callbacks.write_to_warc = function(url, http_stat)
