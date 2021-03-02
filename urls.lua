@@ -70,6 +70,15 @@ bad_code = function(status_code)
 end
 
 queue_url = function(url)
+  temp = ""
+  for c in string.gmatch(url, "(.)") do
+    local b = string.byte(c)
+    if b < 32 or b > 126 then
+      c = string.format("%%%02X", b)
+    end
+    temp = temp .. c
+  end
+  url = temp
   if not duplicate_urls[url] then
     queued_urls[url] = true
   end
@@ -147,7 +156,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  --queue_url(url)
+  queue_url(url)
 
   return false
 end
