@@ -201,6 +201,12 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   for _, pattern in pairs(page_requisite_patterns) do
+    if string.match(parenturl, pattern) then
+      return false
+    end
+  end
+
+  for _, pattern in pairs(page_requisite_patterns) do
     if string.match(url, pattern) then
       queue_url(url)
       return false
