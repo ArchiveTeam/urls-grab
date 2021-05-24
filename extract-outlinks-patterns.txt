@@ -726,7 +726,7 @@ news.sky.com
 news.tbs.co.jp
 news.vice.com
 news.vip-urlaub.de
-#news.yahoo.com
+news.yahoo.com
 news24.com
 newscentralasia.net
 newsletter.co.uk
@@ -1093,7 +1093,6 @@ wsj.com
 www3.nhk.or.jp
 wymondhamandattleboroughmercury.co.uk
 xinhuanet.com
-#yahoo.tumblr.com
 yarmouthadvertiser24.co.uk
 yemen-nn.com
 yenisafak.com
