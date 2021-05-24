@@ -394,7 +394,7 @@ feweek.co.uk
 fi.radiovaticana.va
 fightland.vice.com
 finance.qq.com
-finance.yahoo.com
+#finance.yahoo.com
 fiskeribladet.no
 flip.channelnewsasia.com
 forbes.com
@@ -726,7 +726,7 @@ news.sky.com
 news.tbs.co.jp
 news.vice.com
 news.vip-urlaub.de
-news.yahoo.com
+#news.yahoo.com
 news24.com
 newscentralasia.net
 newsletter.co.uk
@@ -898,7 +898,7 @@ sport.rbc.ru
 sport360.com
 sports.qq.com
 sports.vice.com
-sports.yahoo.com
+#sports.yahoo.com
 sq.radiovaticana.va
 standaard.be
 standard-freeholder.com
@@ -1093,7 +1093,7 @@ wsj.com
 www3.nhk.or.jp
 wymondhamandattleboroughmercury.co.uk
 xinhuanet.com
-yahoo.tumblr.com
+#yahoo.tumblr.com
 yarmouthadvertiser24.co.uk
 yemen-nn.com
 yenisafak.com
