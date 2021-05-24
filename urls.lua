@@ -33,6 +33,7 @@ local bad_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
 local extract_outlinks_patterns = {}
+local redirect_domains = {}
 
 local dupes_file = io.open("duplicate-urls.txt", "r")
 for url in dupes_file:lines() do
@@ -180,11 +181,14 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   for _, pattern in pairs(extract_outlinks_patterns) do
     if string.find(string.match(parenturl, "^https?://([^/]+)"), pattern, 1, true) then
       extract_page_requisites = true
---      if string.match(parenturl, "^https?://([^/]+)") ~= string.match(url, "^https?://([^/]+)") then
-        if not string.find(string.match(url, "^https?://([^/]+)"), pattern, 1, true) then
-        queue_url(url)
-        return false
+      local new_domain = string.match(url, "^https?://([^/]+)")
+      for domain, _ in pairs(redirect_domains) do
+        if string.find(new_domain, domain, 1, true) then
+          return false
+        end
       end
+      queue_url(url)
+      return false
     end
   end
 
@@ -303,6 +307,11 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
   io.stdout:flush()
 
+  if redirect_domains["done"] then
+    redirect_domains = {}
+  end
+  redirect_domains[string.match(url["url"], "^https?://([^/]+)")] = true
+
   if status_code >= 300 and status_code <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
     redirect_urls[url["url"]] = true
@@ -317,6 +326,8 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     if downloaded[newloc] then
       return wget.actions.EXIT
     end
+  else
+    redirect_domains["done"] = true
   end
 
   if downloaded[url["url"]] then
