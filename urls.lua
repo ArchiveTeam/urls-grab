@@ -180,7 +180,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   for _, pattern in pairs(extract_outlinks_patterns) do
     if string.find(string.match(parenturl, "^https?://([^/]+)"), pattern, 1, true) then
       extract_page_requisites = true
-      if string.match(parenturl, "^https?://([^/]+)") ~= string.match(url, "^https?://([^/]+)") then
+--      if string.match(parenturl, "^https?://([^/]+)") ~= string.match(url, "^https?://([^/]+)") then
+        if not string.find(string.match(url, "^https?://([^/]+)"), pattern, 1, true) then
         queue_url(url)
         return false
       end
