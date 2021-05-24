@@ -179,7 +179,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   local domain_pattern = "^https?://([^/]+)/" --"([^%./]+%.[^%./]+)/"
   for _, pattern in pairs(extract_outlinks_patterns) do
-    if string.match(parenturl, pattern, 1, true) then
+    if string.match(string.match(parenturl, "^https?://([^/]+)"), pattern, 1, true) then
       extract_page_requisites = true
       if string.match(parenturl, domain_pattern) ~= string.match(url, domain_pattern) then
         queue_url(url)
