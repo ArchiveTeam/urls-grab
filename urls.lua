@@ -32,6 +32,7 @@ local bad_params = {}
 local bad_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
+local extract_outlinks_patterns = {}
 
 local dupes_file = io.open("duplicate-urls.txt", "r")
 for url in dupes_file:lines() do
@@ -62,6 +63,12 @@ for pattern in page_requisite_patterns_file:lines() do
   table.insert(page_requisite_patterns, pattern)
 end
 page_requisite_patterns_file:close()
+
+local extract_outlinks_patterns_file = io.open("extract-outlinks-patterns.txt", "r")
+for pattern in extract_outlinks_patterns_file:lines() do
+  table.insert(extract_outlinks_patterns, pattern)
+end
+extract_outlinks_patterns_file:close()
 
 bad_code = function(status_code)
   return status_code == 0
@@ -147,17 +154,10 @@ end
 wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_parsed, iri, verdict, reason)
   local url = urlpos["url"]["url"]
   local parenturl = parent["url"]
+  local extract_page_requisites = false
 
   if redirect_urls[parent["url"]] then
     return true
-  end
-
-  if true then
-    return false
-  end
-
-  if not verdict then
-    return false
   end
 
   local tested = {}
@@ -174,6 +174,25 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   local _, count = string.gsub(url, "/", "")
   if count >= 15 then
+    return false
+  end
+
+  local domain_pattern = "^https?://([^/]+)/" --"([^%./]+%.[^%./]+)/"
+  for _, pattern in pairs(extract_outlinks_patterns) do
+    if string.match(parenturl, pattern, 1, true) then
+      extract_page_requisites = true
+      if string.match(parenturl, domain_pattern) ~= string.match(url, domain_pattern) then
+        queue_url(url)
+        return false
+      end
+    end
+  end
+
+  if not extract_page_requisites then
+    return false
+  end
+
+  if not verdict then
     return false
   end
 
