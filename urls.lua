@@ -67,9 +67,21 @@ page_requisite_patterns_file:close()
 
 local extract_outlinks_patterns_file = io.open("extract-outlinks-patterns.txt", "r")
 for pattern in extract_outlinks_patterns_file:lines() do
-  table.insert(extract_outlinks_patterns, pattern)
+  extract_outlinks_patterns[pattern] = true
 end
 extract_outlinks_patterns_file:close()
+
+check_domain_outlinks = function(url, target)
+  local parent = string.match(url, "^https?://([^/]+)")
+  while parent do
+    if (not target and extract_outlinks_patterns[parent])
+      or (target and parent == target) then
+      return parent
+    end
+    parent = string.match(parent, "^[^%.]+%.(.+)$")
+  end
+  return false
+end
 
 bad_code = function(status_code)
   return status_code == 0
@@ -179,14 +191,12 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  for _, pattern in pairs(extract_outlinks_patterns) do
-    if string.find(string.match(parenturl, "^https?://([^/]+)"), pattern, 1, true) then
-      extract_page_requisites = true
---      if string.match(parenturl, "^https?://([^/]+)") ~= string.match(url, "^https?://([^/]+)") then
-        if not string.find(string.match(url, "^https?://([^/]+)"), pattern, 1, true) then
-        queue_url(url)
-        return false
-      end
+  local domain_match = check_domain_outlinks(parenturl)
+  if domain_match then
+    extract_page_requisites = true
+    if not check_domain_outlinks(url, domain_match) then
+      queue_url(url)
+      return false
     end
   end
 
