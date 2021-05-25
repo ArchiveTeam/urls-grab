@@ -95,6 +95,7 @@ queue_url = function(url)
   end
   url = temp
   if not duplicate_urls[url] then
+--if not queued_urls[url] then print('queuing',url) end
     queued_urls[url] = true
   end
 end
@@ -181,14 +182,11 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   for _, pattern in pairs(extract_outlinks_patterns) do
     if string.find(string.match(parenturl, "^https?://([^/]+)"), pattern, 1, true) then
       extract_page_requisites = true
-      local new_domain = string.match(url, "^https?://([^/]+)")
-      for domain, _ in pairs(redirect_domains) do
-        if string.find(new_domain, domain, 1, true) then
-          return false
-        end
+--      if string.match(parenturl, "^https?://([^/]+)") ~= string.match(url, "^https?://([^/]+)") then
+        if not string.find(string.match(url, "^https?://([^/]+)"), pattern, 1, true) then
+        queue_url(url)
+        return false
       end
-      queue_url(url)
-      return false
     end
   end
 
