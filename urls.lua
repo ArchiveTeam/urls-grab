@@ -34,6 +34,7 @@ local page_requisite_patterns = {}
 local duplicate_urls = {}
 local extract_outlinks_patterns = {}
 local redirect_domains = {}
+local checked_domains = {}
 
 local dupes_file = io.open("duplicate-urls.txt", "r")
 for url in dupes_file:lines() do
@@ -191,8 +192,15 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  local domain_match = check_domain_outlinks(parenturl)
-  if domain_match then
+  local domain_match = checked_domains[parenturl]
+  if not domain_match then
+    domain_match = check_domain_outlinks(parenturl)
+    if not domain_match then
+      domain_match = "none"
+    end
+    checked_domains[parenturl] = domain_match
+  end
+  if domain_match ~= "none" then
     extract_page_requisites = true
     if not check_domain_outlinks(url, domain_match) then
       queue_url(url)
