@@ -33,6 +33,7 @@ local bad_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
 local extract_outlinks_patterns = {}
+local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
 
@@ -192,13 +193,13 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  local domain_match = checked_domains[parenturl]
+  local domain_match = checked_domains[item_first_url]
   if not domain_match then
-    domain_match = check_domain_outlinks(parenturl)
+    domain_match = check_domain_outlinks(item_first_url)
     if not domain_match then
       domain_match = "none"
     end
-    checked_domains[parenturl] = domain_match
+    checked_domains[item_first_url] = domain_match
   end
   if domain_match ~= "none" then
     extract_page_requisites = true
@@ -333,8 +334,12 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 
   if redirect_domains["done"] then
     redirect_domains = {}
+    item_first_url = nil
   end
   redirect_domains[string.match(url["url"], "^https?://([^/]+)")] = true
+  if not item_first_url then
+    item_first_url = url["url"]
+  end
 
   if status_code >= 300 and status_code <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
