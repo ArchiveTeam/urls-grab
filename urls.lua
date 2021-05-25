@@ -202,7 +202,15 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
   if domain_match ~= "none" then
     extract_page_requisites = true
-    if not check_domain_outlinks(url) then
+    local newurl_domain = string.match(url, "^https?://([^/]+)")
+    local to_queue = true
+    for domain, _ in pairs(redirect_domains) do
+      if check_domain_outlinks(url, domain) then
+        to_queue = false
+        break
+      end
+    end
+    if to_queue then
       queue_url(url)
       return false
     end
