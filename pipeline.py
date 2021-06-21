@@ -66,10 +66,9 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20210621.01'
+VERSION = '20210621.02'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
-with open('user-agents.txt', 'r') as f:
-    USER_AGENT = random.choice(list(f)).strip()
+
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
 MULTI_ITEM_SIZE = 40
@@ -264,6 +263,8 @@ class ZstdDict(object):
 
 class WgetArgs(object):
     def realize(self, item):
+        with open('user-agents.txt', 'r') as f:
+            USER_AGENT = random.choice(list(f)).strip()
         wget_args = [
             'timeout', '1000',
             WGET_AT,
