@@ -357,7 +357,8 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       queued_urls[newloc] = true
       return wget.actions.EXIT
     end]]
-    if string.match(newloc, "^https?://[^/]*google%.com/sorry") then
+    if string.match(newloc, "^https?://[^/]*google%.com/sorry")
+      or string.match(newloc, "^https?://consent%.youtube%.com/") then
       report_bad_url(url["url"])
       return wget.actions.EXIT
     end
