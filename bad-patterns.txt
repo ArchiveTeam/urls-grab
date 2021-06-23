@@ -1,3 +1,4 @@
 /action/consumeSharedSessionAction
 /action/consumeSsoCookie
 /action/getSharedSiteSession
+/juris/error%.jsf
