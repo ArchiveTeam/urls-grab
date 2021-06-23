@@ -341,6 +341,10 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     item_first_url = url["url"]
   end
 
+  if status_code >= 200 and status_code < 400 then
+    queue_new_urls(url["url"])
+  end
+
   if status_code >= 300 and status_code <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
     redirect_urls[url["url"]] = true
@@ -352,9 +356,11 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       report_bad_url(url["url"])
       return wget.actions.EXIT
     end
-    if downloaded[newloc] then
-      return wget.actions.EXIT
+    if not downloaded[newloc] then
+      print('queuing', newloc)
+      queue_url(newloc)
     end
+    return wget.actions.EXIT
   else
     redirect_domains["done"] = true
   end
@@ -365,10 +371,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   
   if status_code >= 200 and status_code <= 399 then
     downloaded[url["url"]] = true
-  end
-
-  if status_code >= 200 and status_code < 300 then
-    queue_new_urls(url["url"])
   end
 
   if bad_code(status_code) then
