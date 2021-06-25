@@ -2,3 +2,5 @@
 /action/consumeSsoCookie
 /action/getSharedSiteSession
 /juris/error%.jsf
+facebook%.com/login%.php
+facebook%.com/cookie/
