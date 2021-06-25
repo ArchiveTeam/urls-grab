@@ -170,7 +170,7 @@ end
 wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_parsed, iri, verdict, reason)
   local url = urlpos["url"]["url"]
   local parenturl = parent["url"]
-  local extract_page_requisites = true
+  local extract_page_requisites = false
 
   if redirect_urls[parent["url"]] then
     return true
