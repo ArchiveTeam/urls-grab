@@ -170,7 +170,7 @@ end
 wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_parsed, iri, verdict, reason)
   local url = urlpos["url"]["url"]
   local parenturl = parent["url"]
-  local extract_page_requisites = false
+  local extract_page_requisites = true
 
   if redirect_urls[parent["url"]] then
     return true
@@ -230,7 +230,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  if string.len(url) == string.len(parenturl) then
+  --[[if string.len(url) == string.len(parenturl) then
     local good_url = false
     local index1, index2
     temp_url = string.match(url, "^https?://(.+)$")
@@ -250,7 +250,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     if not good_url then
       return false
     end
-  end
+  end]]
 
   if urlpos["link_refresh_p"] ~= 0 then
     queue_url(url)
