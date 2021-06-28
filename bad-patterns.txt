@@ -4,3 +4,4 @@
 /juris/error%.jsf
 facebook%.com/login%.php
 facebook%.com/cookie/
+gongquiz%.com.+&historyNo=[0-9]+
