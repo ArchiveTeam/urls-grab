@@ -5,3 +5,4 @@
 facebook%.com/login%.php
 facebook%.com/cookie/
 gongquiz%.com.+&historyNo=[0-9]+
+univis%.univie%.ac%.at/ausschreibungstellensuche/
