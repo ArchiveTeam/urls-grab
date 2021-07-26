@@ -9,6 +9,7 @@ local warc_file_base = os.getenv("warc_file_base")
 local url_count = 0
 local downloaded = {}
 local abortgrab = false
+local exit_url = false
 
 if urlparse == nil or http == nil then
   io.stdout:write("socket not corrently installed.\n")
@@ -274,6 +275,16 @@ end
 wget.callbacks.write_to_warc = function(url, http_stat)
   if bad_code(http_stat["statcode"]) then
     return false
+  elseif http_stat["statcode"] >= 300 and http_stat["statcode"] <= 399 then
+    local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
+    if string.match(newloc, "^https?://[^/]*google%.com/sorry")
+      or string.match(newloc, "^https?://consent%.youtube%.com/")
+      or string.match(newloc, "^https?://consent%.google%.com/") then
+      report_bad_url(url["url"])
+      exit_url = true
+      return false
+    end
+    return true
   elseif http_stat["statcode"] ~= 200 then
     return true
   end
@@ -346,6 +357,11 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     item_first_url = url["url"]
   end
 
+  if exit_url then
+    exit_url = false
+    return wget.actions.EXIT
+  end
+
   if status_code >= 300 and status_code <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
     redirect_urls[url["url"]] = true
@@ -353,12 +369,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       queued_urls[newloc] = true
       return wget.actions.EXIT
     end]]
-    if string.match(newloc, "^https?://[^/]*google%.com/sorry")
-      or string.match(newloc, "^https?://consent%.youtube%.com/")
-      or string.match(newloc, "^https?://consent%.google%.com/") then
-      report_bad_url(url["url"])
-      return wget.actions.EXIT
-    end
     if downloaded[newloc] then
       return wget.actions.EXIT
     end
