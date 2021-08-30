@@ -279,7 +279,9 @@ wget.callbacks.write_to_warc = function(url, http_stat)
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
     if string.match(newloc, "^https?://[^/]*google%.com/sorry")
       or string.match(newloc, "^https?://consent%.youtube%.com/")
-      or string.match(newloc, "^https?://consent%.google%.com/") then
+      or string.match(newloc, "^https?://consent%.google%.com/")
+      or string.match(newloc, "^https?://misuse%.ncbi%.nlm%.nih%.gov/")
+      or string.match(newloc, "^https?://myprivacy%.dpgmedia%.nl/") then
       report_bad_url(url["url"])
       exit_url = true
       return false
