@@ -264,6 +264,14 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
+  for old_parent_url, _ in pairs(redirect_urls) do
+    for _, pattern in pairs(page_requisite_patterns) do
+      if string.match(old_parent_url, pattern) then
+        return false
+      end
+    end
+  end
+
   for _, pattern in pairs(page_requisite_patterns) do
     if string.match(url, pattern) then
       queue_url(url)
@@ -352,6 +360,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 
   if redirect_domains["done"] then
     redirect_domains = {}
+    redirect_urls = {}
     item_first_url = nil
   end
   redirect_domains[string.match(url["url"], "^https?://([^/]+)")] = true
