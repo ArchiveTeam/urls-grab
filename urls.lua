@@ -253,7 +253,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end]]
 
-  if urlpos["link_refresh_p"] ~= 0 or urlpos["link_inline_p"] ~= 0 then
+  if urlpos["link_refresh_p"] ~= 0 then
     queue_url(url)
     return false
   end
@@ -264,7 +264,12 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  for old_parent_url, _ in pairs(redirect_urls) do
+  if urlpos["link_inline_p"] ~= 0 then
+    queue_url(url)
+    return false
+  end
+
+  --[[for old_parent_url, _ in pairs(redirect_urls) do
     for _, pattern in pairs(page_requisite_patterns) do
       if string.match(old_parent_url, pattern) then
         return false
@@ -277,7 +282,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       queue_url(url)
       return false
     end
-  end
+  end]]
 end
 
 wget.callbacks.write_to_warc = function(url, http_stat)

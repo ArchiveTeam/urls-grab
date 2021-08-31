@@ -13,3 +13,5 @@
 %.cur
 %.tif
 %.tiff
+%.js
+%.css
