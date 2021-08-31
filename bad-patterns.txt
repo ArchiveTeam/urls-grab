@@ -7,3 +7,10 @@ facebook%.com/cookie/
 gongquiz%.com.+&historyNo=[0-9]+
 univis%.univie%.ac%.at/ausschreibungstellensuche/
 fundraise%.cancerresearchuk%.org/signup/account/
+mma%.ft%.com
+^https?://dmg%.go%-2b%-planer%.de/
+^https?://3d%.espace%-aubade%.fr/
+^https?://kuechenplaner%.[^%.]+%.de/cloud/
+^https?://3d%-salledebains%.geberit%.fr/
+^https?://bibliotekanauki%.ceon%.pl/yadda/search/general%.action
+^https?://[^/]+%.icm%.edu%.pl/.*search/article%.action
