@@ -253,7 +253,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end]]
 
-  if urlpos["link_refresh_p"] ~= 0 then
+  if urlpos["link_refresh_p"] ~= 0 or urlpos["link_inline_p"] ~= 0 then
     queue_url(url)
     return false
   end
