@@ -110,7 +110,7 @@ queue_url = function(url)
   end
   url = temp
   if not duplicate_urls[url] then
---if not queued_urls[url] then print('queuing',url) end
+if not queued_urls[url] then print('queuing',url) end
     queued_urls[url] = true
   end
 end

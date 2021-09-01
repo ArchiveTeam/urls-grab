@@ -16,3 +16,4 @@ mma%.ft%.com
 ^https?://[^/]+%.icm%.edu%.pl/.*search/article%.action
 ^https?://interamt%.de/koop/app/
 ^https?://tesiunam%.dgb%.unam%.mx/F/
+^https?://alcantarilla%.sedelectronica%.es/%?x=
