@@ -25,6 +25,7 @@ end
 local status_code = nil
 
 local redirect_urls = {}
+local visited_urls = {}
 
 local uuid = ""
 for _, i in pairs({8, 4, 4, 4, 12}) do
@@ -47,6 +48,9 @@ local extract_outlinks_patterns = {}
 local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
+
+local parenturl_uuid = nil
+local parenturl_requisite = nil
 
 local dupes_file = io.open("duplicate-urls.txt", "r")
 for url in dupes_file:lines() do
@@ -183,7 +187,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local parenturl = parent["url"]
   local extract_page_requisites = false
 
-  if redirect_urls[parent["url"]] then
+  if redirect_urls[parenturl] then
     return true
   end
 
@@ -263,7 +267,16 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end]]
 
-  if string.match(url, uuid) then
+  if parenturl_uuid == nil then
+    parenturl_uuid = false
+    for old_parent_url, _ in pairs(visited_urls) do
+      if string.match(old_parent_url, uuid) then
+        parenturl_uuid = true
+        break
+      end
+    end
+  end
+  if parenturl_uuid and string.match(url, uuid) then
     return false
   end
 
@@ -272,10 +285,22 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  for _, pattern in pairs(page_requisite_patterns) do
-    if string.match(parenturl, pattern) then
-      return false
+  if parenturl_requisite == nil then
+    parenturl_requisite = false
+    for _, pattern in pairs(page_requisite_patterns) do
+      for old_parent_url, _ in pairs(visited_urls) do
+        if string.match(old_parent_url, pattern) then
+          parenturl_requisite = true
+          break
+        end
+      end
+      if parenturl_requisite then
+        break
+      end
     end
+  end
+  if parenturl_requisite then
+    return false
   end
 
   if urlpos["link_inline_p"] ~= 0 then
@@ -283,7 +308,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  --[[for old_parent_url, _ in pairs(redirect_urls) do
+  --[[for old_parent_url, _ in pairs(visited_urls) do
     for _, pattern in pairs(page_requisite_patterns) do
       if string.match(old_parent_url, pattern) then
         return false
@@ -369,6 +394,9 @@ end
 wget.callbacks.httploop_result = function(url, err, http_stat)
   status_code = http_stat["statcode"]
 
+  parenturl_uuid = nil
+  parenturl_requisite = nil
+
   if urls[string.lower(url["url"])] then
     current_url = string.lower(url["url"])
   end
@@ -384,12 +412,15 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   if redirect_domains["done"] then
     redirect_domains = {}
     redirect_urls = {}
+    visited_urls = {}
     item_first_url = nil
   end
   redirect_domains[string.match(url["url"], "^https?://([^/]+)")] = true
   if not item_first_url then
     item_first_url = url["url"]
   end
+
+  visited_urls[url["url"]] = true
 
   if exit_url then
     exit_url = false
