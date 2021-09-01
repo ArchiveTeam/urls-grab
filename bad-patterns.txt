@@ -14,3 +14,5 @@ mma%.ft%.com
 ^https?://3d%-salledebains%.geberit%.fr/
 ^https?://bibliotekanauki%.ceon%.pl/yadda/search/general%.action
 ^https?://[^/]+%.icm%.edu%.pl/.*search/article%.action
+^https?://interamt%.de/koop/app/
+^https?://tesiunam%.dgb%.unam%.mx/F/
