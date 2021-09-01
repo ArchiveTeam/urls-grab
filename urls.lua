@@ -26,6 +26,16 @@ local status_code = nil
 
 local redirect_urls = {}
 
+local uuid = ""
+for _, i in pairs({8, 4, 4, 4, 12}) do
+  for j=1,i do
+    uuid = uuid .. "[0-9a-fA-F]"
+  end
+  if i ~= 12 then
+    uuid = uuid .. "%-"
+  end
+end
+
 local current_url = nil
 local bad_urls = {}
 local queued_urls = {}
@@ -252,6 +262,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       return false
     end
   end]]
+
+  if string.match(url, uuid) then
+    return false
+  end
 
   if urlpos["link_refresh_p"] ~= 0 then
     queue_url(url)
