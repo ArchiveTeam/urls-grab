@@ -358,6 +358,10 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   if urls[string.lower(url["url"])] then
     current_url = string.lower(url["url"])
   end
+
+  if status_code >= 200 then
+    queue_url(string.match(url["url"], "^(https?://[^/]+)") .. "/robots.txt")
+  end
   
   url_count = url_count + 1
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
