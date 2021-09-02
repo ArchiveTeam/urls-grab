@@ -38,12 +38,13 @@ for _, i in pairs({8, 4, 4, 4, 12}) do
   end
 end
 ids_to_ignore[uuid] = true
-local to_ignore = "?"
+local to_ignore = ""
 for i=1,9 do
   to_ignore = to_ignore .. "[0-9]"
 end
-ids_to_ignore[to_ignore .. "$"] = true
-ids_to_ignore[to_ignore .. "[0-9]$"] = true
+ids_to_ignore["%?" .. to_ignore .. "$"] = true
+ids_to_ignore["%?" .. to_ignore .. "[0-9]$"] = true
+ids_to_ignore[to_ignore .. "[0-9]%.[0-9][0-9][0-9][0-9]$"] = true
 
 local current_url = nil
 local bad_urls = {}
@@ -132,7 +133,7 @@ queue_url = function(url)
   end
   url = temp
   if not duplicate_urls[url] then
---if not queued_urls[url] then print('queuing',url) end
+if not queued_urls[url] then print('queuing',url) end
     queued_urls[url] = true
   end
 end
