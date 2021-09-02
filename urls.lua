@@ -45,6 +45,11 @@ end
 ids_to_ignore["%?" .. to_ignore .. "$"] = true
 ids_to_ignore["%?" .. to_ignore .. "[0-9]$"] = true
 ids_to_ignore[to_ignore .. "[0-9]%.[0-9][0-9][0-9][0-9]$"] = true
+to_ignore = ""
+for i=1,50 do
+  to_ignore = to_ignore .. "[0-9a-zA-Z]"
+end
+ids_to_ignore[to_ignore .. "%-[0-9][0-9][0-9][0-9][0-9]"] = true
 
 local current_url = nil
 local bad_urls = {}
@@ -133,7 +138,7 @@ queue_url = function(url)
   end
   url = temp
   if not duplicate_urls[url] then
-if not queued_urls[url] then print('queuing',url) end
+--if not queued_urls[url] then print('queuing',url) end
     queued_urls[url] = true
   end
 end
