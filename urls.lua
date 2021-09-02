@@ -27,6 +27,7 @@ local status_code = nil
 local redirect_urls = {}
 local visited_urls = {}
 
+local ids_to_ignore = {}
 local uuid = ""
 for _, i in pairs({8, 4, 4, 4, 12}) do
   for j=1,i do
@@ -36,6 +37,13 @@ for _, i in pairs({8, 4, 4, 4, 12}) do
     uuid = uuid .. "%-"
   end
 end
+ids_to_ignore[uuid] = true
+local to_ignore = "?"
+for i=1,9 do
+  to_ignore = to_ignore .. "[0-9]"
+end
+ids_to_ignore[to_ignore .. "$"] = true
+ids_to_ignore[to_ignore .. "[0-9]$"] = true
 
 local current_url = nil
 local bad_urls = {}
@@ -270,14 +278,23 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   if parenturl_uuid == nil then
     parenturl_uuid = false
     for old_parent_url, _ in pairs(visited_urls) do
-      if string.match(old_parent_url, uuid) then
-        parenturl_uuid = true
+      for id_to_ignore, _ in pairs(ids_to_ignore) do
+        if string.match(old_parent_url, id_to_ignore) then
+          parenturl_uuid = true
+          break
+        end
+      end
+      if parenturl_uuid then
         break
       end
     end
   end
-  if parenturl_uuid and string.match(url, uuid) then
-    return false
+  if parenturl_uuid then
+    for id_to_ignore, _ in pairs(ids_to_ignore) do
+      if string.match(url, id_to_ignore) then
+        return false
+      end
+    end
   end
 
   if urlpos["link_refresh_p"] ~= 0 then
