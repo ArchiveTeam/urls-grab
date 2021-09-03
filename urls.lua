@@ -127,6 +127,25 @@ bad_code = function(status_code)
     or status_code >= 500
 end
 
+find_path_loop = function(url, max_repetitions)
+  local tested = {}
+  for s in string.gmatch(url, "([^/]+)") do
+    s = string.lower(s)
+    if not tested[s] then
+      if s == "" then
+        tested[s] = -1
+      else
+        tested[s] = 0
+      end
+    end
+    tested[s] = tested[s] + 1
+    if tested[s] == max_repetitions then
+      return true
+    end
+  end
+  return false
+end
+
 queue_url = function(url)
   temp = ""
   for c in string.gmatch(url, "(.)") do
@@ -137,8 +156,11 @@ queue_url = function(url)
     temp = temp .. c
   end
   url = temp
-  if not duplicate_urls[url] then
---if not queued_urls[url] then print('queuing',url) end
+  if not duplicate_urls[url] and not queued_urls[url] then
+    if find_path_loop(url, 2) then
+      return false
+    end
+--print('queuing',url)
     queued_urls[url] = true
   end
 end
@@ -205,16 +227,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return true
   end
 
-  local tested = {}
-  for s in string.gmatch(url, "([^/]+)") do
-    s = string.lower(s)
-    if not tested[s] then
-      tested[s] = 0
-    end
-    tested[s] = tested[s] + 1
-    if tested[s] == 3 then
-      return false
-    end
+  if find_path_loop(url, max_repetitions) then
+    return false
   end
 
   local _, count = string.gsub(url, "/", "")
