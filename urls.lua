@@ -56,6 +56,7 @@ for i=1,50 do
   to_ignore = to_ignore .. "[0-9a-zA-Z]"
 end
 ids_to_ignore[to_ignore .. "%-[0-9][0-9][0-9][0-9][0-9]"] = true
+ids_to_ignore["[0-9a-zA-Z%-_]!%-?[0-9]"] = true
 
 local current_url = nil
 local current_settings = nil
