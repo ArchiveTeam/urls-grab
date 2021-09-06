@@ -217,7 +217,7 @@ queue_new_urls = function(url)
   if string.match(url, "^https?://[^/]+/%(S%([a-z0-9A-Z]+%)%)") then
     return nil
   end
-  local newurl = string.gsub(url, "([%?&;])amp;", "%1")
+  local newurl = string.gsub(url, "([%?&;])[aA][mM][pP];", "%1")
   if url == current_url then
     if newurl ~= url then
       queue_url(newurl)
@@ -470,13 +470,13 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   if status_code == 200 and current_settings and current_settings["deep_extract"] then
     print('deep extract')
     html = read_file(file)
-    for newurl in string.gmatch(html, "[^%-]href='([^']+)'") do
+    for newurl in string.gmatch(html, "[^%-][hH][rR][eE][fF]='([^']+)'") do
       checknewshorturl(newurl)
     end
-    for newurl in string.gmatch(html, '[^%-]href="([^"]+)"') do
+    for newurl in string.gmatch(html, '[^%-][hH][rR][eE][fF]="([^"]+)"') do
       checknewshorturl(newurl)
     end
-    for newurl in string.gmatch(string.gsub(html, "&quot;", '"'), '"(https?://[^"]+)') do
+    for newurl in string.gmatch(string.gsub(html, "&[qQ][uU][oO][tT];", '"'), '"(https?://[^"]+)') do
       checknewurl(newurl)
     end
     for newurl in string.gmatch(string.gsub(html, "&#039;", "'"), "'(https?://[^']+)") do
