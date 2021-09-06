@@ -165,6 +165,13 @@ find_path_loop = function(url, max_repetitions)
 end
 
 queue_url = function(url)
+  load_setting_depth = function(s)
+    n = tonumber(current_settings[s])
+    if n == nil then
+      n = 0
+    end
+    return n
+  end
   temp = ""
   for c in string.gmatch(url, "(.)") do
     local b = string.byte(c)
@@ -175,24 +182,31 @@ queue_url = function(url)
   end
   url = temp
   if current_settings and current_settings["all"] then
-    local depth = tonumber(current_settings["depth"])
-    if depth == nil then
-      depth = 0
-    end
+    local depth = load_setting_depth("depth")
+    local keep_random = load_setting_depth("keep_random")
     depth = depth - 1
+    keep_random = keep_random - 1
     if depth >= 0 then
+      local random = current_settings["random"]
+      if keep_random < 0 then
+        random = nil
+        keep_random = nil
+      end
       local settings = {
         depth=depth,
         all=1,
-        random=current_settings["random"],
+        random=random,
+        keep_random=keep_random,
         url=url
       }
       url = "custom:"
-      for k, v in pairs(settings) do
+      for _, k in pairs({'all', 'depth', 'keep_random', 'random', 'url'}) do
+        local v = settings[k]
         if v ~= nil then
           url = url .. k .. "=" .. urlparse.escape(tostring(v)) .. "&"
         end
       end
+      url = string.sub(url, 1, -2)
     end
   end
   if not duplicate_urls[url] and not queued_urls[url] then
