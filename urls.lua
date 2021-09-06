@@ -290,8 +290,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  local _, count = string.gsub(url, "/", "")
-  if count >= 15 then
+  local _, count = string.gsub(url, "[/%?]", "")
+  if count >= 16 then
     return false
   end
 
