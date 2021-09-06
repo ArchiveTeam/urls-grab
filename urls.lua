@@ -4,6 +4,7 @@ JSON = (loadfile "JSON.lua")()
 
 local item_dir = os.getenv("item_dir")
 local item_name = os.getenv("item_name")
+local custom_items = os.getenv("custom_items")
 local warc_file_base = os.getenv("warc_file_base")
 
 local url_count = 0
@@ -20,6 +21,11 @@ end
 local urls = {}
 for url in string.gmatch(item_name, "([^\n]+)") do
   urls[string.lower(url)] = true
+end
+
+local urls_settings = JSON:decode(custom_items)
+for k, _ in pairs(urls_settings) do
+  urls[string.lower(k)] = true
 end
 
 local status_code = nil
@@ -52,6 +58,7 @@ end
 ids_to_ignore[to_ignore .. "%-[0-9][0-9][0-9][0-9][0-9]"] = true
 
 local current_url = nil
+local current_settings = nil
 local bad_urls = {}
 local queued_urls = {}
 local bad_params = {}
@@ -101,6 +108,17 @@ for pattern in extract_outlinks_patterns_file:lines() do
   extract_outlinks_patterns[pattern] = true
 end
 extract_outlinks_patterns_file:close()
+
+read_file = function(file)
+  if file then
+    local f = assert(io.open(file))
+    local data = f:read("*all")
+    f:close()
+    return data
+  else
+    return ""
+  end
+end
 
 check_domain_outlinks = function(url, target)
   local parent = string.match(url, "^https?://([^/]+)")
@@ -156,6 +174,27 @@ queue_url = function(url)
     temp = temp .. c
   end
   url = temp
+  if current_settings and current_settings["all"] then
+    local depth = tonumber(current_settings["depth"])
+    if depth == nil then
+      depth = 0
+    end
+    depth = depth - 1
+    if depth >= 0 then
+      local settings = {
+        depth=depth,
+        all=1,
+        random=current_settings["random"],
+        url=url
+      }
+      url = "custom:"
+      for k, v in pairs(settings) do
+        if v ~= nil then
+          url = url .. k .. "=" .. urlparse.escape(tostring(v)) .. "&"
+        end
+      end
+    end
+  end
   if not duplicate_urls[url] and not queued_urls[url] then
     if find_path_loop(url, 2) then
       return false
@@ -225,6 +264,11 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   if redirect_urls[parenturl] then
     return true
+  end
+
+  if current_settings and current_settings["all"] then
+    queue_url(url)
+    return false
   end
 
   if find_path_loop(url, max_repetitions) then
@@ -361,6 +405,92 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end]]
 end
 
+wget.callbacks.get_urls = function(file, url, is_css, iri)
+  local html = nil
+
+  downloaded[url] = true
+
+  local function check(url, headers)
+    local url = string.match(url, "^([^#]+)")
+    url = string.gsub(url, "&amp;", "&")
+    queue_url(url)
+  end
+
+  local function checknewurl(newurl, headers)
+    if string.match(newurl, "^#") then
+      return nil
+    end
+    if string.match(newurl, "\\[uU]002[fF]") then
+      return checknewurl(string.gsub(newurl, "\\[uU]002[fF]", "/"), headers)
+    end
+    if string.match(newurl, "^https?:////") then
+      check(string.gsub(newurl, ":////", "://"), headers)
+    elseif string.match(newurl, "^https?://") then
+      check(newurl, headers)
+    elseif string.match(newurl, "^https?:\\/\\?/") then
+      check(string.gsub(newurl, "\\", ""), headers)
+    elseif string.match(newurl, "^\\/") then
+      checknewurl(string.gsub(newurl, "\\", ""), headers)
+    elseif string.match(newurl, "^//") then
+      check(urlparse.absolute(url, newurl), headers)
+    elseif string.match(newurl, "^/") then
+      check(urlparse.absolute(url, newurl), headers)
+    elseif string.match(newurl, "^%.%./") then
+      if string.match(url, "^https?://[^/]+/[^/]+/") then
+        check(urlparse.absolute(url, newurl), headers)
+      else
+        checknewurl(string.match(newurl, "^%.%.(/.+)$"), headers)
+      end
+    elseif string.match(newurl, "^%./") then
+      check(urlparse.absolute(url, newurl), headers)
+    end
+  end
+
+  local function checknewshorturl(newurl, headers)
+    if string.match(newurl, "^#") then
+      return nil
+    end
+    if string.match(newurl, "^%?") then
+      check(urlparse.absolute(url, newurl), headers)
+    elseif not (string.match(newurl, "^https?:\\?/\\?//?/?")
+      or string.match(newurl, "^[/\\]")
+      or string.match(newurl, "^%./")
+      or string.match(newurl, "^[jJ]ava[sS]cript:")
+      or string.match(newurl, "^[mM]ail[tT]o:")
+      or string.match(newurl, "^vine:")
+      or string.match(newurl, "^android%-app:")
+      or string.match(newurl, "^ios%-app:")
+      or string.match(newurl, "^%${")) then
+      check(urlparse.absolute(url, newurl), headers)
+    else
+      checknewurl(newurl, headers)
+    end
+  end
+
+  if status_code == 200 and current_settings and current_settings["deep_extract"] then
+    print('deep extract')
+    html = read_file(file)
+    for newurl in string.gmatch(html, "[^%-]href='([^']+)'") do
+      checknewshorturl(newurl)
+    end
+    for newurl in string.gmatch(html, '[^%-]href="([^"]+)"') do
+      checknewshorturl(newurl)
+    end
+    for newurl in string.gmatch(string.gsub(html, "&quot;", '"'), '"(https?://[^"]+)') do
+      checknewurl(newurl)
+    end
+    for newurl in string.gmatch(string.gsub(html, "&#039;", "'"), "'(https?://[^']+)") do
+      checknewurl(newurl)
+    end
+    for newurl in string.gmatch(html, ">%s*([^<%s]+)") do
+      checknewurl(newurl)
+    end
+    --[[for newurl in string.gmatch(html, "%(([^%)]+)%)") do
+      checknewurl(newurl)
+    end]]
+  end
+end
+
 wget.callbacks.write_to_warc = function(url, http_stat)
   if bad_code(http_stat["statcode"]) then
     return false
@@ -434,14 +564,16 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   parenturl_uuid = nil
   parenturl_requisite = nil
 
-  if urls[string.lower(url["url"])] then
-    current_url = string.lower(url["url"])
+  local url_lower = string.lower(url["url"])
+  if urls[url_lower] then
+    current_url = url_lower
+    current_settings = urls_settings[url_lower]
   end
 
   if status_code >= 200 then
     queue_url(string.match(url["url"], "^(https?://[^/]+)") .. "/robots.txt")
   end
-  
+
   url_count = url_count + 1
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
   io.stdout:flush()
@@ -481,7 +613,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   if downloaded[url["url"]] then
     return wget.actions.EXIT
   end
-  
+
   if status_code >= 200 and status_code <= 399 then
     downloaded[url["url"]] = true
   end
@@ -538,12 +670,16 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
         newurls
       )
       if code == 200 or code == 409 then
+        io.stdout:write("Submitted discovered URLs.\n")
+        io.stdout:flush()
         break
       end
+      io.stdout:write("Failed to submit discovered URLs." .. tostring(code) .. tostring(body) .. "\n")
+      io.stdout:flush()
       os.execute("sleep " .. math.floor(math.pow(2, tries)))
       tries = tries + 1
     end
-    if tries == 10 then
+    if tries == 12 then
       abortgrab = true
     end
   end

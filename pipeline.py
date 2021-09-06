@@ -2,6 +2,7 @@
 import datetime
 from distutils.version import StrictVersion
 import hashlib
+import json
 import os
 import random
 import shutil
@@ -15,8 +16,9 @@ import sys
 
 if sys.version_info[0] < 3:
     from urllib import unquote
+    from urlparser import parse_qs
 else:
-    from urllib.parse import unquote
+    from urllib.parse import unquote, parse_qs
 
 import requests
 import seesaw
@@ -66,7 +68,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20210903.01'
+VERSION = '20210906.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -168,7 +170,7 @@ class SetBadUrls(SimpleTask):
     def process(self, item):
         item['item_name_original'] = item['item_name']
         items = item['item_name'].split('\0')
-        items_lower = [self.unquote_url(url).strip().lower() for url in items]
+        items_lower = [self.unquote_url(url).strip().lower() for url in item['item_urls']]
         with open('%(item_dir)s/%(warc_file_base)s_bad-urls.txt' % item, 'r') as f:
             for url in {
                 self.unquote_url(url).strip().lower() for url in f
@@ -304,13 +306,27 @@ class WgetArgs(object):
             '--warc-zstd-dict', ItemInterpolation('%(item_dir)s/zstdict'),
         ])
 
-        items = item['item_name']
         item['item_name_newline'] = item['item_name'].replace('\0', '\n')
+        item_urls = []
+        custom_items = {}
 
-        for url in items.split('\0'):
-            wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+url])
-            wget_args.append('item-name://'+url)
+        for item_name in item['item_name'].split('\0'):
+            wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
+            wget_args.append('item-name://'+item_name)
+            if item_name.startswith('custom:'):
+                data = parse_qs(item_name.split(':', 1)[1])
+                for k, v in data.items():
+                    if len(v) == 1:
+                        data[k] = v[0]
+                url = data['url']
+                custom_items[url] = data
+            else:
+                url = item_name
+            item_urls.append(url)
             wget_args.append(url)
+
+        item['item_urls'] = item_urls
+        item['custom_items'] = json.dumps(custom_items)
 
         if 'bind_address' in globals():
             wget_args.extend(['--bind-address', globals()['bind_address']])
@@ -347,6 +363,7 @@ pipeline = Pipeline(
         env={
             'item_dir': ItemValue('item_dir'),
             'item_name': ItemValue('item_name_newline'),
+            'custom_items': ItemValue('custom_items'),
             'warc_file_base': ItemValue('warc_file_base')
         }
     ),
