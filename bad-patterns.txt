@@ -18,3 +18,4 @@ mma%.ft%.com
 ^https?://tesiunam%.dgb%.unam%.mx/F/
 ^https?://[^%.]+%.sedelectronica%.es/.*%?x=
 ^https?://www%.cp%-cc%.org/programs%-services/
+/ibank/_crypt_
