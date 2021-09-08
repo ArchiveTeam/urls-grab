@@ -57,6 +57,12 @@ for i=1,50 do
 end
 ids_to_ignore[to_ignore .. "%-[0-9][0-9][0-9][0-9][0-9]"] = true
 ids_to_ignore["[0-9a-zA-Z%-_]!%-?[0-9]"] = true
+to_ignore = ""
+for i=1,32 do
+  to_ignore = to_ignore .. "[0-9a-fA-F]"
+end
+ids_to_ignore["[^0-9a-fA-F]" .. to_ignore .. "[^0-9a-fA-F]"] = true
+ids_to_ignore["[^0-9a-fA-F]" .. to_ignore .. "$"] = true
 
 local current_url = nil
 local current_settings = nil
