@@ -19,3 +19,4 @@ mma%.ft%.com
 ^https?://[^%.]+%.sedelectronica%.es/.*%?x=
 ^https?://www%.cp%-cc%.org/programs%-services/
 /ibank/_crypt_
+pdf%?tm=
