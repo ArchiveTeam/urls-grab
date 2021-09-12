@@ -172,6 +172,7 @@ find_path_loop = function(url, max_repetitions)
 end
 
 queue_url = function(url)
+--local original = url
   load_setting_depth = function(s)
     n = tonumber(current_settings[s])
     if n == nil then
@@ -220,7 +221,7 @@ queue_url = function(url)
     if find_path_loop(url, 2) then
       return false
     end
---print('queuing',url)
+--print('queuing',original, url)
     queued_urls[url] = true
   end
 end
@@ -282,6 +283,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local url = urlpos["url"]["url"]
   local parenturl = parent["url"]
   local extract_page_requisites = false
+
+  if string.match(parent, "%%7B%%7B") and string.match(parent, "%7D%7D") then
+    return false
+  end
 
   if redirect_urls[parenturl] then
     return true
