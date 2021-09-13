@@ -20,3 +20,4 @@ mma%.ft%.com
 ^https?://www%.cp%-cc%.org/programs%-services/
 /ibank/_crypt_
 pdf%?tm=
+%%7B%%7B.+%%7D%%7D
