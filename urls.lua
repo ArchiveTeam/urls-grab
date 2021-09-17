@@ -178,7 +178,7 @@ queue_url = function(url)
     if n == nil then
       n = 0
     end
-    return n
+    return n - 1
   end
   temp = ""
   for c in string.gmatch(url, "(.)") do
@@ -192,23 +192,30 @@ queue_url = function(url)
   if current_settings and current_settings["all"] then
     local depth = load_setting_depth("depth")
     local keep_random = load_setting_depth("keep_random")
-    depth = depth - 1
-    keep_random = keep_random - 1
+    local keep_random = load_setting_depth("keep_all")
     if depth >= 0 then
       local random = current_settings["random"]
-      if keep_random < 0 then
+      local all = current_settings["all"]
+      if keep_random < 0 or random == "" then
         random = nil
         keep_random = nil
       end
+      if keep_all < 0 or all == 0 then
+        all = nil
+        keep_all = nil
+      end
       local settings = {
         depth=depth,
-        all=1,
+        all=all,
+        keep_all=keep_all,
         random=random,
         keep_random=keep_random,
         url=url
       }
       url = "custom:"
-      for _, k in pairs({'all', 'depth', 'keep_random', 'random', 'url'}) do
+      for _, k in pairs(
+        {'all', 'depth', 'keep_all', 'keep_random', 'random', 'url'}
+      ) do
         local v = settings[k]
         if v ~= nil then
           url = url .. k .. "=" .. urlparse.escape(tostring(v)) .. "&"
