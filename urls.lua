@@ -192,7 +192,7 @@ queue_url = function(url)
   if current_settings and current_settings["all"] then
     local depth = load_setting_depth("depth")
     local keep_random = load_setting_depth("keep_random")
-    local keep_random = load_setting_depth("keep_all")
+    local keep_all = load_setting_depth("keep_all")
     if depth >= 0 then
       local random = current_settings["random"]
       local all = current_settings["all"]
