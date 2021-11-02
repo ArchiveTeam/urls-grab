@@ -526,6 +526,7 @@ wget.callbacks.write_to_warc = function(url, http_stat)
   elseif http_stat["statcode"] >= 300 and http_stat["statcode"] <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
     if string.match(newloc, "^https?://[^/]*google%.com/sorry")
+      or string.match(newloc, "^https?://[^/]*google%.com/[sS]ervice[lL]ogin")
       or string.match(newloc, "^https?://consent%.youtube%.com/")
       or string.match(newloc, "^https?://consent%.google%.com/")
       or string.match(newloc, "^https?://misuse%.ncbi%.nlm%.nih%.gov/")
