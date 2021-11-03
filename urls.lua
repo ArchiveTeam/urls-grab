@@ -141,6 +141,7 @@ end
 
 bad_code = function(status_code)
   return status_code == 0
+    or status_code == 400
     or status_code == 401
     or status_code == 403
     or status_code == 407
