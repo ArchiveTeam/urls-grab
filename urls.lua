@@ -172,7 +172,7 @@ find_path_loop = function(url, max_repetitions)
   return false
 end
 
-queue_url = function(url)
+queue_url = function(url, withcustom)
 --local original = url
   load_setting_depth = function(s)
     n = tonumber(current_settings[s])
@@ -190,7 +190,7 @@ queue_url = function(url)
     temp = temp .. c
   end
   url = temp
-  if current_settings and current_settings["all"] then
+  if current_settings and current_settings["all"] and withcustom then
     local depth = load_setting_depth("depth")
     local keep_random = load_setting_depth("keep_random")
     local keep_all = load_setting_depth("keep_all")
@@ -292,13 +292,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local parenturl = parent["url"]
   local extract_page_requisites = false
 
+  local current_settings_all = current_settings and current_settings["all"]
+
   if redirect_urls[parenturl] then
     return true
-  end
-
-  if current_settings and current_settings["all"] then
-    queue_url(url)
-    return false
   end
 
   if find_path_loop(url, max_repetitions) then
@@ -385,7 +382,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
   if parenturl_uuid then
     for id_to_ignore, _ in pairs(ids_to_ignore) do
-      if string.match(url, id_to_ignore) then
+      if string.match(url, id_to_ignore) and not current_settings_all then
         return false
       end
     end
@@ -410,12 +407,17 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       end
     end
   end
-  if parenturl_requisite then
+  if parenturl_requisite and not current_settings_all then
     return false
   end
 
   if urlpos["link_inline_p"] ~= 0 then
     queue_url(url)
+    return false
+  end
+
+  if current_settings_all then
+    queue_url(url, true)
     return false
   end
 
