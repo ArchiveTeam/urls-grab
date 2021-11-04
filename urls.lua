@@ -190,6 +190,9 @@ queue_url = function(url, withcustom)
     temp = temp .. c
   end
   url = temp
+  url = string.match(url, "^([^{]+)")
+  url = string.match(url, "^([^<]+)")
+  url = string.match(url, "^([^\\]+)")
   if current_settings and current_settings["all"] and withcustom then
     local depth = load_setting_depth("depth")
     local keep_random = load_setting_depth("keep_random")
