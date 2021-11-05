@@ -343,7 +343,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end]]
 
-  if status_code < 200 or status_code >= 300 or not verdict then
+  if (status_code < 200 or status_code >= 300 or not verdict)
+    and not current_settings_all then
     return false
   end
 
