@@ -420,8 +420,14 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  if current_settings_all
-    and string.match(parent["host"], "([^%.]+%.[^%.]+)$") == string.match(urlpos["url"]["host"], "([^%.]+%.[^%.]+)$") then
+  local current_host = string.match(urlpos["url"]["host"], "([^%.]+%.[^%.]+)$")
+  local first_parent_host = string.match(parent["host"], "([^%.]+%.[^%.]+)$")
+
+  if current_url then
+    first_parent_host = string.match(current_url .. "/", "^https?://[^/]-([^/%.]+%.[^/%.]+)/")
+  end
+
+  if current_settings_all and first_parent_host == current_host then
     queue_url(url, true)
     return false
   end
