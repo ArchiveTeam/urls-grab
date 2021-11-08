@@ -32,18 +32,19 @@ local status_code = nil
 
 local redirect_urls = {}
 local visited_urls = {}
-
 local ids_to_ignore = {}
-local uuid = ""
-for _, i in pairs({8, 4, 4, 4, 12}) do
-  for j=1,i do
-    uuid = uuid .. "[0-9a-fA-F]"
+for _, lengths in pairs({{8, 4, 4, 4, 12}, {8, 4, 4, 12}}) do
+  local uuid = ""
+  for _, i in pairs(lengths) do
+    for j=1,i do
+      uuid = uuid .. "[0-9a-fA-F]"
+    end
+    if i ~= 12 then
+      uuid = uuid .. "%-"
+    end
   end
-  if i ~= 12 then
-    uuid = uuid .. "%-"
-  end
+  ids_to_ignore[uuid] = true
 end
-ids_to_ignore[uuid] = true
 local to_ignore = ""
 for i=1,9 do
   to_ignore = to_ignore .. "[0-9]"
