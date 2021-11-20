@@ -536,6 +536,15 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
 end
 
 wget.callbacks.write_to_warc = function(url, http_stat)
+  local url_lower = string.lower(url["url"])
+  if urls[url_lower] then
+    current_url = url_lower
+    current_settings = urls_settings[url_lower]
+  end
+  if current_settings and not current_settings["random"] then
+    queue_url(url["url"])
+    return false
+  end
   if bad_code(http_stat["statcode"]) then
     return false
   elseif http_stat["statcode"] >= 300 and http_stat["statcode"] <= 399 then
