@@ -626,6 +626,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 
   if status_code >= 200 then
     queue_url(string.match(url["url"], "^(https?://[^/]+)") .. "/robots.txt")
+    queue_url(string.match(url["url"], "^(https?://[^/]+)") .. "/favicon.ico")
   end
 
   url_count = url_count + 1
