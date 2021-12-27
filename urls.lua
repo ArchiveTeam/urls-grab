@@ -574,7 +574,7 @@ wget.callbacks.write_to_warc = function(url, http_stat)
       local body, code, headers, status = http.request(
         "https://web.archive.org/__wb/calendarcaptures/2"
           .. "?url=" .. urlparse.escape(url["url"])
-          .. "&date=20"
+          .. "&date=202"
       )
       if code ~= 200 then
         io.stdout:write("Got " .. tostring(code) .. " from the Wayback Machine.\n")
