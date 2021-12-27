@@ -564,9 +564,9 @@ wget.callbacks.write_to_warc = function(url, http_stat)
   elseif http_stat["statcode"] ~= 200 then
     return true
   end
-  --[[if true then
+  if true then
     return true
-  end]]
+  end
   if http_stat["len"] > min_dedup_mb * 1024 * 1024 then
     io.stdout:write("Data larger than " .. tostring(min_dedup_mb) .. " MB. Checking with Wayback Machine.\n")
     io.stdout:flush()
