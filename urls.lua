@@ -317,6 +317,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
+  if string.match(parenturl, "%.pdf$") then
+    return false
+  end
+
   local domain_match = checked_domains[item_first_url]
   if not domain_match then
     domain_match = check_domain_outlinks(item_first_url)
