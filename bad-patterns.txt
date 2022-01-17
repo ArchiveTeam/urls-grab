@@ -21,3 +21,5 @@ mma%.ft%.com
 /ibank/_crypt_
 pdf%?tm=
 %%7B%%7B.+%%7D%%7D
+^https?://[^/]+/&quot;
+^http://[0-9a-z][0-9a-z][0-9a-z]?[0-9][0-9][0-9]%.[^/]+%.com/
