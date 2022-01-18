@@ -13,6 +13,8 @@ local abortgrab = false
 local exit_url = false
 local min_dedup_mb = 5
 
+local timestamp = nil
+
 if urlparse == nil or http == nil then
   io.stdout:write("socket not corrently installed.\n")
   io.stdout:flush()
@@ -174,6 +176,18 @@ find_path_loop = function(url, max_repetitions)
   return false
 end
 
+percent_encode_url = function(url)
+  temp = ""
+  for c in string.gmatch(url, "(.)") do
+    local b = string.byte(c)
+    if b < 32 or b > 126 then
+      c = string.format("%%%02X", b)
+    end
+    temp = temp .. c
+  end
+  return temp
+end
+
 queue_url = function(url, withcustom)
 --local original = url
   load_setting_depth = function(s)
@@ -183,15 +197,7 @@ queue_url = function(url, withcustom)
     end
     return n - 1
   end
-  temp = ""
-  for c in string.gmatch(url, "(.)") do
-    local b = string.byte(c)
-    if b < 32 or b > 126 then
-      c = string.format("%%%02X", b)
-    end
-    temp = temp .. c
-  end
-  url = temp
+  url = percent_encode_url(url)
   url = string.match(url, "^([^{]+)")
   url = string.match(url, "^([^<]+)")
   url = string.match(url, "^([^\\]+)")
@@ -629,9 +635,21 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     current_settings = urls_settings[url_lower]
   end
 
-  if status_code >= 200 then
-    queue_url(string.match(url["url"], "^(https?://[^/]+)") .. "/robots.txt")
-    queue_url(string.match(url["url"], "^(https?://[^/]+)") .. "/favicon.ico")
+  if not timestamp then
+    local body, code, headers, status = http.request("https://legacy-api.arpa.li/now")
+    assert(code == 200)
+    timestamp = tonumber(string.match(body, "^([0-9]+)"))
+  end
+
+  local random_s = os.date('%Y%m', timestamp)
+  local base_url = string.match(url["url"], "^(https?://[^/]+)")
+  for _, newurl in pairs({
+    --base_url .. "/robots.txt",
+    --base_url .. "/favicon.ico",
+    base_url .. "/"
+  }) do
+    newurl = percent_encode_url(newurl)
+    queued_urls["random=" .. random_s .. "&url=" .. urlparse.escape(tostring(newurl))] = true
   end
 
   url_count = url_count + 1
@@ -706,6 +724,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     for _, pattern in pairs(bad_patterns) do
       is_bad = string.match(url, pattern)
       if is_bad then
+        io.stdout:write("Filtering out URL " .. url .. ".\n")
+        io.stdout:flush()
         break
       end
     end
