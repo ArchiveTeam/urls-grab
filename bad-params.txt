@@ -56,3 +56,4 @@ rand
 wicket:antiCache
 cachebuster
 nocache
+vs
