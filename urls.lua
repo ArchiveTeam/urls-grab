@@ -120,11 +120,17 @@ for pattern in extract_outlinks_patterns_file:lines() do
 end
 extract_outlinks_patterns_file:close()
 
-read_file = function(file)
+read_file = function(file, bytes)
+  if not bytes then
+    bytes = "*all"
+  end
   if file then
     local f = assert(io.open(file))
-    local data = f:read("*all")
+    local data = f:read(bytes)
     f:close()
+    if not data then
+      data = ""
+    end
     return data
   else
     return ""
@@ -463,7 +469,9 @@ end
 wget.callbacks.get_urls = function(file, url, is_css, iri)
   local html = nil
 
-  downloaded[url] = true
+  if url then
+    downloaded[url] = true
+  end
 
   local function check(url, headers)
     local url = string.match(url, "^([^#]+)")
@@ -484,6 +492,8 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       check(newurl, headers)
     elseif string.match(newurl, "^https?:\\/\\?/") then
       check(string.gsub(newurl, "\\", ""), headers)
+    elseif not url then
+      return nil
     elseif string.match(newurl, "^\\/") then
       checknewurl(string.gsub(newurl, "\\", ""), headers)
     elseif string.match(newurl, "^//") then
@@ -505,9 +515,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     if string.match(newurl, "^#") then
       return nil
     end
-    if string.match(newurl, "^%?") then
+    if url and string.match(newurl, "^%?") then
       check(urlparse.absolute(url, newurl), headers)
-    elseif not (string.match(newurl, "^https?:\\?/\\?//?/?")
+    elseif url and not (string.match(newurl, "^https?:\\?/\\?//?/?")
       or string.match(newurl, "^[/\\]")
       or string.match(newurl, "^%./")
       or string.match(newurl, "^[jJ]ava[sS]cript:")
@@ -522,9 +532,12 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     end
   end
 
-  if status_code == 200 and current_settings and current_settings["deep_extract"] then
-    print('deep extract')
+  if (status_code == 200 and current_settings and current_settings["deep_extract"])
+    or not url then
     html = read_file(file)
+    if not url then
+      html = string.gsub(html, "&#160;", " ")
+    end
     for newurl in string.gmatch(html, "[^%-][hH][rR][eE][fF]='([^']+)'") do
       checknewshorturl(newurl)
     end
@@ -537,12 +550,35 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     for newurl in string.gmatch(string.gsub(html, "&#039;", "'"), "'(https?://[^']+)") do
       checknewurl(newurl)
     end
-    for newurl in string.gmatch(html, ">%s*([^<%s]+)") do
-      checknewurl(newurl)
+    if url then
+      for newurl in string.gmatch(html, ">%s*([^<%s]+)") do
+        checknewurl(newurl)
+      end
     end
     --[[for newurl in string.gmatch(html, "%(([^%)]+)%)") do
       checknewurl(newurl)
     end]]
+  elseif string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF]$")
+    or string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF][^a-z0-9A-Z]")
+    or string.match(read_file(file, 4), "%%[pP][dD][fF]") then
+    io.stdout:write("Extracting links from PDF.\n")
+    io.stdout:flush()
+    local temp_file = file .. "-html.html"
+    local check_file = io.open(temp_file)
+    if check_file then
+      check_file:close()
+      os.remove(temp_file)
+    end
+    os.execute("pdftohtml -nodrm -hidden -i -s -q " .. file)
+    check_file = io.open(temp_file)
+    if check_file then
+      check_file:close()
+      wget.callbacks.get_urls(temp_file, nil, nil, nil)
+      os.remove(temp_file)
+    else
+      io.stdout:write("Not a PDF.\n")
+      io.stdout:flush()
+    end
   end
 end
 
