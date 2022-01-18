@@ -649,7 +649,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     base_url .. "/"
   }) do
     newurl = percent_encode_url(newurl)
-    queued_urls["random=" .. random_s .. "&url=" .. urlparse.escape(tostring(newurl))] = true
+    queued_urls["custom:random=" .. random_s .. "&url=" .. urlparse.escape(tostring(newurl))] = true
   end
 
   url_count = url_count + 1
