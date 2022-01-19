@@ -537,6 +537,20 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     html = read_file(file)
     if not url then
       html = string.gsub(html, "&#160;", " ")
+      html = string.gsub(html, "&lt;", "<")
+      html = string.gsub(html, "&gt;", ">")
+      html = string.gsub(html, "&quot;", '"')
+      html = string.gsub(html, "&apos;", "'")
+      html = string.gsub(html, "&#(%d+);",
+        function(n)
+          return string.char(n)
+        end
+      )
+      html = string.gsub(html, "&#x(%d+);",
+        function(n)
+          return string.char(tonumber(n, 16))
+        end
+      )
     end
     for newurl in string.gmatch(html, "[^%-][hH][rR][eE][fF]='([^']+)'") do
       checknewshorturl(newurl)
