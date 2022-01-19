@@ -551,8 +551,8 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           return string.char(tonumber(n, 16))
         end
       )
-      for _, remove in pairs({"", "<br/>"}) do
-        local temp_html = html
+      local temp_html = string.gsub(html, "\n", "")
+      for _, remove in pairs({"", "<br/>", "</?p[^>]*>"}) do
         if remove ~= "" then
           temp_html = string.gsub(temp_html, remove, "")
         end
