@@ -151,6 +151,8 @@ end
 
 bad_code = function(status_code)
   return status_code == 0
+    or status_code < 200
+    or (status_code > 200 and status_code < 300)
     or status_code == 400
     or status_code == 401
     or status_code == 403
@@ -557,7 +559,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           temp_html = string.gsub(temp_html, remove, "")
         end
         for newurl in string.gmatch(temp_html, "(https?://[^%s<>#\"'\\`{})%]]+)") do
-          while string.match(newurl, "[%.&,!]$") do
+          while string.match(newurl, "[%.&,!;]$") do
             newurl = string.match(newurl, "^(.+).$")
           end
           check(newurl)
