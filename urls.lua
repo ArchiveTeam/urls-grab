@@ -551,6 +551,18 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           return string.char(tonumber(n, 16))
         end
       )
+      for _, remove in pairs({"", "<br/>"}) do
+        local temp_html = html
+        if remove ~= "" then
+          temp_html = string.gsub(temp_html, remove, "")
+        end
+        for newurl in string.gmatch(temp_html, "(https?://[^%s<>#\"'\\`{})%]]+)") do
+          while string.match(newurl, "[%.&,!]$") do
+            newurl = string.match(newurl, "^(.+).$")
+          end
+          check(newurl)
+        end
+      end
     end
     for newurl in string.gmatch(html, "[^%-][hH][rR][eE][fF]='([^']+)'") do
       checknewshorturl(newurl)
