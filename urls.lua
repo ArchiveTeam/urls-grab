@@ -705,7 +705,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     timestamp = tonumber(string.match(body, "^([0-9]+)"))
   end
 
-  local random_s = os.date('%Y%m', timestamp)
+  --[[local random_s = os.date('%Y%m', timestamp)
   local base_url = string.match(url["url"], "^(https?://[^/]+)")
   for _, newurl in pairs({
     --base_url .. "/robots.txt",
@@ -714,7 +714,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   }) do
     newurl = percent_encode_url(newurl)
     queued_urls["custom:random=" .. random_s .. "&url=" .. urlparse.escape(tostring(newurl))] = true
-  end
+  end]]
 
   url_count = url_count + 1
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
