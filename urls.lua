@@ -245,7 +245,7 @@ queue_url = function(url, withcustom)
     end
   end
   if not duplicate_urls[url] and not queued_urls[url] then
-    if find_path_loop(url, 2) then
+    if find_path_loop(url, 3) then
       return false
     end
 --print('queuing',original, url)
@@ -317,7 +317,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return true
   end
 
-  if find_path_loop(url, 2) then
+  if find_path_loop(url, 3) then
     return false
   end
 
