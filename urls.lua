@@ -197,6 +197,7 @@ percent_encode_url = function(url)
 end
 
 queue_url = function(url, withcustom)
+  queue_new_urls(url)
 --local original = url
   load_setting_depth = function(s)
     n = tonumber(current_settings[s])
