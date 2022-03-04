@@ -314,7 +314,9 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   local current_settings_all = current_settings and current_settings["all"]
 
-  if redirect_urls[parenturl] then
+  if redirect_urls[parenturl] and not (
+    status_code == 300 and string.match(parenturl, "^https?://[^/]*feb%-web%.ru/")
+  ) then
     return true
   end
 
