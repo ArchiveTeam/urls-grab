@@ -754,6 +754,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   end
 
   if downloaded[url["url"]] then
+    report_bad_url(url["url"])
     return wget.actions.EXIT
   end
 
