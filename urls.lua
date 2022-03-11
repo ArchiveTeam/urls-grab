@@ -812,12 +812,13 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
 
   if newurls ~= nil then
     local tries = 0
+    newurls = newurls .. "\0"
     while tries < 10 do
       local body, code, headers, status = http.request(
-        "http://blackbird-amqp.meo.ws:23038/urls-m92hrwe0faimbhi/",
+        "https://legacy-api.arpa.li/backfeed/legacy/urls-cqwl3wzwdtjqtrk",
         newurls
       )
-      if code == 200 or code == 409 then
+      if code == 204 then
         io.stdout:write("Submitted discovered URLs.\n")
         io.stdout:flush()
         break
