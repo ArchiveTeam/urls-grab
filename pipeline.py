@@ -66,7 +66,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20220311.02'
+VERSION = '20220312.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -315,11 +315,19 @@ class WgetArgs(object):
             '--warc-zstd-dict', ItemInterpolation('%(item_dir)s/zstdict'),
         ])
 
+        item['item_name'] = '\0'.join([
+            item_name for item_name in item['item_name'].split('\0')
+            if (item_name.startswith('custom:') and '&url=' in item_name) \
+                or item_name.startswith('http://') \
+                or item_name.startswith('https://') \
+        ])
+
         item['item_name_newline'] = item['item_name'].replace('\0', '\n')
         item_urls = []
         custom_items = {}
 
         for item_name in item['item_name'].split('\0'):
+            print(item_name)
             wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
             wget_args.append('item-name://'+item_name)
             if item_name.startswith('custom:'):

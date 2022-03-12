@@ -814,10 +814,11 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     local tries = 0
     while tries < 10 do
       local body, code, headers, status = http.request(
-        "https://legacy-api.arpa.li/backfeed/legacy/urls-cqwl3wzwdtjqtrk",
+        "https://legacy-api.arpa.li/backfeed/legacy/urls-glx7ansh4e17aii",
         newurls .. "\0"
       )
-      if code == 204 then
+      print(body)
+      if code == 200 then
         io.stdout:write("Submitted discovered URLs.\n")
         io.stdout:flush()
         break
