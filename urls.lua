@@ -254,6 +254,12 @@ queue_url = function(url, withcustom)
   end
 end
 
+queue_monthly_url = function(url)
+  local random_s = os.date('%Y%m', timestamp)
+  url = percent_encode_url(url)
+  queued_urls["custom:random=" .. random_s .. "&url=" .. urlparse.escape(tostring(url))] = true
+end
+
 remove_param = function(url, param_pattern)
   local newurl = url
   repeat
@@ -313,6 +319,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local extract_page_requisites = false
 
   local current_settings_all = current_settings and current_settings["all"]
+
+  queue_monthly_url(string.match(url, "^(https?://[^/]+)") .. "/")
 
   if redirect_urls[parenturl] and not (
     status_code == 300 and string.match(parenturl, "^https?://[^/]*feb%-web%.ru/")
@@ -708,15 +716,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     timestamp = tonumber(string.match(body, "^([0-9]+)"))
   end
 
-  local random_s = os.date('%Y%m', timestamp)
   local base_url = string.match(url["url"], "^(https?://[^/]+)")
   for _, newurl in pairs({
     base_url .. "/robots.txt",
     base_url .. "/favicon.ico",
     base_url .. "/"
   }) do
-    newurl = percent_encode_url(newurl)
-    queued_urls["custom:random=" .. random_s .. "&url=" .. urlparse.escape(tostring(newurl))] = true
+    queue_monthly_url(newurl)
   end
 
   url_count = url_count + 1
