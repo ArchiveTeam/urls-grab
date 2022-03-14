@@ -66,7 +66,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20220314.01'
+VERSION = '20220314.02'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -327,7 +327,6 @@ class WgetArgs(object):
         custom_items = {}
 
         for item_name in item['item_name'].split('\0'):
-            print(item_name)
             wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
             wget_args.append('item-name://'+item_name)
             if item_name.startswith('custom:'):
