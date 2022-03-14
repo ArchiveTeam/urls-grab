@@ -711,8 +711,8 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   local random_s = os.date('%Y%m', timestamp)
   local base_url = string.match(url["url"], "^(https?://[^/]+)")
   for _, newurl in pairs({
-    --base_url .. "/robots.txt",
-    --base_url .. "/favicon.ico",
+    base_url .. "/robots.txt",
+    base_url .. "/favicon.ico",
     base_url .. "/"
   }) do
     newurl = percent_encode_url(newurl)
