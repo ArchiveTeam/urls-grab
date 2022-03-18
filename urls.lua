@@ -150,19 +150,14 @@ check_domain_outlinks = function(url, target)
 end
 
 bad_code = function(status_code)
-  return status_code == 0
-    or status_code < 200
-    or (status_code > 200 and status_code < 300)
-    or status_code == 400
-    or status_code == 401
-    or status_code == 403
-    or status_code == 407
-    or status_code == 408
-    or status_code == 411
-    or status_code == 413
-    or status_code == 429
-    or status_code == 451
-    or status_code >= 500
+  return status_code ~= 200
+    and status_code ~= 301
+    and status_code ~= 302
+    and status_code ~= 303
+    and status_code ~= 307
+    and status_code ~= 308
+    and status_code ~= 404
+    and status_code ~= 410
 end
 
 find_path_loop = function(url, max_repetitions)
