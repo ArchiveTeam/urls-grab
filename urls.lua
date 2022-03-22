@@ -193,6 +193,9 @@ end
 
 queue_url = function(url, withcustom)
   queue_new_urls(url)
+  if not string.match(url, "^https?://[^/]+%.") then
+    return nil
+  end
 --local original = url
   load_setting_depth = function(s)
     n = tonumber(current_settings[s])
@@ -283,9 +286,9 @@ queue_new_urls = function(url)
   end
   url = string.gsub(url, "&quot;", '"')
   url = string.gsub(url, "&amp;", "&")
-  for newurl in string.gmatch(url, '([^"]+)') do
+  for newurl in string.gmatch(url, '([^"\\]+)') do
     if newurl ~= url then
-      queue_url(queued_urls, newurl)
+      queue_url(newurl)
     end
   end
 end
