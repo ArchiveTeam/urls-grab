@@ -788,8 +788,32 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 end
 
 wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total_downloaded_bytes, total_download_time)
+  local function submit_backfeed(newurls)
+    local tries = 0
+    while tries < 10 do
+      local body, code, headers, status = http.request(
+        "https://legacy-api.arpa.li/backfeed/legacy/urls-glx7ansh4e17aii",
+        newurls .. "\0"
+      )
+      print(body)
+      if code == 200 then
+        io.stdout:write("Submitted discovered URLs.\n")
+        io.stdout:flush()
+        break
+      end
+      io.stdout:write("Failed to submit discovered URLs." .. tostring(code) .. tostring(body) .. "\n")
+      io.stdout:flush()
+      os.execute("sleep " .. math.floor(math.pow(2, tries)))
+      tries = tries + 1
+    end
+    if tries == 5 then
+      abortgrab = true
+    end
+  end
+
   local newurls = nil
   local is_bad = false
+  local count = 0
   local dup_urls = io.open(item_dir .. '/' .. warc_file_base .. '_duplicate-urls.txt', 'w')
   for url, _ in pairs(queued_urls) do
     for _, pattern in pairs(bad_patterns) do
@@ -809,32 +833,18 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       else
         newurls = newurls .. "\0" .. url
       end
+      count = count + 1
+      if count == 100 then
+        submit_backfeed(newurls)
+        newurls = nil
+        count = 0
+      end
     end
+  end
+  if newurls ~= nil then
+    submit_backfeed(newurls)
   end
   dup_urls:close()
-
-  if newurls ~= nil then
-    local tries = 0
-    while tries < 10 do
-      local body, code, headers, status = http.request(
-        "https://legacy-api.arpa.li/backfeed/legacy/urls-glx7ansh4e17aii",
-        newurls .. "\0"
-      )
-      print(body)
-      if code == 200 then
-        io.stdout:write("Submitted discovered URLs.\n")
-        io.stdout:flush()
-        break
-      end
-      io.stdout:write("Failed to submit discovered URLs." .. tostring(code) .. tostring(body) .. "\n")
-      io.stdout:flush()
-      os.execute("sleep " .. math.floor(math.pow(2, tries)))
-      tries = tries + 1
-    end
-    if tries == 12 then
-      abortgrab = true
-    end
-  end
 
   local file = io.open(item_dir .. '/' .. warc_file_base .. '_bad-urls.txt', 'w')
   for url, _ in pairs(bad_urls) do
