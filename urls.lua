@@ -637,7 +637,8 @@ wget.callbacks.write_to_warc = function(url, http_stat)
       or string.match(newloc, "^https?://consent%.youtube%.com/")
       or string.match(newloc, "^https?://consent%.google%.com/")
       or string.match(newloc, "^https?://misuse%.ncbi%.nlm%.nih%.gov/")
-      or string.match(newloc, "^https?://myprivacy%.dpgmedia%.nl/") then
+      or string.match(newloc, "^https?://myprivacy%.dpgmedia%.nl/")
+      or string.match(newloc, "^https?://idp%.springer%.com/authorize%?") then
       report_bad_url(url["url"])
       exit_url = true
       return false
@@ -790,7 +791,8 @@ end
 wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total_downloaded_bytes, total_download_time)
   local function submit_backfeed(newurls)
     local tries = 0
-    while tries < 10 do
+    local maxtries = 4
+    while tries < maxtries do
       local body, code, headers, status = http.request(
         "https://legacy-api.arpa.li/backfeed/legacy/urls-glx7ansh4e17aii",
         newurls .. "\0"
@@ -806,7 +808,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       os.execute("sleep " .. math.floor(math.pow(2, tries)))
       tries = tries + 1
     end
-    if tries == 5 then
+    if tries == maxtries then
       abortgrab = true
     end
   end
