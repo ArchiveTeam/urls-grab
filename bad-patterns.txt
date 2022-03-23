@@ -4,6 +4,9 @@
 /juris/error%.jsf
 facebook%.com/login%.php
 facebook%.com/cookie/
+facebook%.com/plugins/
+facebook%.com/sharer/
+facebook%.com/sharer%.php
 gongquiz%.com.+&historyNo=[0-9]+
 univis%.univie%.ac%.at/ausschreibungstellensuche/
 fundraise%.cancerresearchuk%.org/signup/account/

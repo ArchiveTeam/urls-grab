@@ -74,6 +74,7 @@ local bad_urls = {}
 local queued_urls = {}
 local bad_params = {}
 local bad_patterns = {}
+local ignore_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
 local extract_outlinks_patterns = {}
@@ -107,6 +108,12 @@ for pattern in bad_patterns_file:lines() do
   table.insert(bad_patterns, pattern)
 end
 bad_patterns_file:close()
+
+local ignore_patterns_file = io.open("ignore-patterns.txt", "r")
+for pattern in ignore_patterns_file:lines() do
+  table.insert(ignore_patterns, pattern)
+end
+ignore_patterns_file:close()
 
 local page_requisite_patterns_file = io.open("page-requisite-patterns.txt", "r")
 for pattern in page_requisite_patterns_file:lines() do
@@ -771,6 +778,12 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   if downloaded[url["url"]] then
     report_bad_url(url["url"])
     return wget.actions.EXIT
+  end
+
+  for _, pattern in pairs(ignore_patterns) do
+    if string.match(url["url"], pattern) then
+      return wget.actions.EXIT
+    end
   end
 
   if status_code >= 200 and status_code <= 399 then
