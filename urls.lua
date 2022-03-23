@@ -334,13 +334,22 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  if string.match(url, "%.pdf") and not string.match(parenturl, "%.pdf") then
-    queue_url(url)
-    return false
-  end
-
-  if string.match(parenturl, "%.pdf$") then
-    return false
+  for _, extension in pairs({
+    "pdf", "doc[mx]?", "xls[mx]?", "ppt[mx]?", "zip", "odt", "odm", "ods", "odp", "xml", "json"
+  }) do
+    if string.match(parenturl, "%." .. extension .. "$")
+      or string.match(parenturl, "%." .. extension .. "[^a-z0-9A-Z]")
+      or string.match(parenturl, "%." .. string.upper(extension) .. "$")
+      or string.match(parenturl, "%." .. string.upper(extension) .. "[^a-z0-9A-Z]") then
+      return false
+    end
+    if string.match(url, "%." .. extension .. "$")
+      or string.match(url, "%." .. extension .. "[^a-z0-9A-Z]")
+      or string.match(url, "%." .. string.upper(extension) .. "$")
+      or string.match(url, "%." .. string.upper(extension) .. "[^a-z0-9A-Z]") then
+      queue_url(url)
+      return false
+    end
   end
 
   local domain_match = checked_domains[item_first_url]
