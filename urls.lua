@@ -199,6 +199,9 @@ percent_encode_url = function(url)
 end
 
 queue_url = function(url, withcustom)
+  if not url then
+    return nil
+  end
   queue_new_urls(url)
   if not string.match(url, "^https?://[^/]+%.") then
     return nil
@@ -219,6 +222,7 @@ queue_url = function(url, withcustom)
     local depth = load_setting_depth("depth")
     local keep_random = load_setting_depth("keep_random")
     local keep_all = load_setting_depth("keep_all")
+    local any_domain = load_setting_depth("any_domain")
     if depth >= 0 then
       local random = current_settings["random"]
       local all = current_settings["all"]
@@ -230,17 +234,21 @@ queue_url = function(url, withcustom)
         all = nil
         keep_all = nil
       end
+      if any_domain <= 0 then
+        any_domain = nil
+      end
       local settings = {
         depth=depth,
         all=all,
         keep_all=keep_all,
         random=random,
         keep_random=keep_random,
-        url=url
+        url=url,
+        any_domain=any_domain
       }
       url = "custom:"
       for _, k in pairs(
-        {'all', 'depth', 'keep_all', 'keep_random', 'random', 'url'}
+        {"all", "any_domain", "depth", "keep_all", "keep_random", "random", "url"}
       ) do
         local v = settings[k]
         if v ~= nil then
@@ -254,13 +262,13 @@ queue_url = function(url, withcustom)
     if find_path_loop(url, 2) then
       return false
     end
---print('queuing',original, url)
+--print("queuing",original, url)
     queued_urls[url] = true
   end
 end
 
 queue_monthly_url = function(url)
-  local random_s = os.date('%Y%m', timestamp)
+  local random_s = os.date("%Y%m", timestamp)
   url = percent_encode_url(url)
   queued_urls["custom:random=" .. random_s .. "&url=" .. urlparse.escape(tostring(url))] = true
 end
@@ -275,6 +283,9 @@ remove_param = function(url, param_pattern)
 end
 
 queue_new_urls = function(url)
+  if not url then
+    return nil
+  end
   local newurl = string.gsub(url, "([%?&;])[aA][mM][pP];", "%1")
   if url == current_url then
     if newurl ~= url then
@@ -323,6 +334,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local extract_page_requisites = false
 
   local current_settings_all = current_settings and current_settings["all"]
+  local current_settings_any_domain = current_settings and current_settings["any_domain"]
 
   --queue_monthly_url(string.match(url, "^(https?://[^/]+)") .. "/")
 
@@ -471,7 +483,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     first_parent_host = string.match(current_url .. "/", "^https?://[^/]-([^/%.]+%.[^/%.]+)/")
   end
 
-  if current_settings_all and first_parent_host == current_host then
+  if current_settings_all and (
+    current_settings_any_domain
+    or first_parent_host == current_host
+  ) then
     queue_url(url, true)
     return false
   end
@@ -838,7 +853,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
   local newurls = nil
   local is_bad = false
   local count = 0
-  local dup_urls = io.open(item_dir .. '/' .. warc_file_base .. '_duplicate-urls.txt', 'w')
+  local dup_urls = io.open(item_dir .. "/" .. warc_file_base .. "_duplicate-urls.txt", "w")
   for url, _ in pairs(queued_urls) do
     for _, pattern in pairs(bad_patterns) do
       is_bad = string.match(url, pattern)
@@ -870,7 +885,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
   end
   dup_urls:close()
 
-  local file = io.open(item_dir .. '/' .. warc_file_base .. '_bad-urls.txt', 'w')
+  local file = io.open(item_dir .. "/" .. warc_file_base .. "_bad-urls.txt", "w")
   for url, _ in pairs(bad_urls) do
     file:write(url .. "\n")
   end
