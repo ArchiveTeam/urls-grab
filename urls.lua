@@ -199,6 +199,9 @@ percent_encode_url = function(url)
 end
 
 queue_url = function(url, withcustom)
+  if not url then
+    return nil
+  end
   queue_new_urls(url)
   if not string.match(url, "^https?://[^/]+%.") then
     return nil
@@ -280,6 +283,9 @@ remove_param = function(url, param_pattern)
 end
 
 queue_new_urls = function(url)
+  if not url then
+    return nil
+  end
   local newurl = string.gsub(url, "([%?&;])[aA][mM][pP];", "%1")
   if url == current_url then
     if newurl ~= url then
