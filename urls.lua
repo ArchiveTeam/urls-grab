@@ -214,6 +214,7 @@ queue_url = function(url, withcustom)
     end
     return n - 1
   end
+  url = string.gsub(url, "'%+'", "")
   url = percent_encode_url(url)
   url = string.match(url, "^([^{]+)")
   url = string.match(url, "^([^<]+)")
