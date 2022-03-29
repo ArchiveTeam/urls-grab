@@ -746,13 +746,15 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     timestamp = tonumber(string.match(body, "^([0-9]+)"))
   end
 
-  local base_url = string.match(url["url"], "^(https?://[^/]+)")
-  for _, newurl in pairs({
-    base_url .. "/robots.txt",
-    base_url .. "/favicon.ico",
-    base_url .. "/"
-  }) do
-    queue_monthly_url(newurl)
+  local base_url = string.match(url["url"], "^(https://[^/]+)")
+  if base_url then
+    for _, newurl in pairs({
+      base_url .. "/robots.txt",
+      base_url .. "/favicon.ico",
+      base_url .. "/"
+    }) do
+      queue_monthly_url(newurl)
+    end
   end
 
   url_count = url_count + 1
