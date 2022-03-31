@@ -259,6 +259,18 @@ queue_url = function(url, withcustom)
       url = string.sub(url, 1, -2)
     end
   end
+  for tempurl, _ in pairs(visited_urls) do
+    if string.match(url, "^custom") then
+      break
+    end
+    local tld = string.match(tempurl, "^https?://[^/]+%.([^%./]+)")
+    for _, tld_requeue in pairs({"ru", "ua", "xn--p1ai", "xn--j1amh"}) do
+      if tld == tld_requeue then
+        url = "custom:random=REQUEUEBACKFEED&url=" .. urlparse.escape(tostring(url))
+        break
+      end
+    end
+  end
   if not duplicate_urls[url] and not queued_urls[url] then
     if find_path_loop(url, 2) then
       return false
