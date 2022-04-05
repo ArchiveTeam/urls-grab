@@ -13,5 +13,5 @@
 [%?&;]jsessionid=
 [%?&;]script_case_session=
 [%?&;]Dilid=
-[%?&;]phpsessid=
+[%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
 [%?&;]wtd=
