@@ -7,7 +7,6 @@
 %?16[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$
 ;extid=[0-9a-f]+$
 [%?&;]_flowexecutionkey=
-;jsessionid=
 [%?&;]sid=
 [%?&;]cid=
 [%?&;]jsessionid=
@@ -15,4 +14,5 @@
 [%?&;]Dilid=
 [%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
 [%?&;]wtd=
+[%?&;]nonce=
 ^https?://[^/]+/index%.php%?s=
