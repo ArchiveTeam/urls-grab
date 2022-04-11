@@ -794,6 +794,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       return wget.actions.EXIT
     elseif string.match(newloc, "^https?://[^/]*telegram%.org/dl%?tme=") then
       queue_url(newloc)
+      return wget.actions.EXIT
     end
   else
     redirect_domains["done"] = true
