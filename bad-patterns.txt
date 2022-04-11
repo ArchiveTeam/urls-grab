@@ -30,3 +30,4 @@ mma%.ft%.com
 ^https?://[^/]*yahoo%.com/.+%%5C.+at%.atwola%.com
 ^https?://[^/]*at%.atwola%.com/
 ^https?://www%.bafa%.de/
+%%5C%%22
