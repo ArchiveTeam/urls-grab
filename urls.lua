@@ -799,7 +799,9 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     ) == (
       string.match(url["url"], "^https?://www%.(.+)")
       or string.match(url["url"], "^https?://(.+)")
-    ) then
+    )
+    or status_code == 301
+    or status_code == 308 then
       queue_url(newloc)
       return wget.actions.EXIT
     end
