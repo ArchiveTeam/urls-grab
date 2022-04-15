@@ -355,7 +355,18 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   for _, extension in pairs({
-    "pdf", "doc[mx]?", "xls[mx]?", "ppt[mx]?", "zip", "odt", "odm", "ods", "odp", "xml", "json"
+    "pdf",
+    "doc[mx]?",
+    "xls[mx]?",
+    "ppt[mx]?",
+    "zip",
+    "odt",
+    "odm",
+    "ods",
+    "odp",
+    "xml",
+    "json",
+    "torrent"
   }) do
     if string.match(parenturl, "%." .. extension .. "$")
       or string.match(parenturl, "%." .. extension .. "[^a-z0-9A-Z]")
