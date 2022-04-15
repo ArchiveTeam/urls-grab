@@ -17,4 +17,5 @@
 [%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
 [%?&;]wtd=
 [%?&;]nonce=
+[%?&;]rnd=
 ^https?://[^/]+/index%.php%?s=
