@@ -144,6 +144,14 @@ read_file = function(file, bytes)
   end
 end
 
+table_length = function(t)
+  local count = 0
+  for _ in pairs(t) do
+    count = count + 1
+  end
+  return count
+end
+
 check_domain_outlinks = function(url, target)
   local parent = string.match(url, "^https?://([^/]+)")
   while parent do
@@ -652,7 +660,10 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     check_file = io.open(temp_file)
     if check_file then
       check_file:close()
+      local temp_length = table_length(queued_urls)
       wget.callbacks.get_urls(temp_file, nil, nil, nil)
+      io.stdout:write("Found " .. tostring(table_length(queued_urls)-temp_length) .. " URLs.\n")
+      io.stdout:flush()
       os.remove(temp_file)
     else
       io.stdout:write("Not a PDF.\n")
