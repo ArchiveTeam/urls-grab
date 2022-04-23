@@ -814,16 +814,16 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     end]]
     if downloaded[newloc] then
       return wget.actions.EXIT
-    elseif string.match(newloc, "^https?://[^/]*telegram%.org/dl%?tme=")
-    or (
-      string.match(newloc, "^https?://www%.(.+)")
-      or string.match(newloc, "^https?://(.+)")
-    ) == (
-      string.match(url["url"], "^https?://www%.(.+)")
-      or string.match(url["url"], "^https?://(.+)")
-    )
-    or status_code == 301
-    or status_code == 308 then
+    elseif string.match(url["url"], "^https?://[^/]*telegram%.org/dl%?tme=")
+      or (
+        string.match(newloc, "^https?://www%.(.+)")
+        or string.match(newloc, "^https?://(.+)")
+      ) == (
+        string.match(url["url"], "^https?://www%.(.+)")
+        or string.match(url["url"], "^https?://(.+)")
+      )
+      or status_code == 301
+      or status_code == 308 then
       queue_url(newloc)
       return wget.actions.EXIT
     end
