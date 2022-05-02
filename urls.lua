@@ -318,6 +318,23 @@ queue_new_urls = function(url)
       queue_url(newurl)
     end
   end
+  for newurl in string.gmatch(url, "(https?%%3[aA]%%2[fF][^%?&;]+)") do
+    newurl = urlparse.unescape(newurl)
+    queue_url(newurl)
+  end
+  for _, pattern in pairs({
+    ".(https?:/[^&%?;]+)",
+    ".(https?:/[^&%?]+)",
+    ".(https?:/[^&]+)",
+    ".(https?:/.+)"
+  }) do
+    for newurl in string.gmatch(url, pattern) do
+      queue_url(newurl)
+    end
+  end
+  if string.match(url, "^https?:/[^/]") then
+    queue_url(string.gsub(url, "^(https?:/)(.+)", "%1/%2"))
+  end
 end
 
 report_bad_url = function(url)
@@ -846,7 +863,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     downloaded[url["url"]] = true
   end
 
-  if status_code >= 200 and status_code < 300 then
+  if status_code >= 200 and status_code < 500 then
     queue_new_urls(url["url"])
   end
 
