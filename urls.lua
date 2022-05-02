@@ -863,7 +863,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     downloaded[url["url"]] = true
   end
 
-  if status_code >= 200 and status_code < 500 then
+  if status_code >= 200 and status_code < 300 then
     queue_new_urls(url["url"])
   end
 
