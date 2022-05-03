@@ -177,7 +177,7 @@ end
 
 find_path_loop = function(url, max_repetitions)
   local tested = {}
-  for s in string.gmatch(urlparse.unescape(url), "([^/]+)") do
+  for s in string.gmatch(urlparse.unescape(url), "([^/%?&]+)") do
     s = string.lower(s)
     if not tested[s] then
       if s == "" then

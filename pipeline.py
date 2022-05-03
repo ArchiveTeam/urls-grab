@@ -49,8 +49,9 @@ LOCK = threading.Lock()
 WGET_AT = find_executable(
     'Wget+AT',
     [
-	    'GNU Wget 1.20.3-at.20211001.01'
-	],
+        'GNU Wget 1.20.3-at.20211001.01',
+        'GNU Wget 1.21.3-at.20220503.02'
+    ],
     [
         './wget-at',
         '/home/warrior/data/wget-at'
@@ -66,7 +67,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20220502.03'
+VERSION = '20220504.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
