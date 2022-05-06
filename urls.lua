@@ -318,7 +318,7 @@ queue_new_urls = function(url)
       queue_url(newurl)
     end
   end
-  for newurl in string.gmatch(url, "(https?%%3[aA]%%2[fF][^%?&;]+)") do
+  --[[for newurl in string.gmatch(url, "(https?%%3[aA]%%2[fF][^%?&;]+)") do
     newurl = urlparse.unescape(newurl)
     queue_url(newurl)
   end
@@ -334,7 +334,7 @@ queue_new_urls = function(url)
   end
   if string.match(url, "^https?:/[^/]") then
     queue_url(string.gsub(url, "^(https?:/)(.+)", "%1/%2"))
-  end
+  end]]
 end
 
 report_bad_url = function(url)
