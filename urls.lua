@@ -10,6 +10,7 @@ local warc_file_base = os.getenv("warc_file_base")
 local url_count = 0
 local downloaded = {}
 local abortgrab = false
+local killgrab = false
 local exit_url = false
 local min_dedup_mb = 5
 
@@ -126,6 +127,11 @@ for pattern in extract_outlinks_patterns_file:lines() do
   extract_outlinks_patterns[pattern] = true
 end
 extract_outlinks_patterns_file:close()
+
+kill_grab = function(item)
+  io.stdout:write("Aborting crawling.\n")
+  killgrab = true
+end
 
 read_file = function(file, bytes)
   if not bytes then
@@ -804,6 +810,10 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
   io.stdout:flush()
 
+  if killgrab then
+    return wget.actions.ABORT
+  end
+
   if redirect_domains["done"] then
     redirect_domains = {}
     redirect_urls = {}
@@ -888,6 +898,9 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     local tries = 0
     local maxtries = 4
     while tries < maxtries do
+      if killgrab then
+        return false
+      end
       local body, code, headers, status = http.request(
         "https://legacy-api.arpa.li/backfeed/legacy/urls-glx7ansh4e17aii",
         newurls .. "\0"
@@ -904,7 +917,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       tries = tries + 1
     end
     if tries == maxtries then
-      abortgrab = true
+      kill_grab()
     end
   end
 
@@ -951,6 +964,9 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
 end
 
 wget.callbacks.before_exit = function(exit_status, exit_status_string)
+  if killgrab then
+    return wget.exits.IO_FAIL
+  end
   if abortgrab then
     return wget.exits.IO_FAIL
   end
