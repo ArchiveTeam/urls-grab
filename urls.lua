@@ -399,16 +399,16 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     "json",
     "torrent"
   }) do
-    if string.match(parenturl, "%." .. extension .. "$")
-      or string.match(parenturl, "%." .. extension .. "[^a-z0-9A-Z]")
-      or string.match(parenturl, "%." .. string.upper(extension) .. "$")
-      or string.match(parenturl, "%." .. string.upper(extension) .. "[^a-z0-9A-Z]") then
+    if string.match(parenturl, "[^a-z0-9A-Z]" .. extension .. "$")
+      or string.match(parenturl, "[^a-z0-9A-Z]" .. extension .. "[^a-z0-9A-Z]")
+      or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "$")
+      or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "[^a-z0-9A-Z]") then
       return false
     end
-    if string.match(url, "%." .. extension .. "$")
-      or string.match(url, "%." .. extension .. "[^a-z0-9A-Z]")
-      or string.match(url, "%." .. string.upper(extension) .. "$")
-      or string.match(url, "%." .. string.upper(extension) .. "[^a-z0-9A-Z]") then
+    if string.match(url, "[^a-z0-9A-Z]" .. extension .. "$")
+      or string.match(url, "[^a-z0-9A-Z]" .. extension .. "[^a-z0-9A-Z]")
+      or string.match(url, "[^a-z0-9A-Z]" .. string.upper(extension) .. "$")
+      or string.match(url, "[^a-z0-9A-Z]" .. string.upper(extension) .. "[^a-z0-9A-Z]") then
       queue_url(url)
       return false
     end
