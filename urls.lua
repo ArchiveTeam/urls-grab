@@ -692,6 +692,30 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       io.stdout:write("Not a PDF.\n")
       io.stdout:flush()
     end
+  elseif status_code == 200
+    and string.match(url, "^https?://[^/]+/robots%.txt$") then
+    html = read_file(file)
+    for line in string.gmatch(html, "(.-)\n") do
+      local name, path = string.match(line, "([^:]+):%s*(.+)$")
+      if name and path then
+        if string.lower(name) == "sitemap" then
+          -- the path should normally be absolute already
+          local newurl = urlparse.absolute(url, path)
+          queue_monthly_url(newurl)
+        end
+      end
+    end
+  elseif string.match(url, "^https?://[^/]+/.*%.[xX][mM][lL]")
+    and string.match(string.lower(read_file(file, 200)), "sitemap") then
+    html = read_file(file)
+    for sitemap in string.gmatch(html, "<sitemap>(.-)</sitemap>") do
+      local newurl = string.match(sitemap, "<loc>%s*([^%s<]+)%s*</loc>")
+      if newurl then
+        -- should already be absolute
+        newurl = urlparse.absolute(url, newurl)
+        queue_monthly_url(newurl)
+      end
+    end
   end
 end
 
@@ -799,6 +823,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       for _, newurl in pairs({
         base_url .. "/robots.txt",
         base_url .. "/favicon.ico",
+        base_url .. "/sitemap.xml",
         base_url .. "/"
       }) do
         queue_monthly_url(newurl)
