@@ -696,7 +696,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     and string.match(url, "^https?://[^/]+/robots%.txt$") then
     html = read_file(file)
     for line in string.gmatch(html, "(.-)\n") do
-      local name, path = string.match(line, "([^:]+):%s*(.+)$")
+      local name, path = string.match(line, "([^:]+):%s*(.-)%s+$")
       if name and path then
         if string.lower(name) == "sitemap" then
           -- the path should normally be absolute already
