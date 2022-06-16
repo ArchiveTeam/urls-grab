@@ -692,7 +692,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       io.stdout:write("Not a PDF.\n")
       io.stdout:flush()
     end
-  elseif status_code == 200
+  --[[elseif status_code == 200
     and string.match(url, "^https?://[^/]+/robots%.txt$") then
     html = read_file(file)
     for line in string.gmatch(html, "(.-)\n") do
@@ -719,7 +719,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         newurl = urlparse.absolute(url, newurl)
         queue_monthly_url(newurl)
       end
-    end
+    end]]
   end
 end
 
@@ -827,7 +827,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       for _, newurl in pairs({
         base_url .. "/robots.txt",
         base_url .. "/favicon.ico",
-        base_url .. "/sitemap.xml",
+        --base_url .. "/sitemap.xml",
         base_url .. "/"
       }) do
         queue_monthly_url(newurl)
