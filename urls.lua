@@ -967,11 +967,11 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     end
   end
 
-  local newurls = nil
-  local is_bad = false
-  local count = 0
   local dup_urls = io.open(item_dir .. "/" .. warc_file_base .. "_duplicate-urls.txt", "w")
   for shard, url_data in pairs(queued_urls) do
+    local count = 0
+    local newurls = nil
+    local is_bad = false
     print('Queuing to shard', shard)
     for url, _ in pairs(url_data) do
       for _, pattern in pairs(bad_patterns) do
