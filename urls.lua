@@ -152,6 +152,9 @@ end
 
 table_length = function(t)
   local count = 0
+  if not t then
+    return count
+  end
   for _ in pairs(t) do
     count = count + 1
   end
@@ -273,19 +276,29 @@ queue_url = function(url, withcustom)
       url = string.sub(url, 1, -2)
     end
   end
-  if not duplicate_urls[url] and not queued_urls[url] then
+  local shard = ""
+  if string.match(url, "&random=") then
+    shard = "periodic"
+  end
+  if not queued_urls[shard] then
+    queued_urls[shard] = {}
+  end
+  if not duplicate_urls[url] and not queued_urls[shard][url] then
     if find_path_loop(url, 2) then
       return false
     end
 --print("queuing",original, url)
-    queued_urls[url] = true
+    queued_urls[shard][url] = true
   end
 end
 
 queue_monthly_url = function(url)
   local random_s = os.date("%Y%m", timestamp)
   url = percent_encode_url(url)
-  queued_urls["custom:random=" .. random_s .. "&url=" .. urlparse.escape(tostring(url))] = true
+  if not queued_urls[random_s] then
+    queued_urls[random_s] = {}
+  end
+  queued_urls[random_s]["custom:random=" .. random_s .. "&url=" .. urlparse.escape(tostring(url))] = true
 end
 
 remove_param = function(url, param_pattern)
@@ -683,9 +696,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     check_file = io.open(temp_file)
     if check_file then
       check_file:close()
-      local temp_length = table_length(queued_urls)
+      local temp_length = table_length(queued_urls[""])
       wget.callbacks.get_urls(temp_file, nil, nil, nil)
-      io.stdout:write("Found " .. tostring(table_length(queued_urls)-temp_length) .. " URLs.\n")
+      io.stdout:write("Found " .. tostring(table_length(queued_urls[""])-temp_length) .. " URLs.\n")
       io.stdout:flush()
       os.remove(temp_file)
     else
@@ -865,7 +878,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
     redirect_urls[url["url"]] = true
     --[[if strip_url(url["url"]) == strip_url(newloc) then
-      queued_urls[newloc] = true
+      queued_urls[""][newloc] = true
       return wget.actions.EXIT
     end]]
     if downloaded[newloc] then
@@ -923,15 +936,19 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 end
 
 wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total_downloaded_bytes, total_download_time)
-  local function submit_backfeed(newurls)
+  local function submit_backfeed(newurls, key, shard)
     local tries = 0
     local maxtries = 4
+    local parameters = ""
+    if shard ~= "" then
+      parameters = "?shard=" .. shard
+    end
     while tries < maxtries do
       if killgrab then
         return false
       end
       local body, code, headers, status = http.request(
-        "https://legacy-api.arpa.li/backfeed/legacy/urls-glx7ansh4e17aii",
+        "https://legacy-api.arpa.li/backfeed/legacy/" .. key .. parameters,
         newurls .. "\0"
       )
       print(body)
@@ -954,34 +971,39 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
   local is_bad = false
   local count = 0
   local dup_urls = io.open(item_dir .. "/" .. warc_file_base .. "_duplicate-urls.txt", "w")
-  for url, _ in pairs(queued_urls) do
-    for _, pattern in pairs(bad_patterns) do
-      is_bad = string.match(url, pattern)
-      if is_bad then
-        io.stdout:write("Filtering out URL " .. url .. ".\n")
+  for shard, url_data in pairs(queued_urls) do
+    print('Queuing to shard', shard)
+    for url, _ in pairs(url_data) do
+      for _, pattern in pairs(bad_patterns) do
+        is_bad = string.match(url, pattern)
+        if is_bad then
+          io.stdout:write("Filtering out URL " .. url .. ".\n")
+          io.stdout:flush()
+          break
+        end
+      end
+      if not is_bad then
+        io.stdout:write("Queuing URL " .. url .. ".\n")
         io.stdout:flush()
-        break
+        if shard == "" then
+          dup_urls:write(url .. "\n")
+        end
+        if newurls == nil then
+          newurls = url
+        else
+          newurls = newurls .. "\0" .. url
+        end
+        count = count + 1
+        if count == 100 then
+          submit_backfeed(newurls, "urls-glx7ansh4e17aii", shard)
+          newurls = nil
+          count = 0
+        end
       end
     end
-    if not is_bad then
-      io.stdout:write("Queuing URL " .. url .. ".\n")
-      io.stdout:flush()
-      dup_urls:write(url .. "\n")
-      if newurls == nil then
-        newurls = url
-      else
-        newurls = newurls .. "\0" .. url
-      end
-      count = count + 1
-      if count == 100 then
-        submit_backfeed(newurls)
-        newurls = nil
-        count = 0
-      end
+    if newurls ~= nil then
+      submit_backfeed(newurls, "urls-glx7ansh4e17aii", shard)
     end
-  end
-  if newurls ~= nil then
-    submit_backfeed(newurls)
   end
   dup_urls:close()
 
