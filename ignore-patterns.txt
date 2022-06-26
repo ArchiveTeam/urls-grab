@@ -19,4 +19,6 @@
 [%?&;]n?once=
 [%?&;]rnd=
 [%?&;][sS]ession[iI][dD]=
+[%?&;]fk=
+[%?&;]session_?id=
 ^https?://[^/]+/index%.php%?s=
