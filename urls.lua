@@ -1,5 +1,6 @@
 local urlparse = require("socket.url")
 local http = require("socket.http")
+local html_entities = require('htmlEntities')
 JSON = (loadfile "JSON.lua")()
 
 local item_dir = os.getenv("item_dir")
@@ -16,8 +17,8 @@ local min_dedup_mb = 5
 
 local timestamp = nil
 
-if urlparse == nil or http == nil then
-  io.stdout:write("socket not corrently installed.\n")
+if urlparse == nil or http == nil or html_entities == nil then
+  io.stdout:write("Dependencies not corrently installed.\n")
   io.stdout:flush()
   abortgrab = true
 end
@@ -638,6 +639,15 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       html = string.gsub(html, "&gt;", ">")
       html = string.gsub(html, "&quot;", '"')
       html = string.gsub(html, "&apos;", "'")
+      for _, pattern in pairs({
+        "https?://www([^\032-\126]+)",
+        "https?://[^/%.]+([^\032-\126]+)[^/%.]+/"
+      }) do
+        for s in string.gmatch(html, pattern) do
+          print('replacing', s)
+          html = string.gsub(html, s, "%.")
+        end
+      end
       html = string.gsub(html, "&#(%d+);",
         function(n)
           return string.char(n)
@@ -653,11 +663,19 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         if remove ~= "" then
           temp_html = string.gsub(temp_html, remove, "")
         end
-        for newurl in string.gmatch(temp_html, "(https?://[^%s<>#\"'\\`{})%]]+)") do
-          while string.match(newurl, "[%.&,!;]$") do
-            newurl = string.match(newurl, "^(.+).$")
+        for _, pattern in pairs({
+          "(https?://[^%s<>#\"'\\`{})%]]+)",
+          '"(https?://[^"]+)',
+          "'(https?://[^']+)",
+          ">%s*(https?://[^<%s]+)"
+        }) do
+          for newurl in string.gmatch(temp_html, pattern) do
+            while string.match(newurl, "[%.&,!;]$") do
+              newurl = string.match(newurl, "^(.+).$")
+            end
+            check(newurl)
+            check(html_entities.decode(newurl))
           end
-          check(newurl)
         end
       end
     end
@@ -681,56 +699,61 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     --[[for newurl in string.gmatch(html, "%(([^%)]+)%)") do
       checknewurl(newurl)
     end]]
-  elseif string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF]$")
-    or string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF][^a-z0-9A-Z]")
-    or string.match(read_file(file, 4), "%%[pP][dD][fF]") then
-    io.stdout:write("Extracting links from PDF.\n")
-    io.stdout:flush()
-    local temp_file = file .. "-html.html"
-    local check_file = io.open(temp_file)
-    if check_file then
-      check_file:close()
-      os.remove(temp_file)
-    end
-    os.execute("pdftohtml -nodrm -hidden -i -s -q " .. file)
-    check_file = io.open(temp_file)
-    if check_file then
-      check_file:close()
-      local temp_length = table_length(queued_urls[""])
-      wget.callbacks.get_urls(temp_file, nil, nil, nil)
-      io.stdout:write("Found " .. tostring(table_length(queued_urls[""])-temp_length) .. " URLs.\n")
+  end
+  if url then
+    if string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF]$")
+      or string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF][^a-z0-9A-Z]")
+      or string.match(read_file(file, 4), "%%[pP][dD][fF]") then
+      io.stdout:write("Extracting links from PDF.\n")
       io.stdout:flush()
-      os.remove(temp_file)
-    else
-      io.stdout:write("Not a PDF.\n")
-      io.stdout:flush()
+      local temp_file = file .. "-html.html"
+      local check_file = io.open(temp_file)
+      if check_file then
+        check_file:close()
+        os.remove(temp_file)
+      end
+      os.execute("pdftohtml -nodrm -hidden -i -s -q " .. file)
+      check_file = io.open(temp_file)
+      if check_file then
+        check_file:close()
+        local temp_length = table_length(queued_urls[""])
+        wget.callbacks.get_urls(temp_file, nil, nil, nil)
+        io.stdout:write("Found " .. tostring(table_length(queued_urls[""])-temp_length) .. " URLs.\n")
+        io.stdout:flush()
+        os.remove(temp_file)
+      else
+        io.stdout:write("Not a PDF.\n")
+        io.stdout:flush()
+      end
     end
-  elseif status_code == 200
-    and string.match(url, "^https?://[^/]+/robots%.txt$") then
-    html = read_file(file)
-    for line in string.gmatch(html, "(.-)\n") do
-      local name, path = string.match(line, "([^:]+):%s*(.-)%s+$")
-      if name and path then
-        -- the path should normally be absolute already
-        local newurl = urlparse.absolute(url, path)
-        if string.lower(name) == "sitemap" then
-          queue_monthly_url(newurl)
-        elseif string.lower(name) ~= "user-agent"
-          and not string.match(path, "%*")
-          and not string.match(path, "%$") then
-          queue_url(newurl)
+    if status_code == 200
+      and string.match(url, "^https?://[^/]+/robots%.txt$") then
+      html = read_file(file)
+      for line in string.gmatch(html, "(.-)\n") do
+        local name, path = string.match(line, "([^:]+):%s*(.-)%s+$")
+        if name and path then
+          -- the path should normally be absolute already
+          local newurl = urlparse.absolute(url, path)
+          if string.lower(name) == "sitemap" then
+            queue_monthly_url(newurl)
+          elseif string.lower(name) ~= "user-agent"
+            and not string.match(path, "%*")
+            and not string.match(path, "%$") then
+            queue_url(newurl)
+          end
         end
       end
     end
-  elseif string.match(url, "^https?://[^/]+/.*%.[xX][mM][lL]")
-    and string.match(string.lower(read_file(file, 200)), "sitemap") then
-    html = read_file(file)
-    for sitemap in string.gmatch(html, "<sitemap>(.-)</sitemap>") do
-      local newurl = string.match(sitemap, "<loc>%s*([^%s<]+)%s*</loc>")
-      if newurl then
-        -- should already be absolute
-        newurl = urlparse.absolute(url, newurl)
-        queue_monthly_url(newurl)
+    if string.match(url, "^https?://[^/]+/.*%.[xX][mM][lL]")
+      and string.match(string.lower(read_file(file, 200)), "sitemap") then
+      html = read_file(file)
+      for sitemap in string.gmatch(html, "<sitemap>(.-)</sitemap>") do
+        local newurl = string.match(sitemap, "<loc>%s*([^%s<]+)%s*</loc>")
+        if newurl then
+          -- should already be absolute
+          newurl = urlparse.absolute(url, newurl)
+          queue_monthly_url(newurl)
+        end
       end
     end
   end
