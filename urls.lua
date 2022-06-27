@@ -658,23 +658,28 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           return string.char(tonumber(n, 16))
         end
       )
-      local temp_html = string.gsub(html, "\n", "")
+      local temp = html
       for _, remove in pairs({"", "<br/>", "</?p[^>]*>"}) do
         if remove ~= "" then
-          temp_html = string.gsub(temp_html, remove, "")
+          temp = string.gsub(temp, remove, "")
         end
-        for _, pattern in pairs({
-          "(https?://[^%s<>#\"'\\`{})%]]+)",
-          '"(https?://[^"]+)',
-          "'(https?://[^']+)",
-          ">%s*(https?://[^<%s]+)"
-        }) do
-          for newurl in string.gmatch(temp_html, pattern) do
-            while string.match(newurl, "[%.&,!;]$") do
-              newurl = string.match(newurl, "^(.+).$")
+        temp2 = string.gsub(temp, "%s+\n", "\n")
+        temp2 = string.gsub(temp2, "([^>\"'\\`}%)%]%.,])\n", "%1")
+        for _, newline_white in pairs({" ", ""}) do
+          temp3 = string.gsub(temp2, "\n", newline_white)
+          for _, pattern in pairs({
+            "(https?://[^%s<>#\"'\\`{}%)%]]+)",
+            '"(https?://[^"]+)',
+            "'(https?://[^']+)",
+            ">%s*(https?://[^<%s]+)"
+          }) do
+            for newurl in string.gmatch(temp3, pattern) do
+              while string.match(newurl, "[%.&,!;]$") do
+                newurl = string.match(newurl, "^(.+).$")
+              end
+              check(newurl)
+              check(html_entities.decode(newurl))
             end
-            check(newurl)
-            check(html_entities.decode(newurl))
           end
         end
       end
