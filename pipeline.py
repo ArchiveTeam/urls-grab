@@ -67,7 +67,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20220703.01'
+VERSION = '20220703.02'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -121,6 +121,7 @@ class CheckRequirements(SimpleTask):
     def process(self, item):
         if not self._checked:
             assert shutil.which('pdftohtml') is not None
+            assert shutil.which('gzip') is not None
             self._checked = True
 
 

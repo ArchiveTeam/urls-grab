@@ -733,9 +733,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     end
     if status_code == 200
       and string.match(url, "^https?://[^/]+/robots%.txt$") then
-      html = read_file(file)
+      html = read_file(file) .. "\n"
       for line in string.gmatch(html, "(.-)\n") do
-        local name, path = string.match(line, "([^:]+):%s*(.-)%s+$")
+        local name, path = string.match(line, "([^:]+):%s*(.-)%s*$")
         if name and path then
           -- the path should normally be absolute already
           local newurl = urlparse.absolute(url, path)
@@ -747,6 +747,20 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
             queue_url(newurl)
           end
         end
+      end
+    end
+    if string.match(url, "sitemap.*%.gz$")
+      or string.match(url, "%.xml%.gz") then
+      local temp_file = file .. ".uncompressed"
+      io.stdout:write("Attempting to decompress sitemap to " .. temp_file .. ".\n")
+      io.stdout:flush()
+      os.execute("gzip -kdc " .. file .. " > " .. temp_file)
+      local check_file = io.open(temp_file)
+      if check_file then
+        io.stdout:write("Extracting sitemaps from decompressed sitemap.\n")
+        io.stdout:flush()
+        check_file:close()
+        wget.callbacks.get_urls(temp_file, string.match(url, "^(.-)%.gz$"), nil, nil)
       end
     end
     if string.match(url, "^https?://[^/]+/.*%.[xX][mM][lL]")
