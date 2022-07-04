@@ -294,6 +294,9 @@ queue_url = function(url, withcustom)
 end
 
 queue_monthly_url = function(url)
+  if find_path_loop(url, 3) then
+    return nil
+  end
   local random_s = os.date("%Y%m", timestamp)
   url = percent_encode_url(url)
   if not queued_urls[random_s] then
