@@ -1,5 +1,6 @@
 local urlparse = require("socket.url")
 local http = require("socket.http")
+local idn2 = require("idn2")
 local html_entities = require('htmlEntities')
 JSON = (loadfile "JSON.lua")()
 
@@ -83,6 +84,7 @@ local extract_outlinks_patterns = {}
 local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
+local tlds = {}
 
 local parenturl_uuid = nil
 local parenturl_requisite = nil
@@ -92,6 +94,12 @@ for url in dupes_file:lines() do
   duplicate_urls[url] = true
 end
 dupes_file:close()
+
+local tlds_file = io.open("tlds.txt", "r")
+for tld in tlds_file:lines() do
+  tlds[tld] = true
+end
+tlds_file:close()
 
 local bad_params_file = io.open("bad-params.txt", "r")
 for param in bad_params_file:lines() do
@@ -670,18 +678,40 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         temp2 = string.gsub(temp2, "([^>\"'\\`}%)%]%.,])\n", "%1")
         for _, newline_white in pairs({" ", ""}) do
           temp3 = string.gsub(temp2, "\n", newline_white)
-          for _, pattern in pairs({
+          local url_patterns = {
             "(https?://[^%s<>#\"'\\`{}%)%]]+)",
             '"(https?://[^"]+)',
             "'(https?://[^']+)",
             ">%s*(https?://[^<%s]+)"
-          }) do
+          }
+          if newline_white == " " then
+            table.insert(url_patterns, "([a-zA-Z0-9%-%.]+%.[a-zA-Z0-9%-%.]+)")
+            table.insert(url_patterns, "([a-zA-Z0-9%-%.]+%.[a-zA-Z0-9%-%.]+/[^%s<>#\"'\\`{}%)%]]+)")
+          end
+          for _, pattern in pairs(url_patterns) do
             for newurl in string.gmatch(temp3, pattern) do
               while string.match(newurl, "[%.&,!;]$") do
                 newurl = string.match(newurl, "^(.+).$")
               end
-              check(newurl)
-              check(html_entities.decode(newurl))
+              if string.match(newurl, "^https?://") then
+                check(newurl)
+                check(html_entities.decode(newurl))
+              elseif string.match(newurl, "^[a-zA-Z0-9]") then
+                if not string.find(newurl, "/") then
+                  newurl = newurl .. "/"
+                end
+                local a, b = string.match(newurl, "^([^/]+)(/.*)$")
+                newurl = string.lower(a) .. b
+                local tld = string.match(newurl, "^[^/]+%.([a-z]+)/")
+                if not tld then
+                  tld = string.match(newurl, "^[^/]+%.(xn%-%-[a-z0-9]+)/")
+                end
+                print(newurl, tld, tlds[tld])
+                if tld and tlds[tld] then
+                  check("http://" .. newurl)
+                  check("https://" .. newurl)
+                end
+              end
             end
           end
         end
