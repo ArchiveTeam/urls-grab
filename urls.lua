@@ -679,10 +679,10 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         for _, newline_white in pairs({" ", ""}) do
           temp3 = string.gsub(temp2, "\n", newline_white)
           local url_patterns = {
-            "(https?://[^%s<>#\"'\\`{}%)%]]+)",
-            '"(https?://[^"]+)',
-            "'(https?://[^']+)",
-            ">%s*(https?://[^<%s]+)"
+            "([hH][tT][tT][pP][sS]?://[^%s<>#\"'\\`{}%)%]]+)",
+            '"([hH][tT][tT][pP][sS]?://[^"]+)',
+            "'([hH][tT][tT][pP][sS]?://[^']+)",
+            ">%s*([hH][tT][tT][pP][sS]?://[^<%s]+)"
           }
           if newline_white == " " then
             table.insert(url_patterns, "([a-zA-Z0-9%-%.]+%.[a-zA-Z0-9%-%.]+)")
@@ -693,7 +693,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
               while string.match(newurl, "[%.&,!;]$") do
                 newurl = string.match(newurl, "^(.+).$")
               end
-              if string.match(newurl, "^https?://") then
+              if string.match(newurl, "^[hH][tT][tT][pP][sS]?://") then
+                local a, b = string.match(newurl, "^([hH][tT][tT][pP][sS]?://[^/]+)(.*)")
+                newurl = string.lower(a) .. b
                 check(newurl)
                 check(html_entities.decode(newurl))
               elseif string.match(newurl, "^[a-zA-Z0-9]") then
