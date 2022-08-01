@@ -428,14 +428,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       or string.match(parenturl, "[^a-z0-9A-Z]" .. extension .. "[^a-z0-9A-Z]")
       or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "$")
       or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "[^a-z0-9A-Z]")
-      or (
-        (
-          extension == "doc"
-          or extension == "xls"
-          or extension == "ppt"
-        )
-        and string.match(parenturl, "^http://")
-      ) then
+      -- get rid of loop on sites from chinese origin (also various non-.cn domains)
+      or string.match(parenturl, "^https?://[^/]+/.+%.[a-z]+%?/.+%." .. extension .. "$") then
       return false
     end
     if string.match(url, "[^a-z0-9A-Z]" .. extension .. "$")
