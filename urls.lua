@@ -427,7 +427,15 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     if string.match(parenturl, "[^a-z0-9A-Z]" .. extension .. "$")
       or string.match(parenturl, "[^a-z0-9A-Z]" .. extension .. "[^a-z0-9A-Z]")
       or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "$")
-      or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "[^a-z0-9A-Z]") then
+      or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "[^a-z0-9A-Z]")
+      or (
+        (
+          extension == "doc"
+          or extension == "xls"
+          or extension == "ppt"
+        )
+        and string.match(parenturl, "^http://")
+      ) then
       return false
     end
     if string.match(url, "[^a-z0-9A-Z]" .. extension .. "$")
