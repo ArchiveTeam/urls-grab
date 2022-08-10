@@ -424,19 +424,20 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     "json",
     "torrent"
   }) do
-    if string.match(parenturl, "[^a-z0-9A-Z]" .. extension .. "$")
-      or string.match(parenturl, "[^a-z0-9A-Z]" .. extension .. "[^a-z0-9A-Z]")
-      or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "$")
-      or string.match(parenturl, "[^a-z0-9A-Z]" .. string.upper(extension) .. "[^a-z0-9A-Z]")
+    local prefix = "[%.%?/&]"
+    if string.match(parenturl, prefix .. extension .. "$")
+      or string.match(parenturl, prefix .. extension .. "[^a-z0-9A-Z]")
+      or string.match(parenturl, prefix .. string.upper(extension) .. "$")
+      or string.match(parenturl, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]")
       -- get rid of loop on sites from chinese origin (also various non-.cn domains)
       or string.match(url, "^https?://[^/]+/%?/.+%." .. extension .. "$")
       or string.match(url, "^https?://[^/]+/.+%.[a-z]+%?/.+%." .. extension .. "$") then
       return false
     end
-    if string.match(url, "[^a-z0-9A-Z]" .. extension .. "$")
-      or string.match(url, "[^a-z0-9A-Z]" .. extension .. "[^a-z0-9A-Z]")
-      or string.match(url, "[^a-z0-9A-Z]" .. string.upper(extension) .. "$")
-      or string.match(url, "[^a-z0-9A-Z]" .. string.upper(extension) .. "[^a-z0-9A-Z]") then
+    if string.match(url, prefix .. extension .. "$")
+      or string.match(url, prefix .. extension .. "[^a-z0-9A-Z]")
+      or string.match(url, prefix .. string.upper(extension) .. "$")
+      or string.match(url, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]") then
       queue_url(url)
       return false
     end
