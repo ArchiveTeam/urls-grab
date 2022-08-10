@@ -31,3 +31,4 @@ mma%.ft%.com
 ^https?://[^/]*at%.atwola%.com/
 ^https?://www%.bafa%.de/
 %%5C%%22
+^https?://[^/%.]+%.[^/%.]+%.pl/w/load%.php%?modules=
