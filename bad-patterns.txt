@@ -32,3 +32,4 @@ mma%.ft%.com
 ^https?://www%.bafa%.de/
 %%5C%%22
 ^https?://[^/%.]+%.[^/%.]+%.pl/w/load%.php%?modules=
+:image/[a-z]+;base64,
