@@ -242,9 +242,7 @@ queue_url = function(url, withcustom)
   end
   url = string.gsub(url, "'%s*%+%s*'", "")
   url = percent_encode_url(url)
-  url = string.match(url, "^([^{]+)")
-  url = string.match(url, "^([^<]+)")
-  url = string.match(url, "^([^\\]+)")
+  url = string.match(url, "^([^#{<\\]+)")
   if current_settings and current_settings["all"] and withcustom then
     local depth = load_setting_depth("depth")
     local keep_random = load_setting_depth("keep_random")
@@ -285,6 +283,11 @@ queue_url = function(url, withcustom)
       url = string.sub(url, 1, -2)
     end
   end
+  for _, pattern in pairs(bad_patterns) do
+    if string.match(url, pattern) then
+      return false
+    end
+  end
   local shard = ""
   if string.match(url, "&random=") then
     shard = "periodic"
@@ -307,6 +310,7 @@ queue_monthly_url = function(url)
   end
   local random_s = os.date("%Y%m", timestamp)
   url = percent_encode_url(url)
+  url = string.match(url, "^([^#]+)")
   if not queued_urls[random_s] then
     queued_urls[random_s] = {}
   end
@@ -1055,14 +1059,6 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     local is_bad = false
     print('Queuing to shard', shard)
     for url, _ in pairs(url_data) do
-      for _, pattern in pairs(bad_patterns) do
-        is_bad = string.match(url, pattern)
-        if is_bad then
-          io.stdout:write("Filtering out URL " .. url .. ".\n")
-          io.stdout:flush()
-          break
-        end
-      end
       if not is_bad then
         io.stdout:write("Queuing URL " .. url .. ".\n")
         io.stdout:flush()
