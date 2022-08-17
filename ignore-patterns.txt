@@ -21,4 +21,5 @@
 [%?&;][sS]ession[iI][dD]=
 [%?&;]fk=
 [%?&;]session_?id=
+[%?&;]nocache=
 ^https?://[^/]+/index%.php%?s=
