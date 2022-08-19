@@ -1,7 +1,7 @@
 local urlparse = require("socket.url")
 local http = require("socket.http")
 local idn2 = require("idn2")
-local html_entities = require('htmlEntities')
+local html_entities = require("htmlEntities")
 JSON = (loadfile "JSON.lua")()
 
 local item_dir = os.getenv("item_dir")
@@ -85,6 +85,8 @@ local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
 local tlds = {}
+local telegram_posts = {[""]={}}
+local telegram_channels = {[""]={}}
 
 local parenturl_uuid = nil
 local parenturl_requisite = nil
@@ -389,6 +391,28 @@ strip_url = function(url)
   return url
 end
 
+queue_telegram = function(url)
+  local domain, rest = string.match(url, "^https?://([^/]+)([^%?&]+)")
+  if domain ~= "t.me" and domain ~= "telegram.me" then
+    return nil
+  end
+  local _, temp = string.match(rest, "^/s(/.+)$")
+  if temp then
+    rest = temp
+  end
+  local user = string.match(rest, "^/([^/]+)")
+  if user then
+    telegram_channels[""]["channel:" .. user] = true
+    telegram_posts[""]["channel:" .. user] = true
+  else
+    return nil
+  end
+  local post = string.match(rest, "^/[^/]+/([0-9]+)$")
+  if post then
+    telegram_posts[""]["post:" .. user .. ":" .. post] = true
+  end
+end
+
 wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_parsed, iri, verdict, reason)
   local url = urlpos["url"]["url"]
   local parenturl = parent["url"]
@@ -396,6 +420,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   local current_settings_all = current_settings and current_settings["all"]
   local current_settings_any_domain = current_settings and current_settings["any_domain"]
+
+  queue_telegram(url)
 
   --queue_monthly_url(string.match(url, "^(https?://[^/]+)") .. "/")
 
@@ -586,6 +612,8 @@ end
 wget.callbacks.get_urls = function(file, url, is_css, iri)
   local html = nil
 
+  queue_telegram(url)
+
   if url then
     downloaded[url] = true
   end
@@ -663,7 +691,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         "https?://[^/%.]+([^\032-\126]+)[^/%.]+/"
       }) do
         for s in string.gmatch(html, pattern) do
-          print('replacing', s)
+          print("replacing", s)
           html = string.gsub(html, s, "%.")
         end
       end
@@ -1053,33 +1081,40 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
   end
 
   local dup_urls = io.open(item_dir .. "/" .. warc_file_base .. "_duplicate-urls.txt", "w")
-  for shard, url_data in pairs(queued_urls) do
-    local count = 0
-    local newurls = nil
-    local is_bad = false
-    print('Queuing to shard', shard)
-    for url, _ in pairs(url_data) do
-      if not is_bad then
-        io.stdout:write("Queuing URL " .. url .. ".\n")
-        io.stdout:flush()
-        if shard == "" then
-          dup_urls:write(url .. "\n")
-        end
-        if newurls == nil then
-          newurls = url
-        else
-          newurls = newurls .. "\0" .. url
-        end
-        count = count + 1
-        if count == 100 then
-          submit_backfeed(newurls, "urls-glx7ansh4e17aii", shard)
-          newurls = nil
-          count = 0
+  for key, items_data in pairs({
+    ["telegram-wdvrpbeov02cm53"] = telegram_posts,
+    ["telegram-channels-c8cixci89uv1exw"] = telegram_channels,
+    ["urls-glx7ansh4e17aii"] = queued_urls
+  }) do
+    local project_name = string.match(key, "^(.+)%-")
+    for shard, url_data in pairs(items_data) do
+      local count = 0
+      local newurls = nil
+      local is_bad = false
+      print("Queuing to project " .. project_name .. " on shard " .. shard)
+      for url, _ in pairs(url_data) do
+        if not is_bad then
+          io.stdout:write("Queuing URL " .. url .. ".\n")
+          io.stdout:flush()
+          if shard == "" and project_name == "urls" then
+            dup_urls:write(url .. "\n")
+          end
+          if newurls == nil then
+            newurls = url
+          else
+            newurls = newurls .. "\0" .. url
+          end
+          count = count + 1
+          if count == 100 then
+            submit_backfeed(newurls, key, shard)
+            newurls = nil
+            count = 0
+          end
         end
       end
-    end
-    if newurls ~= nil then
-      submit_backfeed(newurls, "urls-glx7ansh4e17aii", shard)
+      if newurls ~= nil then
+        submit_backfeed(newurls, key, shard)
+      end
     end
   end
   dup_urls:close()
