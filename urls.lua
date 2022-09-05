@@ -810,17 +810,20 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     if status_code == 200
       and string.match(url, "^https?://[^/]+/robots%.txt$") then
       html = read_file(file) .. "\n"
-      for line in string.gmatch(html, "(.-)\n") do
-        local name, path = string.match(line, "([^:]+):%s*(.-)%s*$")
-        if name and path then
-          -- the path should normally be absolute already
-          local newurl = urlparse.absolute(url, path)
-          if string.lower(name) == "sitemap" then
-            queue_monthly_url(newurl)
-          elseif string.lower(name) ~= "user-agent"
-            and not string.match(path, "%*")
-            and not string.match(path, "%$") then
-            queue_url(newurl)
+      if not string.match(html, "<[^>]+/>")
+        and not string.match(html, "</") then
+        for line in string.gmatch(html, "(.-)\n") do
+          local name, path = string.match(line, "([^:]+):%s*(.-)%s*$")
+          if name and path then
+            -- the path should normally be absolute already
+            local newurl = urlparse.absolute(url, path)
+            if string.lower(name) == "sitemap" then
+              queue_monthly_url(newurl)
+            elseif string.lower(name) ~= "user-agent"
+              and not string.match(path, "%*")
+              and not string.match(path, "%$") then
+              queue_url(newurl)
+            end
           end
         end
       end
