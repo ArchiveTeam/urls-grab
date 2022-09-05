@@ -86,7 +86,7 @@ local redirect_domains = {}
 local checked_domains = {}
 local tlds = {}
 local telegram_posts = {[""]={}}
-local telegram_channels = {[""]={}}
+local telegram_channels = {}
 
 local parenturl_uuid = nil
 local parenturl_requisite = nil
@@ -402,7 +402,12 @@ queue_telegram = function(url)
   end
   local user = string.match(rest, "^/([^/]+)")
   if user then
-    telegram_channels[""]["channel:" .. user] = true
+    local year_month = os.date("%Y%m", timestamp)
+    local channel_shard = "periodic" .. year_month
+    if not telegram_channels[channel_shard] then
+      telegram_channels[channel_shard] = {}
+    end
+    telegram_channels[channel_shard]["channel:" .. user .. "#" .. year_month] = true
     telegram_posts[""]["channel:" .. user] = true
   else
     return nil
