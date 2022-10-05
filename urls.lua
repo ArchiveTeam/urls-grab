@@ -392,6 +392,9 @@ strip_url = function(url)
 end
 
 queue_telegram = function(url)
+  if not url then
+    return nil
+  end
   local domain, rest = string.match(url, "^https?://([^/]+)([^%?&]+)")
   if domain ~= "t.me" and domain ~= "telegram.me" then
     return nil
@@ -731,7 +734,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           end
           for _, pattern in pairs(url_patterns) do
             for newurl in string.gmatch(temp3, pattern) do
-              while string.match(newurl, "[%.&,!;]$") do
+              while string.match(newurl, ".[%.&,!;]$") do
                 newurl = string.match(newurl, "^(.+).$")
               end
               if string.match(newurl, "^[hH][tT][tT][pP][sS]?://") then
