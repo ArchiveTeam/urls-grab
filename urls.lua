@@ -1059,7 +1059,7 @@ end
 wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total_downloaded_bytes, total_download_time)
   local function submit_backfeed(newurls, key, shard)
     local tries = 0
-    local maxtries = 2
+    local maxtries = 10
     local parameters = ""
     if shard ~= "" then
       parameters = "?shard=" .. shard
