@@ -699,7 +699,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         "https?://[^/%.]+([^\032-\126]+)[^/%.]+/"
       }) do
         for s in string.gmatch(html, pattern) do
-          print("replacing", s)
+          --print("replacing", s)
           html = string.gsub(html, s, "%.")
         end
       end
@@ -752,7 +752,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
                 if not tld then
                   tld = string.match(newurl, "^[^/]+%.(xn%-%-[a-z0-9]+)/")
                 end
-                print(newurl, tld, tlds[tld])
+                --print(newurl, tld, tlds[tld])
                 if tld and tlds[tld] then
                   check("http://" .. newurl)
                   check("https://" .. newurl)
@@ -1016,6 +1016,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
         or string.match(url["url"], "^https?://(.+)")
       )
       or status_code == 301
+      or status_code == 303
       or status_code == 308 then
       queue_url(newloc)
       return wget.actions.EXIT
