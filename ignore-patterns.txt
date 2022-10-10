@@ -22,4 +22,5 @@
 [%?&;]fk=
 [%?&;]session_?id=
 [%?&;]nocache=
+[%?&;]ses=
 ^https?://[^/]+/index%.php%?s=
