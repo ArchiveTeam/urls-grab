@@ -587,7 +587,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  if urlpos["link_inline_p"] ~= 0 then
+  if urlpos["link_inline_p"] ~= 0
+    and not string.match(url, "%.html$") then
     queue_url(url)
     return false
   end
