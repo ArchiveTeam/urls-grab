@@ -230,6 +230,11 @@ queue_url = function(url, withcustom)
   if not url then
     return nil
   end
+  if string.match(url, "^http://")
+    and string.match(current_url, "^http://")
+    and string.match(url, "^http://([^/]+)") ~= string.match(current_url, "^http://([^/]+)") then
+    return nil
+  end
   queue_new_urls(url)
   if not string.match(url, "^https?://[^/]+%.") then
     return nil
@@ -313,6 +318,7 @@ queue_monthly_url = function(url)
   local random_s = os.date("%Y%m", timestamp)
   url = percent_encode_url(url)
   url = string.match(url, "^([^#]+)")
+--print('random', url)
   if not queued_urls[random_s] then
     queued_urls[random_s] = {}
   end
