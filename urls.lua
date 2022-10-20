@@ -454,6 +454,11 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
+  if string.match(parenturl, "%?content=[a-zA-Z0-9%%]+$")
+    and string.match(url, "%?content=[a-zA-Z0-9%%]+$") then
+    return false
+  end
+
   for _, extension in pairs({
     "pdf",
     "doc[mx]?",
