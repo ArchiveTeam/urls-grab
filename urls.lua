@@ -88,6 +88,9 @@ local tlds = {}
 local telegram_posts = {[""]={}}
 local telegram_channels = {[""]={}}
 local ftp_urls = {[""]={}}
+local urls_all = {}
+
+local month_timestamp = os.date("%Y%m", timestamp)
 
 local parenturl_uuid = nil
 local parenturl_requisite = nil
@@ -312,18 +315,21 @@ queue_url = function(url, withcustom)
   end
 end
 
+queue_monthly_item = function(item, t)
+  if not t[month_timestamp] then
+    t[month_timestamp] = {}
+  end
+--print("monthly", url)
+  t[month_timestamp][item] = true
+end
+
 queue_monthly_url = function(url)
   if find_path_loop(url, 3) then
     return nil
   end
-  local random_s = os.date("%Y%m", timestamp)
   url = percent_encode_url(url)
   url = string.match(url, "^([^#]+)")
---print('random', url)
-  if not queued_urls[random_s] then
-    queued_urls[random_s] = {}
-  end
-  queued_urls[random_s]["custom:random=" .. random_s .. "&url=" .. urlparse.escape(tostring(url))] = true
+  queue_monthly_item("custom:random=" .. month_timestamp .. "&url=" .. urlparse.escape(tostring(url)), queued_urls)
 end
 
 remove_param = function(url, param_pattern)
@@ -442,6 +448,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     ftp_urls[""][url] = true
     return false
   end
+
+  queue_monthly_item(url, urls_all)
 
   --queue_monthly_url(string.match(url, "^(https?://[^/]+)") .. "/")
 
@@ -1115,7 +1123,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["telegram-wdvrpbeov02cm53"] = telegram_posts,
     ["telegram-channels-c8cixci89uv1exw"] = telegram_channels,
     ["urls-glx7ansh4e17aii"] = queued_urls,
-    ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls
+    ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
+    ["urls-all-tx2vacclx396i0h"] = urls_all
   }) do
     local project_name = string.match(key, "^(.+)%-")
     for shard, url_data in pairs(items_data) do
