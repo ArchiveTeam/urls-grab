@@ -87,6 +87,7 @@ local checked_domains = {}
 local tlds = {}
 local telegram_posts = {[""]={}}
 local telegram_channels = {[""]={}}
+local ftp_urls = {[""]={}}
 
 local parenturl_uuid = nil
 local parenturl_requisite = nil
@@ -436,6 +437,11 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local current_settings_any_domain = current_settings and current_settings["any_domain"]
 
   queue_telegram(url)
+
+  if string.match(url, "^ftp://") then
+    ftp_urls[""][url] = true
+    return false
+  end
 
   --queue_monthly_url(string.match(url, "^(https?://[^/]+)") .. "/")
 
@@ -1108,7 +1114,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
   for key, items_data in pairs({
     ["telegram-wdvrpbeov02cm53"] = telegram_posts,
     ["telegram-channels-c8cixci89uv1exw"] = telegram_channels,
-    ["urls-glx7ansh4e17aii"] = queued_urls
+    ["urls-glx7ansh4e17aii"] = queued_urls,
+    ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls
   }) do
     local project_name = string.match(key, "^(.+)%-")
     for shard, url_data in pairs(items_data) do
