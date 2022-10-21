@@ -449,7 +449,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  queue_monthly_item(url, urls_all)
+  --queue_monthly_item(url, urls_all)
 
   --queue_monthly_url(string.match(url, "^(https?://[^/]+)") .. "/")
 
