@@ -418,7 +418,7 @@ queue_telegram = function(url)
   end
   local user = string.match(rest, "^/([^/]+)")
   if user then
-    local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t").yday / 5))
+    local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t").yday))
     local channel_shard = "periodic" .. year_month
     if not telegram_posts[channel_shard] then
       telegram_posts[channel_shard] = {}
