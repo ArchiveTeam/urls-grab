@@ -1031,7 +1031,8 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       queued_urls[""][newloc] = true
       return wget.actions.EXIT
     end]]
-    if downloaded[newloc] then
+    if downloaded[newloc]
+      or string.match(newloc, "^magnet:") then
       return wget.actions.EXIT
     elseif string.match(url["url"], "^https?://[^/]*telegram%.org/dl%?tme=")
       or (
