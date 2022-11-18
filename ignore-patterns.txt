@@ -20,6 +20,7 @@
 [%?&;]n?once=
 [%?&;]rnd=
 [%?&;][sS]ession[iI][dD]=
+[%?&;]session=
 [%?&;]fk=
 [%?&;]session_?id=
 [%?&;]nocache=
