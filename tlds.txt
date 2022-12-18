@@ -16,7 +16,6 @@ accountants
 aco
 actor
 ad
-adac
 ads
 adult
 ae
@@ -175,7 +174,6 @@ brother
 brussels
 bs
 bt
-bugatti
 build
 builders
 business
@@ -195,7 +193,6 @@ calvinklein
 cam
 camera
 camp
-cancerresearch
 canon
 capetown
 capital
@@ -722,7 +719,6 @@ loan
 loans
 locker
 locus
-loft
 lol
 london
 lotte
@@ -1059,7 +1055,6 @@ seek
 select
 sener
 services
-ses
 seven
 sew
 sex
@@ -1386,7 +1381,6 @@ xn--j1aef
 xn--j1amh
 xn--j6w193g
 xn--jlq480n2rg
-xn--jlq61u9w7b
 xn--jvr189m
 xn--kcrx77d1x4a
 xn--kprw13d
