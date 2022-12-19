@@ -205,7 +205,12 @@ end
 
 find_path_loop = function(url, max_repetitions)
   local tested = {}
-  for s in string.gmatch(urlparse.unescape(url), "([^/%?&]+)") do
+  local tempurl = urlparse.unescape(url)
+  tempurl = string.match(tempurl, "^https?://[^/]+(.*)$")
+  if not tempurl then
+    return false
+  end
+  for s in string.gmatch(tempurl, "([^/%?&]+)") do
     s = string.lower(s)
     if not tested[s] then
       if s == "" then
