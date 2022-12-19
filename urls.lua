@@ -18,6 +18,10 @@ local min_dedup_mb = 5
 
 local timestamp = nil
 
+local current_file = nil
+local current_file_html = nil
+local current_file_url = nil
+
 if urlparse == nil or http == nil or html_entities == nil then
   io.stdout:write("Dependencies not corrently installed.\n")
   io.stdout:flush()
@@ -450,13 +454,30 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   --queue_monthly_item(url, urls_all)
-
   --queue_monthly_url(string.match(url, "^(https?://[^/]+)") .. "/")
 
   if redirect_urls[parenturl] and not (
     status_code == 300 and string.match(parenturl, "^https?://[^/]*feb%-web%.ru/")
   ) then
     return true
+  end
+
+  -- prevent loop on some bad srcset URLs
+  if parenturl == current_file_url
+    and (
+      string.match(url, "https?://[a-z]+%.[^%.]+%.[a-z]+/[a-z]+$")
+      or string.match(url, "https?://[a-z]+%.[^%.]+%.[a-z]+/en/[a-z]+$")
+    ) then
+    if current_file_html == nil then
+      current_file_html = read_file(current_file)
+    end
+    for srcset in string.gmatch(current_file_html, 'srcset="([^"]+)"') do
+      for srcset_url in string.gmatch(srcset, "([^,]+)") do
+        if string.match(url, "([a-z]+)$") == string.match(srcset_url, "^%s*([a-z]+)%s[^%s].-%s[0-9]+w$") then
+          return false
+        end
+      end
+    end
   end
 
   if find_path_loop(url, 2) then
@@ -888,6 +909,9 @@ end
 
 wget.callbacks.write_to_warc = function(url, http_stat)
   local url_lower = string.lower(url["url"])
+  current_file = http_stat["local_file"]
+  current_file_url = url["url"]
+  current_file_html = nil
   if urls[url_lower] then
     current_url = url_lower
     current_settings = urls_settings[url_lower]
