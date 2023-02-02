@@ -89,8 +89,24 @@ local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
 local tlds = {}
-local telegram_posts = {[""]={}}
-local telegram_channels = {[""]={}}
+
+local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t").yday))
+local periodic_shard = "periodic" .. year_month
+
+local pastebin_items = {
+  [""]={}
+}
+local mediafire_items = {
+  [""]={}
+}
+local telegram_posts = {
+  [""]={},
+  [periodic_shard]={}
+}
+local telegram_channels = {
+  [""]={},
+  [periodic_shard]={}
+}
 local ftp_urls = {[""]={}}
 local urls_all = {}
 
@@ -413,33 +429,60 @@ strip_url = function(url)
   return url
 end
 
-queue_telegram = function(url)
-  if not url then
-    return nil
-  end
-  local domain, rest = string.match(url, "^https?://([^/]+)([^%?&]+)")
-  if domain ~= "t.me" and domain ~= "telegram.me" then
+queue_telegram = function(rest)
+  local rest = string.match(rest, "^([^%?&]+)")
+  if string.len(rest) == 0 then
     return nil
   end
   local _, temp = string.match(rest, "^/s(/.+)$")
   if temp then
     rest = temp
   end
-  local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t").yday))
-  local channel_shard = "periodic" .. year_month
-  if not telegram_posts[channel_shard] then
-    telegram_posts[channel_shard] = {}
-  end
   local user = string.match(rest, "^/([^/]+)")
   if user then
-    telegram_posts[channel_shard]["channel:" .. user] = true
+    telegram_posts[periodic_shard]["channel:" .. user] = true
     telegram_channels[""]["channel:" .. user] = true
   else
     return nil
   end
   local post = string.match(rest, "^/[^/]+/([0-9]+)$")
   if post then
-    telegram_posts[channel_shard]["post:" .. user .. ":" .. post] = true
+    telegram_posts[periodic_shard]["post:" .. user .. ":" .. post] = true
+  end
+end
+
+queue_pastebin = function(rest)
+  for s in string.gmatch(rest, "([a-zA-Z0-9]+)") do
+    if string.len(s) == 8 then
+      pastebin_items[""]["paste:" .. s] = true
+    end
+  end
+end
+
+queue_mediafire = function(rest)
+  for s in string.gmatch(rest, "([a-zA-Z0-9]+)") do
+    s = string.lower(s)
+    if string.len(s) >= 10 then
+      mediafire_items[""]["id:" .. s] = true
+      s = string.match(s, "^(.-).g$")
+      if s then
+        mediafire_items[""]["id:" .. s] = true
+      end
+    end
+  end
+end
+
+queue_services = function(url)
+  if not url then
+    return nil
+  end
+  local domain, rest = string.match(url, "^https?://[^/]-([^/%.]+%.[^/%.]+)(/.*)$")
+  if domain == "t.me" or domain == "telegram.me" then
+    queue_telegram(rest)
+  elseif domain == "pastebin.com" then
+    queue_pastebin(rest)
+  elseif domain == "mediafire.com" or domain == "mfi.re" then
+    queue_mediafire(rest)
   end
 end
 
@@ -451,7 +494,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local current_settings_all = current_settings and current_settings["all"]
   local current_settings_any_domain = current_settings and current_settings["any_domain"]
 
-  queue_telegram(url)
+  queue_services(url)
 
   if string.match(url, "^ftp://") then
     ftp_urls[""][url] = true
@@ -672,7 +715,7 @@ end
 wget.callbacks.get_urls = function(file, url, is_css, iri)
   local html = nil
 
-  queue_telegram(url)
+  queue_services(url)
 
   if url then
     downloaded[url] = true
@@ -1152,6 +1195,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
   for key, items_data in pairs({
     ["telegram-wdvrpbeov02cm53"] = telegram_posts,
     ["telegram-channels-c8cixci89uv1exw"] = telegram_channels,
+    ["pastebin-xa5xj5bx2no3qc1"] = pastebin_items,
+    ["mediafire-9cmzz6b3jawqbih"] = mediafire_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
     ["urls-all-tx2vacclx396i0h"] = urls_all
