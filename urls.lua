@@ -454,7 +454,7 @@ end
 queue_pastebin = function(rest)
   for s in string.gmatch(rest, "([a-zA-Z0-9]+)") do
     if string.len(s) == 8 then
-      pastebin_items[""]["paste:" .. s] = true
+      pastebin_items[""][s] = true
     end
   end
 end
