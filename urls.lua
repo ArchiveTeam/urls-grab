@@ -259,11 +259,11 @@ queue_url = function(url, withcustom)
   if not url then
     return nil
   end
-  if string.match(url, "^http://")
+  --[[if string.match(url, "^http://")
     and string.match(current_url, "^http://")
     and string.match(url, "^http://([^/]+)") ~= string.match(current_url, "^http://([^/]+)") then
     return nil
-  end
+  end]]
   queue_new_urls(url)
   if not string.match(url, "^https?://[^/]+%.") then
     return nil
