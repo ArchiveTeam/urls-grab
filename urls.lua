@@ -945,6 +945,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       html = read_file(file)
       for sitemap in string.gmatch(html, "<sitemap>(.-)</sitemap>") do
         local newurl = string.match(sitemap, "<loc>%s*([^%s<]+)%s*</loc>")
+        newurl = html_entities.decode(newurl)
         if newurl then
           -- should already be absolute
           newurl = urlparse.absolute(url, newurl)
