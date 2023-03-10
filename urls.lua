@@ -510,6 +510,15 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return true
   end
 
+  if string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/")
+    and string.match(parenturl, "%%20")
+    and string.match(parenturl, "%.[a-z0-9]+$")
+    and string.match(url, "^https://[^/%.]+%.[^/%.]+%.de/")
+    and string.match(url, " ")
+    and string.match(url, "%.[a-z0-9]+$") then
+    return false
+  end
+
   -- prevent loop on some bad srcset URLs
   if parenturl == current_file_url
     and (
