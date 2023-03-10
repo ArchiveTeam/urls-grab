@@ -36,7 +36,7 @@ git checkout v1.21.3-at
 
 #echo -n 1.21.3-at-lua | tee ./.version ./.tarball-version > /dev/null
 
-if ./bootstrap && ./configure $CONFIGURE_SSL_OPT --disable-nls && make && src/wget -V | grep -q lua
+if ./bootstrap && ./configure $CONFIGURE_SSL_OPT --with-cares --disable-nls && make && src/wget -V | grep -q lua
 then
   cp src/wget ../../wget-at
   cd ../../
