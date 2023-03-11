@@ -514,7 +514,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/en/")
       or (
         string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/")
-        and string.match(parenturl, "%%20")
+        and (
+          string.match(parenturl, "%%20")
+          or string.match(parenturl, "_desktop_img/")
+        )
       )
     )
     and (
@@ -524,6 +527,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
         and (
           string.match(url, " ")
           or string.match(url, "%%20")
+          or string.match(url, "_desktop_img/")
         )
       )
     )
