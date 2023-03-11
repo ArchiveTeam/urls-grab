@@ -510,17 +510,17 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return true
   end
 
-  if string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/")
-    and string.match(parenturl, "%%20")
+  if string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/en/")
+    --and string.match(parenturl, "%%20")
     and (
       string.match(parenturl, "[/%.][a-z0-9]+$")
       or string.match(parenturl, "[/%.][a-z0-9]+%?")
     )
-    and string.match(url, "^https://[^/%.]+%.[^/%.]+%.de/")
-    and (
-      string.match(url, " ")
-      or string.match(url, "%%20")
-    )
+    and string.match(url, "^https://[^/%.]+%.[^/%.]+%.de/en/")
+    --and (
+    --  string.match(url, " ")
+    --  or string.match(url, "%%20")
+    --)
     and (
       string.match(url, "[/%.][a-z0-9]+$")
       or string.match(url, "[/%.][a-z0-9]+%?")
