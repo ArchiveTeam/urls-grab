@@ -79,12 +79,12 @@ local current_url = nil
 local current_settings = nil
 local bad_urls = {}
 local queued_urls = {}
-local bad_params = {}
-local bad_patterns = {}
-local ignore_patterns = {}
+local remove_params = {}
+local filter_discovered = {}
+local exit_url_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
-local extract_outlinks_patterns = {}
+local extract_outlinks_domains = {}
 local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
@@ -124,47 +124,47 @@ for url in dupes_file:lines() do
 end
 dupes_file:close()
 
-local tlds_file = io.open("tlds.txt", "r")
+local tlds_file = io.open("static-tlds.txt", "r")
 for tld in tlds_file:lines() do
   tlds[tld] = true
 end
 tlds_file:close()
 
-local bad_params_file = io.open("bad-params.txt", "r")
-for param in bad_params_file:lines() do
+local remove_params_file = io.open("static-remove-params.txt", "r")
+for param in remove_params_file:lines() do
   local param = string.gsub(
     param, "([a-zA-Z])",
     function(c)
       return "[" .. string.lower(c) .. string.upper(c) .. "]"
     end
   )
-  table.insert(bad_params, param)
+  table.insert(remove_params, param)
 end
-bad_params_file:close()
+remove_params_file:close()
 
-local bad_patterns_file = io.open("bad-patterns.txt", "r")
-for pattern in bad_patterns_file:lines() do
-  table.insert(bad_patterns, pattern)
+local filter_discovered_file = io.open("static-filter-discovered.txt", "r")
+for pattern in filter_discovered_file:lines() do
+  table.insert(filter_discovered, pattern)
 end
-bad_patterns_file:close()
+filter_discovered_file:close()
 
-local ignore_patterns_file = io.open("ignore-patterns.txt", "r")
-for pattern in ignore_patterns_file:lines() do
-  table.insert(ignore_patterns, pattern)
+local exit_url_patterns_file = io.open("static-exit-url-patterns.txt", "r")
+for pattern in exit_url_patterns_file:lines() do
+  table.insert(exit_url_patterns, pattern)
 end
-ignore_patterns_file:close()
+exit_url_patterns_file:close()
 
-local page_requisite_patterns_file = io.open("page-requisite-patterns.txt", "r")
+local page_requisite_patterns_file = io.open("static-page-requisite-patterns.txt", "r")
 for pattern in page_requisite_patterns_file:lines() do
   table.insert(page_requisite_patterns, pattern)
 end
 page_requisite_patterns_file:close()
 
-local extract_outlinks_patterns_file = io.open("extract-outlinks-patterns.txt", "r")
-for pattern in extract_outlinks_patterns_file:lines() do
-  extract_outlinks_patterns[pattern] = true
+local extract_outlinks_domains_file = io.open("static-extract-outlinks-domains.txt", "r")
+for pattern in extract_outlinks_domains_file:lines() do
+  extract_outlinks_domains[pattern] = true
 end
-extract_outlinks_patterns_file:close()
+extract_outlinks_domains_file:close()
 
 kill_grab = function(item)
   io.stdout:write("Aborting crawling.\n")
@@ -202,7 +202,7 @@ end
 check_domain_outlinks = function(url, target)
   local parent = string.match(url, "^https?://([^/]+)")
   while parent do
-    if (not target and extract_outlinks_patterns[parent])
+    if (not target and extract_outlinks_domains[parent])
       or (target and parent == target) then
       return parent
     end
@@ -322,7 +322,7 @@ queue_url = function(url, withcustom)
       url = string.sub(url, 1, -2)
     end
   end
-  for _, pattern in pairs(bad_patterns) do
+  for _, pattern in pairs(filter_discovered) do
     if string.match(url, pattern) then
       return false
     end
@@ -379,7 +379,7 @@ queue_new_urls = function(url)
       queue_url(newurl)
     end
   end
-  for _, param_pattern in pairs(bad_params) do
+  for _, param_pattern in pairs(remove_params) do
     newurl = remove_param(newurl, param_pattern)
   end
   if newurl ~= url then
@@ -1169,7 +1169,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     return wget.actions.EXIT
   end
 
-  for _, pattern in pairs(ignore_patterns) do
+  for _, pattern in pairs(exit_url_patterns) do
     if string.match(url["url"], pattern) then
       return wget.actions.EXIT
     end
