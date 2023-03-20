@@ -93,6 +93,9 @@ local tlds = {}
 local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t").yday))
 local periodic_shard = "periodic" .. year_month
 
+local zippyshare_urls_items = {
+  [""]={}
+}
 local pastebin_items = {
   [""]={}
 }
@@ -483,6 +486,8 @@ queue_services = function(url)
     queue_pastebin(rest)
   elseif domain == "mediafire.com" or domain == "mfi.re" then
     queue_mediafire(rest)
+  elseif domain == "zippyshare.com" then
+    zippyshare_urls_items[""][url] = true
   end
 end
 
@@ -1234,7 +1239,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["mediafire-9cmzz6b3jawqbih"] = mediafire_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
-    ["urls-all-tx2vacclx396i0h"] = urls_all
+    ["urls-all-tx2vacclx396i0h"] = urls_all,
+    ["zippyshare-urls-jtelkase24jmz0z"] = zippyshare_urls_items
   }) do
     local project_name = string.match(key, "^(.+)%-")
     for shard, url_data in pairs(items_data) do
