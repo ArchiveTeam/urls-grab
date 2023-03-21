@@ -79,6 +79,8 @@ local current_url = nil
 local current_settings = nil
 local bad_urls = {}
 local queued_urls = {}
+local skip_parent_urls_check = {}
+local skip_parent_urls = {}
 local remove_params = {}
 local filter_discovered = {}
 local exit_url_patterns = {}
@@ -89,6 +91,7 @@ local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
 local tlds = {}
+
 
 local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t").yday))
 local periodic_shard = "periodic" .. year_month
@@ -339,7 +342,7 @@ queue_url = function(url, withcustom)
       return false
     end
 --print("queuing",original, url)
-    queued_urls[shard][url] = true
+    queued_urls[shard][url] = current_url
   end
 end
 
@@ -348,7 +351,7 @@ queue_monthly_item = function(item, t)
     t[month_timestamp] = {}
   end
 --print("monthly", url)
-  t[month_timestamp][item] = true
+  t[month_timestamp][item] = current_url
 end
 
 queue_monthly_url = function(url)
@@ -504,6 +507,49 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   if string.match(url, "^ftp://") then
     ftp_urls[""][url] = true
     return false
+  end
+
+  if skip_parent_urls[parenturl] then
+    return false
+  end
+
+  for parenturl_pattern, pattern_table in pairs({
+    ["^https?://[a-z0-9]+%.[a-z%-]+%.[a-z]+/"]={
+      ["pics"]="^https?://[a-z0-9]+%.[a-z%-]+%.[a-z]+/pics/[a-zA-Z0-9%-_]+%.[a-z]+$",
+      ["vicom"]="/[vV][iI]com[0-9]+/",
+      ["k8"]="^https?://[kK]8"
+    }
+  }) do
+    if string.match(parenturl, parenturl_pattern) then
+      local found_any = false
+      local check_string = parenturl_pattern .. parenturl
+      for pattern_name, pattern in pairs(pattern_table) do
+        if string.match(url, pattern) then
+          found_any = true
+          if not skip_parent_urls_check[check_string] then
+            skip_parent_urls_check[check_string] = {}
+            for k, _ in pairs(pattern_table) do
+              skip_parent_urls_check[check_string][k] = false
+            end
+          end
+          skip_parent_urls_check[check_string][pattern_name] = true
+        end
+      end
+      if found_any then
+        local all_true = true
+        for _, v in pairs(skip_parent_urls_check[check_string]) do
+          if not v then
+            all_true = false
+            break
+          end
+        end
+        if all_true then
+          io.stdout:write("Skipping all URLs discovered for URL " .. parenturl .. ".\n")
+          io.stdout:flush()
+          skip_parent_urls[parenturl] = true
+        end
+      end
+    end
   end
 
   --queue_monthly_item(url, urls_all)
@@ -1248,8 +1294,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       local newurls = nil
       local is_bad = false
       print("Queuing to project " .. project_name .. " on shard " .. shard)
-      for url, _ in pairs(url_data) do
-        if not is_bad then
+      for url, parent_url in pairs(url_data) do
+        if not is_bad and not skip_parent_urls[parent_url] then
           io.stdout:write("Queuing URL " .. url .. ".\n")
           io.stdout:flush()
           if shard == "" and project_name == "urls" then
