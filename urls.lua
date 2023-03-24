@@ -92,9 +92,24 @@ local redirect_domains = {}
 local checked_domains = {}
 local tlds = {}
 
-
 local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t").yday))
 local periodic_shard = "periodic" .. year_month
+
+local filter_pattern_sets = {
+  ["^https?://[a-z0-9]+%.[a-z%-]+%.[a-z]+/"]={
+    ["pics"]="^https?://[a-z0-9]+%.[a-z%-]+%.[a-z]+/pics/[a-zA-Z0-9%-_]+%.[a-z]+$",
+    ["vicom"]="/[vV][iI]com[0-9]+/",
+    ["k8"]="^https?://[kK]8"
+  },
+  ["^https?://[a-z0-9]+%.[^%.]+%.de/pages/"]={
+    ["pages"]="^https?://[a-z0-9]+%.[^%.]+%.de/pages/.+%.html",
+    --["css"]="%s.*%.css$"
+  },
+  ["^https?://[a-z0-9]+%.[^%.]+%.de/news/"]={
+    ["pages"]="^https?://[a-z0-9]+%.[^%.]+%.de/news/[^&%?/]+$",
+    --["css"]="%.css"
+  }
+}
 
 local zippyshare_urls_items = {
   [""]={}
@@ -513,13 +528,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  for parenturl_pattern, pattern_table in pairs({
-    ["^https?://[a-z0-9]+%.[a-z%-]+%.[a-z]+/"]={
-      ["pics"]="^https?://[a-z0-9]+%.[a-z%-]+%.[a-z]+/pics/[a-zA-Z0-9%-_]+%.[a-z]+$",
-      ["vicom"]="/[vV][iI]com[0-9]+/",
-      ["k8"]="^https?://[kK]8"
-    }
-  }) do
+  for parenturl_pattern, pattern_table in pairs(filter_pattern_sets) do
     if string.match(parenturl, parenturl_pattern) then
       local found_any = false
       local check_string = parenturl_pattern .. parenturl
