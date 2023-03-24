@@ -111,6 +111,9 @@ local filter_pattern_sets = {
   },
   ["^https?://[a-z0-9]+%.[^%.]+%.de/.*%s"]={
     ["space"]="^https?://[a-z0-9]+%.[^%.]+%.de/.*%s"
+  },
+  ["^https?://[a-z0-9]+%.[^%.]+%.de/.*%%20"]={
+    ["space"]="^https?://[a-z0-9]+%.[^%.]+%.de/.*%s"
   }
 }
 
