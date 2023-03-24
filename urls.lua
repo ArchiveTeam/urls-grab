@@ -106,8 +106,11 @@ local filter_pattern_sets = {
     --["css"]="%s.*%.css$"
   },
   ["^https?://[a-z0-9]+%.[^%.]+%.de/news/"]={
-    ["pages"]="^https?://[a-z0-9]+%.[^%.]+%.de/news/[^&%?/]+$",
+    ["news"]="^https?://[a-z0-9]+%.[^%.]+%.de/news/[^&%?/]+$",
     --["css"]="%.css"
+  },
+  ["^https?://[a-z0-9]+%.[^%.]+%.de/.*%s"]={
+    ["space"]="^https?://[a-z0-9]+%.[^%.]+%.de/.*%s"
   }
 }
 
