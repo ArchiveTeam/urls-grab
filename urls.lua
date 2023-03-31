@@ -543,34 +543,36 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  for parenturl_pattern, pattern_table in pairs(filter_pattern_sets) do
-    if string.match(parenturl, parenturl_pattern) then
-      local found_any = false
-      local check_string = parenturl_pattern .. parenturl
-      for pattern_name, pattern in pairs(pattern_table) do
-        if string.match(url, pattern) then
-          found_any = true
-          if not skip_parent_urls_check[check_string] then
-            skip_parent_urls_check[check_string] = {}
-            for k, _ in pairs(pattern_table) do
-              skip_parent_urls_check[check_string][k] = false
+  if url ~= parenturl then
+    for parenturl_pattern, pattern_table in pairs(filter_pattern_sets) do
+      if string.match(parenturl, parenturl_pattern) then
+        local found_any = false
+        local check_string = parenturl_pattern .. parenturl
+        for pattern_name, pattern in pairs(pattern_table) do
+          if string.match(url, pattern) then
+            found_any = true
+            if not skip_parent_urls_check[check_string] then
+              skip_parent_urls_check[check_string] = {}
+              for k, _ in pairs(pattern_table) do
+                skip_parent_urls_check[check_string][k] = false
+              end
+            end
+            skip_parent_urls_check[check_string][pattern_name] = true
+          end
+        end
+        if found_any then
+          local all_true = true
+          for _, v in pairs(skip_parent_urls_check[check_string]) do
+            if not v then
+              all_true = false
+              break
             end
           end
-          skip_parent_urls_check[check_string][pattern_name] = true
-        end
-      end
-      if found_any then
-        local all_true = true
-        for _, v in pairs(skip_parent_urls_check[check_string]) do
-          if not v then
-            all_true = false
-            break
+          if all_true then
+            io.stdout:write("Skipping all URLs discovered for URL " .. parenturl .. ".\n")
+            io.stdout:flush()
+            skip_parent_urls[parenturl] = true
           end
-        end
-        if all_true then
-          io.stdout:write("Skipping all URLs discovered for URL " .. parenturl .. ".\n")
-          io.stdout:flush()
-          skip_parent_urls[parenturl] = true
         end
       end
     end
