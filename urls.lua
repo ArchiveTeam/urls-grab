@@ -87,6 +87,7 @@ local exit_url_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
 local extract_outlinks_domains = {}
+local extract_from_domain = {}
 local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
@@ -189,6 +190,14 @@ for pattern in extract_outlinks_domains_file:lines() do
   extract_outlinks_domains[pattern] = true
 end
 extract_outlinks_domains_file:close()
+
+local extract_from_domain_file = io.open("static-extract-from-domain.txt", "r")
+for pattern in extract_from_domain_file:lines() do
+  if not string.match(pattern, "^#") then
+    extract_from_domain[pattern] = true
+  end
+end
+extract_from_domain_file:close()
 
 kill_grab = function(item)
   io.stdout:write("Aborting crawling.\n")
@@ -624,6 +633,14 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
         if string.match(url, "([a-z]+)$") == string.match(srcset_url, "^%s*([a-z]+)%s[^%s].-%s[0-9]+w$") then
           return false
         end
+      end
+    end
+  end
+
+  if string.match(parenturl, "^https?://[^/]+/$") then
+    for s in string.gmatch(string.match(url, "^https?://[^/]+(.*)$"), "([a-zA-Z0-9]+)") do
+      if extract_from_domain[s] then
+        queue_monthly_url(url)
       end
     end
   end
