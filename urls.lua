@@ -110,21 +110,32 @@ local filter_pattern_sets = {
     ["news"]="^https?://[a-z0-9]+%.[^%.]+%.de/news/[^&%?/]+$",
     --["css"]="%.css"
   },
---[[  ["^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%s"]={
-    ["space"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%s"
-  },]]
   ["^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%%20"]={
-    ["space"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%s"
-  },
---[[  ["^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%s.?"]={
-    ["space"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%%20"
-  },]]
-  ["^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%%20.?"]={
-    ["space"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%%20"
+    ["space"]={
+      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%s",
+      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.*%%20"
+    }
   },
   ["^https?://[^/]+.*/X[a-z0-9]+"]={
     ["x"]="^https?://[^/]+.*/X[a-z0-9]+.*/X[a-z0-9]",
     ["tk88"]="[tT][kK]88"
+  },
+  ["^http://"]={
+    ["index-robots"]={
+      "^https?://[^/]+//index%.php%?robots%.txt$",
+      "^https?://[^/]+/robots%.txt$"
+    },
+    ["index-sitemap"]={
+      "^https?://[^/]+//index%.php%?sitemap%.xml$",
+      "^https?://[^/]+/sitemap%.xml$"
+    },
+    ["index-html"]={
+      "^https?://[^/]+//index%.php%?[a-z]+/[0-9]+%.html$",
+      "^https?://[^/]+/[0-9]+%.html$"
+    },
+    ["images"]="^https?://[^/]+/uploads/images/[0-9]+%.jpg$",
+    ["html"]="^https?://[^/]+/[a-z]+/[0-9]+%.html$",
+    ["page"]="^https?://[^/]+/[a-z]+/[0-9]+/$"
   }
 }
 
@@ -558,16 +569,24 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       if string.match(parenturl, parenturl_pattern) then
         local found_any = false
         local check_string = parenturl_pattern .. parenturl
-        for pattern_name, pattern in pairs(pattern_table) do
-          if string.match(url, pattern) then
-            found_any = true
-            if not skip_parent_urls_check[check_string] then
-              skip_parent_urls_check[check_string] = {}
-              for k, _ in pairs(pattern_table) do
-                skip_parent_urls_check[check_string][k] = false
+        if not skip_parent_urls_check[check_string] then
+          skip_parent_urls_check[check_string] = {}
+          for k, _ in pairs(pattern_table) do
+            skip_parent_urls_check[check_string][k] = false
+          end
+        end
+        for pattern_name, patterns in pairs(pattern_table) do
+          if not skip_parent_urls_check[check_string][pattern_name] then
+            if type(patterns) == "string" then
+              patterns = {patterns}
+            end
+            for _, pattern in pairs(patterns) do
+              if string.match(url, pattern) then
+                found_any = true
+                skip_parent_urls_check[check_string][pattern_name] = true
+                break
               end
             end
-            skip_parent_urls_check[check_string][pattern_name] = true
           end
         end
         if found_any then
