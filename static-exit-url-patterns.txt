@@ -25,4 +25,5 @@
 [%?&;]session_?id=
 [%?&;]nocache=
 [%?&;]ses=
+[%?&;][vV][iI][dD]=
 ^https?://[^/]+/index%.php%?s=
