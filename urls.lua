@@ -625,6 +625,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   if (
       string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/en/")
       or string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/mobile/")
+      or string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/page/")
       or (
         string.match(parenturl, "^https://[^/%.]+%.[^/%.]+%.de/")
         and (
@@ -636,6 +637,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     and (
       string.match(url, "^https://[^/%.]+%.[^/%.]+%.de/en/")
       or string.match(url, "^https://[^/%.]+%.[^/%.]+%.de/mobile/")
+      or string.match(url, "^https://[^/%.]+%.[^/%.]+%.de/page/")
       or (
         string.match(url, "^https://[^/%.]+%.[^/%.]+%.de/")
         and (
