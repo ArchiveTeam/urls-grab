@@ -136,6 +136,12 @@ local filter_pattern_sets = {
     ["images"]="^https?://[^/]+/uploads/images/[0-9]+%.jpg$",
     ["html"]="^https?://[^/]+/[a-z]+/[0-9]+%.html$",
     ["page"]="^https?://[^/]+/[a-z]+/[0-9]+/$"
+  },
+  ["^http://[a-z0-9]+%.[^%.]+%.[a-z]+/$"]={
+    ["sinaimgcn"]="^http://n%.sinaimg%.cn/.+%.jpg$",
+    ["sitemap"]="^http://[a-z0-9]+%.[^%.]+%.[a-z]+/sitemap%.xml",
+    ["template"]="/template/default/04190%-44/",
+    ["domain"]="^http://[a-z0-9]+%.[^%.]+%.[a-z]+/$"
   }
 }
 
