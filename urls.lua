@@ -144,7 +144,12 @@ local filter_pattern_sets = {
     ["domain"]="^http://[a-z0-9]+%.[^%.]+%.[a-z]+/$"
   },
   ["^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.?"]={
-    ["staticindex"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/_static_index/",
+    ["url"]={
+      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/_static_index/",
+      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+.*/spring_php/",
+      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+.*/count_php/",
+      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+.*/plus/.*[_%.]php"
+    },
     ["base"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/$",
     ["image"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/fx%-[a-zA-Z0-9=]+/uploads/[0-9]+/[0-9]+/[0-9]+/[0-9]+%.jpg$",
     --["html"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/[a-z0-9]+%.html$",
