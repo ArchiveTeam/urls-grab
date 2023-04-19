@@ -156,7 +156,7 @@ local filter_pattern_sets = {
     --["abouthtml"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/about%.html$",
     --["sitemaphtml"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/sitemap%.html$",
     --["announcehtml"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/announce%.html$",
-    ["number"]="^https?://[0-9]+%./"
+    ["number"]="^https?://[a-z0-9]+%./"
   }
 }
 
