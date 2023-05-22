@@ -1086,9 +1086,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           if name and path then
             -- the path should normally be absolute already
             local newurl = urlparse.absolute(url, path)
-            --[[if string.lower(name) == "sitemap" then
+            if string.lower(name) == "sitemap" then
               queue_monthly_url(newurl)
-            else]]if string.lower(name) ~= "user-agent"
+            elseif string.lower(name) ~= "user-agent"
               and not string.match(path, "%*")
               and not string.match(path, "%$") then
               queue_url(newurl)
@@ -1097,7 +1097,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         end
       end
     end
-    --[[if string.match(url, "sitemap.*%.gz$")
+    if string.match(url, "sitemap.*%.gz$")
       or string.match(url, "%.xml%.gz") then
       local temp_file = file .. ".uncompressed"
       io.stdout:write("Attempting to decompress sitemap to " .. temp_file .. ".\n")
@@ -1123,7 +1123,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           queue_monthly_url(newurl)
         end
       end
-    end]]
+    end
   end
 end
 
@@ -1234,7 +1234,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       for _, newurl in pairs({
         base_url .. "/robots.txt",
         base_url .. "/favicon.ico",
-        --base_url .. "/sitemap.xml",
+        base_url .. "/sitemap.xml",
         base_url .. "/"
       }) do
         queue_monthly_url(newurl)
