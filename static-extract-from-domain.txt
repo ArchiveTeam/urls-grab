@@ -16,6 +16,13 @@ support
 careers
 jobs
 canary
+policy
+team
+faq
+help
+news
+lawyer
+legal
 
 # german
 agb
