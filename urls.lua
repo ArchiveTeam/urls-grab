@@ -548,21 +548,21 @@ queue_telegram = function(rest)
   end
   local user = string.match(rest, "^/([^/]+)")
   if user then
-    telegram_posts[periodic_shard]["channel:" .. user] = true
-    telegram_channels[""]["channel:" .. user] = true
+    telegram_posts[periodic_shard]["channel:" .. user] = current_url
+    telegram_channels[""]["channel:" .. user] = current_url
   else
     return nil
   end
   local post = string.match(rest, "^/[^/]+/([0-9]+)$")
   if post then
-    telegram_posts[periodic_shard]["post:" .. user .. ":" .. post] = true
+    telegram_posts[periodic_shard]["post:" .. user .. ":" .. post] = current_url
   end
 end
 
 queue_pastebin = function(rest)
   for s in string.gmatch(rest, "([a-zA-Z0-9]+)") do
     if string.len(s) == 8 then
-      pastebin_items[""][s] = true
+      pastebin_items[""][s] = current_url
     end
   end
 end
@@ -571,10 +571,10 @@ queue_mediafire = function(rest)
   for s in string.gmatch(rest, "([a-zA-Z0-9]+)") do
     s = string.lower(s)
     if string.len(s) >= 10 then
-      mediafire_items[""]["id:" .. s] = true
+      mediafire_items[""]["id:" .. s] = current_url
       s = string.match(s, "^(.-).g$")
       if s then
-        mediafire_items[""]["id:" .. s] = true
+        mediafire_items[""]["id:" .. s] = current_url
       end
     end
   end
@@ -592,7 +592,7 @@ queue_services = function(url)
   elseif domain == "mediafire.com" or domain == "mfi.re" then
     queue_mediafire(rest)
   elseif domain == "zippyshare.com" then
-    zippyshare_urls_items[""][url] = true
+    zippyshare_urls_items[""][url] = current_url
   end
 end
 
@@ -613,7 +613,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   queue_services(url)
 
   if string.match(url, "^ftp://") then
-    ftp_urls[""][url] = true
+    ftp_urls[""][url] = current_url
     return false
   end
 
@@ -1476,7 +1476,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       end
       for parent_url, urls_list in pairs(sorted_data) do
         if not skip_parent_urls[parent_url] then
-          io.stdout:write("Queuing for parent URL " .. parent_url .. ".\n")
+          io.stdout:write("Queuing for parent URL " .. tostring(parent_url) .. ".\n")
+          io.stdout:flush()
           for url, _ in pairs(urls_list) do
             io.stdout:write("Queuing URL " .. url .. ".\n")
             io.stdout:flush()
