@@ -20,7 +20,7 @@ policy
 team
 faq
 help
-news
+#news
 lawyer
 legal
 

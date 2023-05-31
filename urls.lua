@@ -228,11 +228,11 @@ for pattern in page_requisite_patterns_file:lines() do
 end
 page_requisite_patterns_file:close()
 
-local extract_outlinks_domains_file = io.open("static-extract-outlinks-domains.txt", "r")
+--[[local extract_outlinks_domains_file = io.open("static-extract-outlinks-domains.txt", "r")
 for pattern in extract_outlinks_domains_file:lines() do
   extract_outlinks_domains[pattern] = true
 end
-extract_outlinks_domains_file:close()
+extract_outlinks_domains_file:close()]]
 
 local paths_file = io.open("static-paths.txt", "r")
 for line in paths_file:lines() do
