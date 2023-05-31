@@ -144,6 +144,7 @@ local filter_pattern_sets = {
     ["template"]="/template/default/04190%-44/",
     ["domain"]="^http://[a-z0-9]+%.[^%.]+%.[a-z]+/$"
   },
+  -- fx- spam
   ["^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.?"]={
     ["url"]={
       "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/_static_index/",
@@ -158,6 +159,28 @@ local filter_pattern_sets = {
     --["sitemaphtml"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/sitemap%.html$",
     --["announcehtml"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/announce%.html$",
     --["number"]="^https?://[a-z0-9]+%./"
+  },
+  -- news/show spam
+  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/"]={
+    ["newslist"]={
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/newslist/[0-9]+/$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/list/[0-9]+/$"
+    },
+    ["images"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/uploads/images/[0-9]+",
+    ["main"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/",
+    ["news"]={
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/news/[0-9]+%.html$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/show/[0-9]+%.html$"
+    },
+    ["template"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/template/"
+  },
+  -- xml spam
+  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?"]={
+    ["num"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[0-9]+/[a-z0-9]+%.xml$",
+    ["num2"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[a-z]+/[a-z0-9]+%.xml$",
+    ["vip"]="/[vV][iI][pP]%-[0-9]+%.",
+    ["styles"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/styles/",
+    ["itc"]="^https?://[^/]*itc%.cn/"
   }
 }
 
@@ -578,6 +601,12 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local parenturl = parent["url"]
   local extract_page_requisites = false
 
+  if string.match(url, "^https?://(.+)$") == string.match(parenturl, "^https?://(.+)$") then
+    return false
+  end
+
+--print(url)
+
   local current_settings_all = current_settings and current_settings["all"]
   local current_settings_any_domain = current_settings and current_settings["any_domain"]
 
@@ -611,6 +640,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
             for _, pattern in pairs(patterns) do
               if string.match(url, pattern) then
                 found_any = true
+--print(check_string, pattern_name)
                 skip_parent_urls_check[check_string][pattern_name] = true
                 break
               end
