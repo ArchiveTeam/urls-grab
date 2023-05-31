@@ -180,7 +180,7 @@ local filter_pattern_sets = {
     ["num2"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[a-z]+/[a-z0-9_]+%.xml$",
     --["vip"]="/[vV][iI][pP]%-[0-9]+%.",
     ["styles"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/styles/",
-    ["itc"]="^https?://[^/]*itc%.cn/"
+    --["itc"]="^https?://[^/]*itc%.cn/"
   }
 }
 
