@@ -87,6 +87,7 @@ local exit_url_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
 local extract_outlinks_domains = {}
+local paths = {}
 local extract_from_domain = {}
 local item_first_url = nil
 local redirect_domains = {}
@@ -232,6 +233,12 @@ for pattern in extract_outlinks_domains_file:lines() do
   extract_outlinks_domains[pattern] = true
 end
 extract_outlinks_domains_file:close()
+
+local paths_file = io.open("static-paths.txt", "r")
+for line in paths_file:lines() do
+  paths[line] = true
+end
+paths_file:close()
 
 local extract_from_domain_file = io.open("static-extract-from-domain.txt", "r")
 for pattern in extract_from_domain_file:lines() do
@@ -1085,23 +1092,62 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         io.stdout:flush()
       end
     end
-    if status_code == 200
-      and string.match(url, "^https?://[^/]+/robots%.txt$") then
-      html = read_file(file) .. "\n"
-      if not string.match(html, "<[^>]+/>")
-        and not string.match(html, "</") then
-        for line in string.gmatch(html, "(.-)\n") do
-          local name, path = string.match(line, "([^:]+):%s*(.-)%s*$")
-          if name and path then
-            -- the path should normally be absolute already
-            local newurl = urlparse.absolute(url, path)
-            if string.lower(name) == "sitemap" then
-              queue_monthly_url(newurl)
-            elseif string.lower(name) ~= "user-agent"
-              and not string.match(path, "%*")
-              and not string.match(path, "%$") then
-              queue_url(newurl)
+    if status_code == 200 then
+      if string.match(url, "^https?://[^/]+/robots%.txt$")
+        or string.match(url, "^https?://[^/]+/security%.txt$")
+        or string.match(url, "^https?://[^/]+/%.well%-known/security%.txt$") then
+        html = read_file(file) .. "\n"
+        if not string.match(html, "<[^>]+/>")
+          and not string.match(html, "</") then
+          for line in string.gmatch(html, "(.-)\n") do
+            local name, path = string.match(line, "([^:]+):%s*(.-)%s*$")
+            if name and path then
+              -- the path should normally be absolute already
+              local newurl = urlparse.absolute(url, path)
+              if string.lower(name) == "sitemap" then
+                queue_monthly_url(newurl)
+              elseif string.lower(name) ~= "user-agent"
+                and not string.match(path, "%*")
+                and not string.match(path, "%$") then
+                queue_url(newurl)
+              end
             end
+          end
+        end
+      elseif string.match(url, "^https?://[^/]+/ads%.txt$")
+        or string.match(url, "^https?://[^/]+/app%-ads%.txt$") then
+        html = read_file(file) .. "\n"
+        for line in string.gmatch(html, "(.-)\n") do
+          if not string.match(line, "^#") then
+            local site = string.match(line, "^([^,%s]+),")
+            if site then
+              if string.match(site, "^https?://") then
+                queue_url(site)
+              else
+                queue_url("http://" .. site .. "/")
+                queue_url("https://" .. site .. "/")
+              end
+            end
+          end
+        end
+      elseif string.match(url, "^https?://[^/]+/%.well%-known/trust%.txt$") then
+        html = read_file(file) .. "\n"
+        for line in string.gmatch(html, "(.-)\n") do
+          if not string.match(line, "^#") then
+            local a, b = string.match(line, "^([^=]+)=%s*(https?://.-)%s*$")
+            if b then
+              queue_url(b)
+            end
+          end
+        end
+      elseif string.match(url, "^https?://[^/]+/%.well%-known/nodeinfo$")
+        or string.match(url, "^https?://[^/]+/%.well%-known/openid%-configuration$")
+        or string.match(url, "^https?://[^/]+/%.well%-known/ai%-plugin%.json$") then
+        html = read_file(file)
+        html = string.gsub(html, "\\", "")
+        for s in string.gmatch(html, '([^"]+)') do
+          if string.match(s, "^https?://") then
+            queue_monthly_url(s)
           end
         end
       end
@@ -1240,13 +1286,8 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   if status_code ~= 0 then
     local base_url = string.match(url["url"], "^(https://[^/]+)")
     if base_url then
-      for _, newurl in pairs({
-        base_url .. "/robots.txt",
-        base_url .. "/favicon.ico",
-        base_url .. "/sitemap.xml",
-        base_url .. "/"
-      }) do
-        queue_monthly_url(newurl)
+      for path, _ in pairs(paths) do
+        queue_monthly_url(base_url .. path)
       end
     end
   end
