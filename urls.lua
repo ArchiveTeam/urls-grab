@@ -1117,26 +1117,32 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       elseif string.match(url, "^https?://[^/]+/ads%.txt$")
         or string.match(url, "^https?://[^/]+/app%-ads%.txt$") then
         html = read_file(file) .. "\n"
-        for line in string.gmatch(html, "(.-)\n") do
-          if not string.match(line, "^#") then
-            local site = string.match(line, "^([^,%s]+),")
-            if site then
-              if string.match(site, "^https?://") then
-                queue_url(site)
-              else
-                queue_url("http://" .. site .. "/")
-                queue_url("https://" .. site .. "/")
+        if not string.match(html, "<[^>]+/>")
+          and not string.match(html, "</") then
+          for line in string.gmatch(html, "(.-)\n") do
+            if not string.match(line, "^#") then
+              local site = string.match(line, "^([^,%s]+),")
+              if site then
+                if string.match(site, "^https?://") then
+                  queue_url(site)
+                else
+                  queue_url("http://" .. site .. "/")
+                  queue_url("https://" .. site .. "/")
+                end
               end
             end
           end
         end
       elseif string.match(url, "^https?://[^/]+/%.well%-known/trust%.txt$") then
         html = read_file(file) .. "\n"
-        for line in string.gmatch(html, "(.-)\n") do
-          if not string.match(line, "^#") then
-            local a, b = string.match(line, "^([^=]+)=%s*(https?://.-)%s*$")
-            if b then
-              queue_url(b)
+        if not string.match(html, "<[^>]+/>")
+          and not string.match(html, "</") then
+          for line in string.gmatch(html, "(.-)\n") do
+            if not string.match(line, "^#") then
+              local a, b = string.match(line, "^([^=]+)=%s*(https?://.-)%s*$")
+              if b then
+                queue_url(b)
+              end
             end
           end
         end
@@ -1145,9 +1151,11 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         or string.match(url, "^https?://[^/]+/%.well%-known/ai%-plugin%.json$") then
         html = read_file(file)
         html = string.gsub(html, "\\", "")
-        for s in string.gmatch(html, '([^"]+)') do
-          if string.match(s, "^https?://") then
-            queue_monthly_url(s)
+        if string.match(html, "^%s*{") then
+          for s in string.gmatch(html, '([^"]+)') do
+            if string.match(s, "^https?://") then
+              queue_monthly_url(s)
+            end
           end
         end
       end
@@ -1428,25 +1436,34 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     for shard, url_data in pairs(items_data) do
       local count = 0
       local newurls = nil
-      local is_bad = false
       print("Queuing to project " .. project_name .. " on shard " .. shard)
+      local sorted_data = {}
       for url, parent_url in pairs(url_data) do
-        if not is_bad and not skip_parent_urls[parent_url] then
-          io.stdout:write("Queuing URL " .. url .. " from " .. parent_url .. ".\n")
-          io.stdout:flush()
-          if shard == "" and project_name == "urls" then
-            dup_urls:write(url .. "\n")
-          end
-          if newurls == nil then
-            newurls = url
-          else
-            newurls = newurls .. "\0" .. url
-          end
-          count = count + 1
-          if count == 100 then
-            submit_backfeed(newurls, key, shard)
-            newurls = nil
-            count = 0
+        if not sorted_data[parent_url] then
+          sorted_data[parent_url] = {}
+        end
+        sorted_data[parent_url][url] = true
+      end
+      for parent_url, urls_list in pairs(sorted_data) do
+        if not skip_parent_urls[parent_url] then
+          io.stdout:write("Queuing for parent URL " .. parent_url .. ".\n")
+          for url, _ in pairs(urls_list) do
+            io.stdout:write("Queuing URL " .. url .. ".\n")
+            io.stdout:flush()
+            if shard == "" and project_name == "urls" then
+              dup_urls:write(url .. "\n")
+            end
+            if newurls == nil then
+              newurls = url
+            else
+              newurls = newurls .. "\0" .. url
+            end
+            count = count + 1
+            if count == 100 then
+              submit_backfeed(newurls, key, shard)
+              newurls = nil
+              count = 0
+            end
           end
         end
       end
