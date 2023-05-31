@@ -202,6 +202,7 @@ local telegram_channels = {
   [periodic_shard]={}
 }
 local ftp_urls = {[""]={}}
+local onion_urls = {[""]={}}
 local urls_all = {}
 
 local month_timestamp = os.date("%Y%m", timestamp)
@@ -614,6 +615,11 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   if string.match(url, "^ftp://") then
     ftp_urls[""][url] = current_url
+    return false
+  end
+
+  if string.match(url, "^https?://[^/]+%.onion/") then
+    onion_urls[""][url] = current_url
     return false
   end
 
@@ -1225,6 +1231,10 @@ wget.callbacks.write_to_warc = function(url, http_stat)
   current_file = http_stat["local_file"]
   current_file_url = url["url"]
   current_file_html = nil
+  if string.match(url["url"], "^https?://[^/]+%.onion/") then
+    onion_urls[""][url["url"]] = current_url
+    return false
+  end
   if urls[url_lower] then
     current_url = url_lower
     current_settings = urls_settings[url_lower]
@@ -1320,6 +1330,15 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     timestamp = tonumber(string.match(body, "^([0-9]+)"))
   end
 
+  url_count = url_count + 1
+  io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
+  io.stdout:flush()
+
+  if string.match(url["url"], "^https?://[^/]+%.onion/") then
+    onion_urls[""][url["url"]] = current_url
+    report_bad_url(url["url"])
+    return wget.actions.EXIT
+  end
 
   if status_code ~= 0
     and status_code < 500 then
@@ -1330,10 +1349,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       end
     end
   end
-
-  url_count = url_count + 1
-  io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
-  io.stdout:flush()
 
   if killgrab then
     return wget.actions.ABORT
@@ -1460,6 +1475,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["mediafire-9cmzz6b3jawqbih"] = mediafire_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
+    ["urls-onion-d943namwkczqavdw"] = onion_urls,
     ["urls-all-tx2vacclx396i0h"] = urls_all,
     ["zippyshare-urls-jtelkase24jmz0z"] = zippyshare_urls_items
   }) do
