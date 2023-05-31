@@ -1432,7 +1432,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       print("Queuing to project " .. project_name .. " on shard " .. shard)
       for url, parent_url in pairs(url_data) do
         if not is_bad and not skip_parent_urls[parent_url] then
-          io.stdout:write("Queuing URL " .. url .. ".\n")
+          io.stdout:write("Queuing URL " .. url .. " from " .. parent_url .. ".\n")
           io.stdout:flush()
           if shard == "" and project_name == "urls" then
             dup_urls:write(url .. "\n")
