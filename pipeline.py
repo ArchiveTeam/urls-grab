@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import random
+import re
 import shutil
 import socket
 import subprocess
@@ -67,7 +68,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20230604.08'
+VERSION = '20230604.09'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -105,6 +106,20 @@ class CheckIP(SimpleTask):
                     'Are you behind a firewall/proxy? That is a big no-no!')
                 raise Exception(
                     'Are you behind a firewall/proxy? That is a big no-no!')
+
+            http_url = 'http://legacy-api.arpa.li/now'
+            response = requests.get(http_url, timeout=10)
+            if response.url != http_url:
+                raise Exception('You have some configured redirect from http to elsewhere!')
+            if not re.search(r'^[0-9]{10}\.[0-9]{1,3}$', response.text):
+                raise Exception('Got wrong content for http URL.')
+
+            try:
+                socket.gethostbyname('oyinyxow')
+            except socket.gaierror:
+                pass
+            else:
+                raise Exception('Bad domain resolved.')
 
         # Check only occasionally
         if self._counter <= 0:
