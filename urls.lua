@@ -9,6 +9,8 @@ local item_name = os.getenv("item_name")
 local custom_items = os.getenv("custom_items")
 local warc_file_base = os.getenv("warc_file_base")
 
+local SPECIAL_INTEREST_FROM_MAIN = "special-interest-from-main"
+
 local url_count = 0
 local downloaded = {}
 local abortgrab = false
@@ -397,6 +399,10 @@ queue_url = function(url, withcustom)
     local any_domain = load_setting_depth("any_domain")
     if depth >= 0 then
       local random = current_settings["random"]
+      local comment = current_settings["comment"]
+      if comment then
+        comment = "-" .. comment
+      end
       local all = current_settings["all"]
       if keep_random < 0 or random == "" then
         random = nil
@@ -416,11 +422,12 @@ queue_url = function(url, withcustom)
         random=random,
         keep_random=keep_random,
         url=url,
-        any_domain=any_domain
+        any_domain=any_domain,
+        comment=comment
       }
       url = "custom:"
       for _, k in pairs(
-        {"all", "any_domain", "depth", "keep_all", "keep_random", "random", "url"}
+        {"all", "any_domain", "comment", "depth", "keep_all", "keep_random", "random", "url"}
       ) do
         local v = settings[k]
         if v ~= nil then
@@ -459,13 +466,17 @@ queue_monthly_item = function(item, t)
   t[month_timestamp][item] = current_url
 end
 
-queue_monthly_url = function(url)
+queue_monthly_url = function(url, comment)
   if find_path_loop(url, 3) then
     return nil
   end
   url = percent_encode_url(url)
   url = string.match(url, "^([^#]+)")
-  queue_monthly_item("custom:random=" .. month_timestamp .. "&url=" .. urlparse.escape(tostring(url)), queued_urls)
+  local comment_string = ""
+  if comment then
+    comment_string = "comment=" .. urlparse.escape(tostring(comment)) .. "&"
+  end
+  queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. "&url=" .. urlparse.escape(tostring(url)), queued_urls)
 end
 
 remove_param = function(url, param_pattern)
@@ -612,6 +623,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   local current_settings_all = current_settings and current_settings["all"]
   local current_settings_any_domain = current_settings and current_settings["any_domain"]
+  local same_domain = string.match(parenturl, "^(https?://[^/]+)") == string.match(url, "^(https?://[^/]+)")
 
   queue_services(url)
 
@@ -747,12 +759,12 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   if string.match(parenturl, "^https?://[^/]+/$")
-    and string.match(parenturl, "^(https?://[^/]+)$") == string.match(url, "^(https?://[^/]+)$") then
+    and same_domain then
     local temp = string.match(url, "^https?://[^/]+(.*)$")
     if temp then
       for s in string.gmatch(temp, "([a-zA-Z0-9]+)") do
         if extract_from_domain[s] then
-          queue_monthly_url(url)
+          queue_monthly_url(url, SPECIAL_INTEREST_FROM_MAIN)
         end
       end
     end
@@ -765,6 +777,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local _, count = string.gsub(url, "[/%?]", "")
   if count >= 16 then
     return false
+  end
+
+  if same_domain and current_settings and current_settings["comment"] == SPECIAL_INTEREST_FROM_MAIN then
+    queue_url(url)
   end
 
   if string.match(parenturl, "%?content=[a-zA-Z0-9%%]+$")
