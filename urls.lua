@@ -746,7 +746,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  if string.match(parenturl, "^(https?://[^/]+)$") == string.match(url, "^(https?://[^/]+)$") then
+  if string.match(parenturl, "^https?://[^/]+/$")
+    and string.match(parenturl, "^(https?://[^/]+)$") == string.match(url, "^(https?://[^/]+)$") then
     local temp = string.match(url, "^https?://[^/]+(.*)$")
     if temp then
       for s in string.gmatch(temp, "([a-zA-Z0-9]+)") do
