@@ -145,17 +145,17 @@ local filter_pattern_sets = {
     ["domain"]="^http://[a-z0-9]+%.[^%.]+%.[a-z]+/$"
   },
   -- fx- spam
-  ["^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.?"]={
+  ["^https?://[a-z0-9]+%.[^/]+%.[a-z]+/.?"]={
     ["url"]={
-      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/_static_index/",
-      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/.+/static/",
-      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+.*/spring_php/",
-      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+.*/count_php/",
-      "^https?://[a-z0-9]+%.[^%.]+%.[a-z]+.*/plus/.*[_%.]php",
+      "^https?://[a-z0-9]+%.[^/]+%.[a-z]+/_static_index/",
+      "^https?://[a-z0-9]+%.[^/]+%.[a-z]+/.+/static/",
+      "^https?://[a-z0-9]+%.[^/]+%.[a-z]+.*/spring_php/",
+      "^https?://[a-z0-9]+%.[^/]+%.[a-z]+.*/count_php/",
+      "^https?://[a-z0-9]+%.[^/]+%.[a-z]+.*/plus/.*[_%.]php",
       "^https?://[a-z0-9]+%./"
     },
-    ["base"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/$",
-    ["image"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/fx%-[a-zA-Z0-9=]+/uploads/[0-9]+/[0-9]+/[0-9]+/[0-9]+%.jpg$",
+    ["base"]="^https?://[a-z0-9]+%.[^/]+%.[a-z]+/$",
+    ["image"]="^https?://[a-z0-9]+%.[^/]+%.[a-z]+/fx%-[a-zA-Z0-9=]+/uploads/[0-9]+/[0-9]+/[0-9]+/[0-9]+%.jpg$",
     --["html"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/[a-z0-9]+%.html$",
     --["abouthtml"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/about%.html$",
     --["sitemaphtml"]="^https?://[a-z0-9]+%.[^%.]+%.[a-z]+/sitemap%.html$",
