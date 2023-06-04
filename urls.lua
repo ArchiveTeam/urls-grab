@@ -627,6 +627,16 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
+  local parenturl_base = string.match(parenturl, "^(https://[^/]+)")
+  if parenturl_base then
+    for path, _ in pairs(paths) do
+      if string.len(path) > 1
+        and parenturl_base .. path == parenturl then
+        return false
+      end
+    end
+  end
+
   if url ~= parenturl then
     for parenturl_pattern, pattern_table in pairs(filter_pattern_sets) do
       if string.match(parenturl, parenturl_pattern) then
