@@ -746,10 +746,13 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  if string.match(parenturl, "^https?://[^/]+/$") then
-    for s in string.gmatch(string.match(url, "^https?://[^/]+(.*)$"), "([a-zA-Z0-9]+)") do
-      if extract_from_domain[s] then
-        queue_monthly_url(url)
+  if string.match(parenturl, "^(https?://[^/]+)$") == string.match(url, "^(https?://[^/]+)$") then
+    local temp = string.match(url, "^https?://[^/]+(.*)$")
+    if temp then
+      for s in string.gmatch(temp, "([a-zA-Z0-9]+)") do
+        if extract_from_domain[s] then
+          queue_monthly_url(url)
+        end
       end
     end
   end

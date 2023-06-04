@@ -20,9 +20,12 @@ policy
 team
 faq
 help
-#news
+tos
+news
 lawyer
 legal
+blog
+report
 
 # german
 agb
