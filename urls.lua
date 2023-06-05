@@ -30,14 +30,28 @@ if urlparse == nil or http == nil or html_entities == nil then
   abortgrab = true
 end
 
+normalize_url = function(url)
+  local candidate_current = url
+  while true do
+    local temp = string.lower(urlparse.unescape(candidate_current))
+    if temp == candidate_current then
+      break
+    end
+    candidate_current = temp
+  end
+  return candidate_current
+end
+
 local urls = {}
 for url in string.gmatch(item_name, "([^\n]+)") do
-  urls[string.lower(url)] = true
+  urls[normalize_url(url)] = true
 end
 
 local urls_settings = JSON:decode(custom_items)
-for k, _ in pairs(urls_settings) do
-  urls[string.lower(k)] = true
+for k, v in pairs(urls_settings) do
+  k = normalize_url(k)
+  urls_settings[k] = v
+  urls[k] = true
 end
 
 local status_code = nil
@@ -1258,6 +1272,14 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   end
 end
 
+set_current_url = function(url)
+  candidate_current = normalize_url(url)
+  if candidate_current ~= current_url and urls[candidate_current] then
+    current_url = candidate_current
+    current_settings = urls_settings[candidate_current]
+  end
+end
+
 wget.callbacks.write_to_warc = function(url, http_stat)
   current_file = http_stat["local_file"]
   current_file_url = url["url"]
@@ -1338,21 +1360,6 @@ wget.callbacks.write_to_warc = function(url, http_stat)
     end
   end
   return true
-end
-
-set_current_url = function(url)
-  local candidate_current = url
-  while true do
-    local temp = string.lower(urlparse.unescape(candidate_current))
-    if temp == candidate_current then
-      break
-    end
-    candidate_current = temp
-  end
-  if candidate_url ~= current_url and urls[candidate_current] then
-    current_url = candidate_current
-    current_settings = urls_settings[candidate_current]
-  end
 end
 
 wget.callbacks.httploop_result = function(url, err, http_stat)
