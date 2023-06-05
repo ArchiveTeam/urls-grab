@@ -68,7 +68,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20230605.01'
+VERSION = '20230605.02'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -186,20 +186,13 @@ class SetBadUrls(SimpleTask):
     def __init__(self):
         SimpleTask.__init__(self, 'SetBadUrls')
 
-    def unquote_url(self, url):
-        temp = unquote(url)
-        while url != temp:
-            url = temp
-            temp = unquote(url)
-        return url
-
     def process(self, item):
         item['item_name_original'] = item['item_name']
         items = item['item_name'].split('\0')
-        items_lower = [self.unquote_url(url).strip().lower() for url in item['item_urls']]
+        items_lower = [normalize_url(url) for url in item['item_urls']]
         with open('%(item_dir)s/%(warc_file_base)s_bad-urls.txt' % item, 'r') as f:
             for url in {
-                self.unquote_url(url).strip().lower() for url in f
+                normalize_url(url) for url in f
             }:
                 index = items_lower.index(url)
                 items.pop(index)
@@ -288,6 +281,15 @@ class ZstdDict(object):
         return cls.data
 
 
+def normalize_url(url):
+    while True:
+        temp = unquote(url).strip().lower()
+        if temp == url:
+            break
+        url = temp
+    return url
+
+
 class WgetArgs(object):
     def realize(self, item):
         with open('user-agents.txt', 'r') as f:
@@ -353,7 +355,7 @@ class WgetArgs(object):
                     if len(v) == 1:
                         data[k] = v[0]
                 url = data['url']
-                custom_items[url.lower()] = data
+                custom_items[normalize_url(url)] = data
             else:
                 url = item_name
             item_urls.append(url)

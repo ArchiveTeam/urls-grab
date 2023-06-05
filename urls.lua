@@ -1259,17 +1259,13 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
 end
 
 wget.callbacks.write_to_warc = function(url, http_stat)
-  local url_lower = string.lower(url["url"])
   current_file = http_stat["local_file"]
   current_file_url = url["url"]
   current_file_html = nil
+  set_current_url(url["url"])
   if string.match(url["url"], "^https?://[^/]+%.onion/") then
     onion_urls[""][url["url"]] = current_url
     return false
-  end
-  if urls[url_lower] then
-    current_url = url_lower
-    current_settings = urls_settings[url_lower]
   end
   if current_settings and not current_settings["random"] then
     queue_url(url["url"])
@@ -1344,17 +1340,28 @@ wget.callbacks.write_to_warc = function(url, http_stat)
   return true
 end
 
+set_current_url = function(url)
+  local candidate_current = url
+  while true do
+    local temp = string.lower(urlparse.unescape(candidate_current))
+    if temp == candidate_current then
+      break
+    end
+    candidate_current = temp
+  end
+  if candidate_url ~= current_url and urls[candidate_current] then
+    current_url = candidate_current
+    current_settings = urls_settings[candidate_current]
+  end
+end
+
 wget.callbacks.httploop_result = function(url, err, http_stat)
   status_code = http_stat["statcode"]
 
   parenturl_uuid = nil
   parenturl_requisite = nil
 
-  local url_lower = string.lower(url["url"])
-  if urls[url_lower] then
-    current_url = url_lower
-    current_settings = urls_settings[url_lower]
-  end
+  set_current_url(url["url"])
 
   if not timestamp then
     local body, code, headers, status = http.request("https://legacy-api.arpa.li/now")
@@ -1437,6 +1444,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     return wget.actions.EXIT
   end
 
+  if bad_code(status_code) then
+    io.stdout:write("Server returned " .. http_stat.statcode .. " (" .. err .. ").\n")
+    io.stdout:flush()
+    report_bad_url(url["url"])
+    return wget.actions.EXIT
+  end
+
   for _, pattern in pairs(exit_url_patterns) do
     if string.match(url["url"], pattern) then
       return wget.actions.EXIT
@@ -1449,13 +1463,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 
   if status_code >= 200 and status_code < 300 then
     queue_new_urls(url["url"])
-  end
-
-  if bad_code(status_code) then
-    io.stdout:write("Server returned " .. http_stat.statcode .. " (" .. err .. ").\n")
-    io.stdout:flush()
-    report_bad_url(url["url"])
-    return wget.actions.EXIT
   end
 
   local sleep_time = 0
