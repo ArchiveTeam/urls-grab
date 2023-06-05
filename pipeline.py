@@ -51,7 +51,7 @@ LOCK = threading.Lock()
 WGET_AT = find_executable(
     'Wget+AT',
     [
-        'GNU Wget 1.21.3-at.20230208.01'
+        'GNU Wget 1.21.3-at.20230605.01'
     ],
     [
         './wget-at',
@@ -299,6 +299,9 @@ class WgetArgs(object):
             WGET_AT,
             '-U', USER_AGENT,
             '-v',
+            '--host-lookups', 'dns',
+            '--hosts-file', '/dev/null',
+            '--resolvconf-file', '/dev/null',
             '--dns-servers', '9.9.9.10,149.112.112.10,2620:fe::10,2620:fe::fe:10',
             '--content-on-error',
             '--lua-script', 'urls.lua',
