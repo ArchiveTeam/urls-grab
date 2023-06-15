@@ -87,30 +87,71 @@ class CheckIP(SimpleTask):
         self._counter = 0
 
     def process(self, item):
-        # NEW for 2014! Check if we are behind firewall/proxy
-
         if self._counter <= 0:
-            item.log_output('Checking IP address.')
-            ip_set = set()
+            command = [
+                WGET_AT,
+                '-U', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:63.0) Gecko/20100101 Firefox/63.0',
+                '--host-lookups', 'dns',
+                '--hosts-file', '/dev/null',
+                '--resolvconf-file', '/dev/null',
+                '--dns-servers', '9.9.9.10,149.112.112.10,2620:fe::10,2620:fe::fe:10',
+                '--output-document', '-',
+                '--max-redirect', '0',
+                '--save-headers',
+                '--no-check-certificate',
+                '--no-hsts'
+            ]
+            kwargs = {
+                'timeout': 60,
+                'capture_output': True
+            }
 
-            ip_set.add(socket.gethostbyname('twitter.com'))
-            #ip_set.add(socket.gethostbyname('facebook.com'))
-            ip_set.add(socket.gethostbyname('youtube.com'))
-            ip_set.add(socket.gethostbyname('microsoft.com'))
-            ip_set.add(socket.gethostbyname('icanhas.cheezburger.com'))
-            ip_set.add(socket.gethostbyname('archiveteam.org'))
+            returned = subprocess.run(
+                command+['http://legacy-api.arpa.li/now'],
+                **kwargs
+            )
+            assert returned.returncode == 0
+            assert re.match(b'^HTTP/1\\.1 200 OK\r\nServer: openresty\r\nDate: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nContent-Type: text/plain\r\nConnection: keep-alive\r\nContent-Length: 1[0-9]\r\nCache-Control: no-store\r\n\r\n[0-9]{10}\\.[0-9]{1,3}$', returned.stdout, flags=re.M)
 
-            if len(ip_set) != 5:
-                item.log_output('Got IP addresses: {0}'.format(ip_set))
-                item.log_output(
-                    'Are you behind a firewall/proxy? That is a big no-no!')
-                raise Exception(
-                    'Are you behind a firewall/proxy? That is a big no-no!')
+            actual_time = float(returned.stdout.rsplit(b'\n', 1)[1])
+            local_time = time.time()
+            max_diff = 30
+            assert abs(actual_time-local_time) < max_diff:
 
-            http_url = 'http://legacy-api.arpa.li/now'
-            response = requests.get(http_url, timeout=10)
-            if not re.search(r'^[0-9]{10}\.[0-9]{1,3}$', response.text):
-                raise Exception('Got wrong content for http URL.')
+            for s in (
+                'http://teststr/',
+                'http://example.test/',
+                'http://example.business/',
+                'http://test.example.bla/example'
+            ):
+                returned = subprocess.run(
+                    command+[s],
+                    **kwargs
+                )
+                assert returned.returncode == 4
+                assert len(returned.stdout) == 0
+                assert b'failed: No IPv4/IPv6 addresses for host.\nwget-at: unable to resolve host address' in returned.stderr
+
+            returned = subprocess.run(
+                command+['https://on.quad9.net/'],
+                **kwargs
+            )
+            assert returned.returncode == 0
+            assert re.match(b'^HTTP/1\\.1 200 OK\r\nServer: nginx/1\\.20\\.1\r\nDate: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nContent-Type: text/html\r\nContent-Length: [56][0-9]{3}\r\nLast-Modified: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nETag: "[^"]+"\r\nAccept-Ranges: bytes\r\nStrict-Transport-Security: max-age=31536000; includeSubdomains; preload\r\nX-Content-Type-Options: nosniff\r\n\r\n', returned.stdout)
+            for b in (
+                b'<title>Yes, you ARE using quad9</title>',
+                b'<font color=#dc205e>YES</font>',
+                b'You ARE using <font color=#ffffff>quad</font><font color=#dc205e>9</font>'
+            ):
+                assert b in returned.stdout
+
+            returned = subprocess.run(
+                command+['http://on.quad9.net/'],
+                **kwargs
+            )
+            assert len(returned.stdout) == 0
+            assert returned.returncode == 8
+            assert b'301 Moved Permanently\nLocation: https://on.quad9.net/ [following]\n0 redirections exceeded.\n' in returned.stderr
 
         # Check only occasionally
         if self._counter <= 0:
