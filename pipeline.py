@@ -68,7 +68,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20230615.04'
+VERSION = '20230615.05'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -119,10 +119,11 @@ class CheckIP(SimpleTask):
             assert abs(actual_time-local_time) < max_diff
 
             for s in (
-                'http://teststr/',
+                'http://domain.invalid/',
                 'http://example.test/',
-                'http://thissubdomaindoesnotexist.arpa.li/',
-                'http://test.example.bla/example'
+                'http://www/',
+                'http://example.test/example',
+                'http://nxdomain.archiveteam.org/'
             ):
                 returned = subprocess.run(
                     command+[s],
