@@ -68,7 +68,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20230616.04'
+VERSION = '20230616.05'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -93,7 +93,7 @@ class CheckIP(SimpleTask):
                 '-U', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:63.0) Gecko/20100101 Firefox/63.0',
                 '--host-lookups', 'dns',
                 '--hosts-file', '/dev/null',
-                '--resolvconf-file', '/dev/null',
+                '--resolvconf-file', 'resolv.conf',
                 '--dns-servers', '9.9.9.10,149.112.112.10,2620:fe::10,2620:fe::fe:10',
                 '--output-document', '-',
                 '--max-redirect', '0',
@@ -338,7 +338,7 @@ class WgetArgs(object):
             '-v',
             '--host-lookups', 'dns',
             '--hosts-file', '/dev/null',
-            '--resolvconf-file', '/dev/null',
+            '--resolvconf-file', 'resolv.conf',
             '--dns-servers', '9.9.9.10,149.112.112.10,2620:fe::10,2620:fe::fe:10',
             '--content-on-error',
             '--lua-script', 'urls.lua',
