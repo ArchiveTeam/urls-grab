@@ -68,7 +68,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20230615.05'
+VERSION = '20230616.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -106,19 +106,21 @@ class CheckIP(SimpleTask):
                 'capture_output': True
             }
 
+            url = 'http://legacy-api.arpa.li/now'
             returned = subprocess.run(
-                command+['http://legacy-api.arpa.li/now'],
+                command+[url],
                 **kwargs
             )
-            assert returned.returncode == 0
-            assert re.match(b'^HTTP/1\\.1 200 OK\r\nServer: openresty\r\nDate: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nContent-Type: text/plain\r\nConnection: keep-alive\r\nContent-Length: 1[0-9]\r\nCache-Control: no-store\r\n\r\n[0-9]{10}\\.[0-9]{1,3}$', returned.stdout, flags=re.M)
+            assert returned.returncode == 0, 'Invalid return code {} on {}.'.format(returned.returncode, url)
+            assert re.match(b'^HTTP/1\\.1 200 OK\r\nServer: openresty\r\nDate: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nContent-Type: text/plain\r\nConnection: keep-alive\r\nContent-Length: 1[0-9]\r\nCache-Control: no-store\r\n\r\n[0-9]{10}\\.[0-9]{1,3}$', returned.stdout, flags=re.M), 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
 
             actual_time = float(returned.stdout.rsplit(b'\n', 1)[1])
             local_time = time.time()
             max_diff = 30
-            assert abs(actual_time-local_time) < max_diff
+            diff = abs(actual_time-local_time)
+            assert diff < max_diff, 'Your time {} is more than {} seconds off of {}.'.format(local_time, max_diff, actual_time)
 
-            for s in (
+            for url in (
                 'http://domain.invalid/',
                 'http://example.test/',
                 'http://www/',
@@ -126,33 +128,35 @@ class CheckIP(SimpleTask):
                 'http://nxdomain.archiveteam.org/'
             ):
                 returned = subprocess.run(
-                    command+[s],
+                    command+[url],
                     **kwargs
                 )
-                assert returned.returncode == 4
-                assert len(returned.stdout) == 0
-                assert b'failed: No IPv4/IPv6 addresses for host.\nwget-at: unable to resolve host address' in returned.stderr
+                assert len(returned.stdout) == 0, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
+                assert returned.returncode == 4, 'Invalid return code {} on {}.'.format(returned.returncode, url)
+                assert b'failed: No IPv4/IPv6 addresses for host.\nwget-at: unable to resolve host address' in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
 
+            url = 'https://on.quad9.net/'
             returned = subprocess.run(
-                command+['https://on.quad9.net/'],
+                command+[url],
                 **kwargs
             )
-            assert returned.returncode == 0
-            assert re.match(b'^HTTP/1\\.1 200 OK\r\nServer: nginx/1\\.20\\.1\r\nDate: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nContent-Type: text/html\r\nContent-Length: [56][0-9]{3}\r\nLast-Modified: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nETag: "[^"]+"\r\nAccept-Ranges: bytes\r\nStrict-Transport-Security: max-age=31536000; includeSubdomains; preload\r\nX-Content-Type-Options: nosniff\r\n\r\n', returned.stdout)
+            assert returned.returncode == 0, 'Invalid return code {} on {}.'.format(returned.returncode, url)
+            assert re.match(b'^HTTP/1\\.1 200 OK\r\nServer: nginx/1\\.20\\.1\r\nDate: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nContent-Type: text/html\r\nContent-Length: [56][0-9]{3}\r\nLast-Modified: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nETag: "[^"]+"\r\nAccept-Ranges: bytes\r\nStrict-Transport-Security: max-age=31536000; includeSubdomains; preload\r\nX-Content-Type-Options: nosniff\r\n\r\n', returned.stdout), 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
             for b in (
                 b'<title>Yes, you ARE using quad9</title>',
                 b'<font color=#dc205e>YES</font>',
                 b'You ARE using <font color=#ffffff>quad</font><font color=#dc205e>9</font>'
             ):
-                assert b in returned.stdout
+                assert b in returned.stdout, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
 
+            url = 'http://on.quad9.net/'
             returned = subprocess.run(
-                command+['http://on.quad9.net/'],
+                command+[url],
                 **kwargs
             )
-            assert len(returned.stdout) == 0
-            assert returned.returncode == 8
-            assert b'301 Moved Permanently\nLocation: https://on.quad9.net/ [following]\n0 redirections exceeded.\n' in returned.stderr
+            assert len(returned.stdout) == 0, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
+            assert returned.returncode == 8, 'Invalid return code {} on {}.'.format(returned.returncode, url)
+            assert b'301 Moved Permanently\nLocation: https://on.quad9.net/ [following]\n0 redirections exceeded.\n' in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
 
         # Check only occasionally
         if self._counter <= 0:
