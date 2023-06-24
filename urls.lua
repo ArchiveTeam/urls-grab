@@ -199,6 +199,15 @@ local filter_pattern_sets = {
     --["vip"]="/[vV][iI][pP]%-[0-9]+%.",
     ["styles"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/styles/",
     --["itc"]="^https?://[^/]*itc%.cn/"
+  },
+  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?.?"]={
+    ["htmlnews"]={
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/html/[a-z0-9]+%.html$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/news/[a-z0-9]+%.html$"
+    },
+    ["baidu"]="^https?://[^/]*baidu%.com/",
+    ["a"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[a-z]+/$",
+    ["sitemap"]="sitemap%.xml$"
   }
 }
 
