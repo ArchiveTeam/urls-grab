@@ -460,11 +460,6 @@ queue_url = function(url, withcustom)
       url = string.sub(url, 1, -2)
     end
   end
-  for _, pattern in pairs(filter_discovered) do
-    if string.match(url, pattern) then
-      return false
-    end
-  end
   local shard = ""
   if string.match(url, "&random=") then
     shard = "periodic"
@@ -1551,21 +1546,32 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
           io.stdout:write("Queuing for parent URL " .. tostring(parent_url) .. ".\n")
           io.stdout:flush()
           for url, _ in pairs(urls_list) do
-            io.stdout:write("Queuing URL " .. url .. ".\n")
-            io.stdout:flush()
-            if shard == "" and project_name == "urls" then
-              dup_urls:write(url .. "\n")
+            local filtered = false
+            for _, pattern in pairs(filter_discovered) do
+              if string.match(url, pattern) then
+                io.stdout:write("Skipping URL " .. url .. ".\n")
+                io.stdout:flush()
+                filtered = true
+                break
+              end
             end
-            if newurls == nil then
-              newurls = url
-            else
-              newurls = newurls .. "\0" .. url
-            end
-            count = count + 1
-            if count == 100 then
-              submit_backfeed(newurls, key, shard)
-              newurls = nil
-              count = 0
+            if not filtered then
+              io.stdout:write("Queuing URL " .. url .. ".\n")
+              io.stdout:flush()
+              if shard == "" and project_name == "urls" then
+                dup_urls:write(url .. "\n")
+              end
+              if newurls == nil then
+                newurls = url
+              else
+                newurls = newurls .. "\0" .. url
+              end
+              count = count + 1
+              if count == 100 then
+                submit_backfeed(newurls, key, shard)
+                newurls = nil
+                count = 0
+              end
             end
           end
         end
