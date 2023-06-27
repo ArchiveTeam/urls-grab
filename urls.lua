@@ -1586,7 +1586,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
 
   local file = io.open(item_dir .. "/" .. warc_file_base .. "_bad-urls.txt", "w")
   for url, _ in pairs(bad_urls) do
-    file:write(url .. "\n")
+    file:write(urlparse.escape(url) .. "\n")
   end
   file:close()
 end
