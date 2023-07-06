@@ -1401,10 +1401,21 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     end
   end
 
+  local url_path = string.match(url["url"], "^https?://[^/]+(/[a-zA-Z0-9_%-%./]*)[^a-zA-Z0-9_%-%./]")
+  if url_path and url_path ~= "/" and url_path ~= "/sitemap.xml" then
+    for path, _ in pairs(paths) do
+      if path == url_path then
+        return wget.actions.EXIT
+      end
+    end
+  end
+
   if status_code ~= 0
     and status_code < 500 then
-    local base_url = string.match(url["url"], "^(https://[^/]+)")
-    if base_url then
+    local base_url = string.match(url["url"], "^(https?://[^/]+)")
+    if string.match(url["url"], "^https?://[^/]+/.") then
+      queue_monthly_url(base_url .. "/")
+    elseif string.match(url["url"], "^https?://[^/]+/$") then
       for path, _ in pairs(paths) do
         queue_monthly_url(base_url .. path)
       end
