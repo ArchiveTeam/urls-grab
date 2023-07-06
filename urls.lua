@@ -1391,6 +1391,16 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     return wget.actions.EXIT
   end
 
+  if killgrab then
+    return wget.actions.ABORT
+  end
+
+  for _, pattern in pairs(exit_url_patterns) do
+    if string.match(url["url"], pattern) then
+      return wget.actions.EXIT
+    end
+  end
+
   if status_code ~= 0
     and status_code < 500 then
     local base_url = string.match(url["url"], "^(https://[^/]+)")
@@ -1399,10 +1409,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
         queue_monthly_url(base_url .. path)
       end
     end
-  end
-
-  if killgrab then
-    return wget.actions.ABORT
   end
 
   if redirect_domains["done"] then
@@ -1461,12 +1467,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     io.stdout:flush()
     report_bad_url(url["url"])
     return wget.actions.EXIT
-  end
-
-  for _, pattern in pairs(exit_url_patterns) do
-    if string.match(url["url"], pattern) then
-      return wget.actions.EXIT
-    end
   end
 
   if status_code >= 200 and status_code <= 399 then
