@@ -182,13 +182,17 @@ local filter_pattern_sets = {
   ["^https?://[^%.]+%.[^%.]+%.[a-z]+/"]={
     ["newslist"]={
       "^https?://[^%.]+%.[^%.]+%.[a-z]+/newslist/[0-9]+/$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/list/[0-9]+/$"
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/list/[0-9]+/$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/show[0-9]+/$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/list_[0-9]+/$"
     },
     ["images"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/uploads/images/[0-9]+",
     ["main"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/",
     ["news"]={
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/news/[0-9]+%.html$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/show/[0-9]+%.html$"
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/news/[0-9/]+%.html$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/show/[0-9/]+%.html$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/html/[0-9/]+%.html$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/[a-z]+_[0-9/]+%.html$"
     },
     ["template"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/template/"
   },
@@ -208,6 +212,23 @@ local filter_pattern_sets = {
     ["baidu"]="^https?://[^/]*baidu%.com/",
     ["a"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[a-z]+/$",
     ["sitemap"]="sitemap%.xml$"
+  },
+  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?.?.?"]={
+    ["xls"]="%.xlsx?$",
+    ["ppt"]="%.pptx?$",
+    ["doc"]="%.docx?$",
+    --["swf"]="%.swf$",
+    --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
+    ["tupian"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/tupian_1/[^%.]+%.jpg$",
+    ["slash"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[^/]+/$",
+    ["slashnum"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[^/]+/[0-9]+/$"
+  },
+  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?.?.?.?"]={
+    ["search"]="^https?://[^/]+/.*/?search/",
+    ["catalogsearch"]="^https?://[^/]+/.*/?catalogsearch/",
+    ["s"]="^https?://[^/]+/%?s=",
+    ["character"]="广",
+    ["brackets"]="【[^%.】]+%.[a-zA-Z0-9]+】"
   }
 }
 
