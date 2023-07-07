@@ -183,16 +183,16 @@ local filter_pattern_sets = {
     ["newslist"]={
       "^https?://[^%.]+%.[^%.]+%.[a-z]+/newslist/[0-9]+/$",
       "^https?://[^%.]+%.[^%.]+%.[a-z]+/list/[0-9]+/$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/show[0-9]+/$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/list_[0-9]+/$"
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/[a-z]+_?[0-9]+/$"
     },
     ["images"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/uploads/images/[0-9]+",
-    ["main"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/",
+    --["main"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/",
     ["news"]={
       "^https?://[^%.]+%.[^%.]+%.[a-z]+/news/[0-9/]+%.html$",
       "^https?://[^%.]+%.[^%.]+%.[a-z]+/show/[0-9/]+%.html$",
       "^https?://[^%.]+%.[^%.]+%.[a-z]+/html/[0-9/]+%.html$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/[a-z]+_[0-9/]+%.html$"
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/[a-z]+_[0-9/]+%.html$",
+      "^https?://[^%.]+%.[^%.]+%.[a-z]+/[a-zA-Z0-9]+%.html$"
     },
     ["template"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/template/"
   },
