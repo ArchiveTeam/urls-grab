@@ -214,9 +214,11 @@ local filter_pattern_sets = {
     ["sitemap"]="sitemap%.xml$"
   },
   ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?.?.?"]={
-    ["xls"]="%.xlsx?$",
-    ["ppt"]="%.pptx?$",
-    ["doc"]="%.docx?$",
+    ["doc"]={
+      "%.xlsx?$",
+      "%.pptx?$",
+      "%.docx?$"
+    },
     --["swf"]="%.swf$",
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
     ["tupian"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/tupian_1/[^%.]+%.jpg$",
