@@ -1216,7 +1216,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           and not string.match(html, "</") then
           for line in string.gmatch(html, "(.-)\n") do
             local name, path = string.match(line, "([^:]+):%s*(.-)%s*$")
-            if name and path then
+            if name and path and name ~= "http" and name ~= "https" then
               -- the path should normally be absolute already
               local newurl = urlparse.absolute(url, path)
               if string.lower(name) == "sitemap" then
