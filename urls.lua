@@ -179,57 +179,62 @@ local filter_pattern_sets = {
     --["number"]="^https?://[a-z0-9]+%./"
   },
   -- news/show spam
-  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/"]={
+  ["^https?://[^/]+%.[^%.]+%.[a-z]+/"]={
     ["newslist"]={
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/newslist/[0-9]+/$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/list/[0-9]+/$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/[a-z]+_?[0-9]+/$"
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/newslist/[0-9]+/$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/list/[0-9]+/$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/product/[a-z]+_?[0-9]+/$"
     },
-    ["images"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/uploads/images/[0-9]+",
-    --["main"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/",
+    ["images"]={
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/uploads/images/",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/{{pasePath}}images/"
+    },
+    --["main"]="^https?://[^/]+%.[^%.]+%.[a-z]+/",
     ["news"]={
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/news/[0-9/]+%.html$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/show/[0-9/]+%.html$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/html/[0-9/]+%.html$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/product/[a-z]+_[0-9/]+%.html$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/[a-zA-Z0-9]+%.html$"
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/news/[0-9/]+%.html$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/show/[0-9/]+%.html$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/html/[0-9/]+%.html$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/product/[a-z]+_[0-9/]+%.html$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/[a-zA-Z0-9]+%.html$"
     },
-    ["template"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/template/"
+    ["template"]="^https?://[^/]+%.[^%.]+%.[a-z]+/template/"
   },
   -- xml spam
-  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?"]={
-    ["num"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[0-9]+/[a-z0-9_]+%.xml$",
-    ["num2"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[a-z]+/[a-z0-9_]+%.xml$",
+  ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?"]={
+    ["num"]="^https?://[^/]+%.[^%.]+%.[a-z]+/[0-9]+/[a-z0-9_]+%.xml$",
+    ["num2"]="^https?://[^/]+%.[^%.]+%.[a-z]+/[a-z]+/[a-z0-9_]+%.xml$",
     --["vip"]="/[vV][iI][pP]%-[0-9]+%.",
-    ["styles"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/styles/",
+    ["styles"]="^https?://[^/]+%.[^%.]+%.[a-z]+/styles/",
     --["itc"]="^https?://[^/]*itc%.cn/"
   },
-  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?.?"]={
+  ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?"]={
     ["htmlnews"]={
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/html/[a-z0-9]+%.html$",
-      "^https?://[^%.]+%.[^%.]+%.[a-z]+/news/[a-z0-9]+%.html$"
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/html/[a-z0-9]+%.html$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/news/[a-z0-9]+%.html$"
     },
     ["baidu"]="^https?://[^/]*baidu%.com/",
-    ["a"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[a-z]+/$",
+    ["a"]="^https?://[^/]+%.[^%.]+%.[a-z]+/[a-z]+/$",
     ["sitemap"]="sitemap%.xml$"
   },
-  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?.?.?"]={
-    ["doc"]={
+  ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?.?"]={
+    --[[["doc"]={
       "%.xlsx?$",
       "%.pptx?$",
       "%.docx?$"
-    },
+    },]]
     --["swf"]="%.swf$",
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
-    ["tupian"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/tupian_1/[^%.]+%.jpg$",
-    ["slash"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[^/]+/$",
-    ["slashnum"]="^https?://[^%.]+%.[^%.]+%.[a-z]+/[^/]+/[0-9]+/$"
+    ["tupian"]={
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/tupian_1/[^%.]+%.jpg$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/templates/moban"
+    },
+    ["slash"]="^https?://[^/]+%.[^%.]+%.[a-z]+/[^/]+/$",
+    ["slashnum"]="^https?://[^/]+%.[^%.]+%.[a-z]+/[^/]+/[0-9]+/$"
   },
-  ["^https?://[^%.]+%.[^%.]+%.[a-z]+/.?.?.?.?"]={
+  ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?.?.?"]={
     ["search"]="^https?://[^/]+/.*/?search/",
     ["catalogsearch"]="^https?://[^/]+/.*/?catalogsearch/",
     ["s"]="^https?://[^/]+/%?s=",
-    ["character"]="广",
     ["brackets"]="【[^%.】]+%.[a-zA-Z0-9]+】"
   }
 }
@@ -1321,7 +1326,7 @@ wget.callbacks.write_to_warc = function(url, http_stat)
     queue_url(url["url"])
     return false
   end
-  if bad_code(http_stat["statcode"]) then
+  if bad_code(http_stat["statcode"]) or http_stat["res"] ~= 0 then
     return false
   elseif http_stat["statcode"] >= 300 and http_stat["statcode"] <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
@@ -1404,9 +1409,22 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     timestamp = tonumber(string.match(body, "^([0-9]+)"))
   end
 
+  local err_string = ""
+  --[[if err ~= "RETRFINISHED" then
+    err_string = err_string .. " (" .. err .. ")"
+  end
+  if http_stat["rderrmsg"] then
+    err_string = err_string .. " (" .. http_stat["rderrmsg"] .. ")"
+  end]]
+
   url_count = url_count + 1
-  io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
+  io.stdout:write(url_count .. "=" .. status_code .. err_string .. " " .. url["url"] .. "  \n")
   io.stdout:flush()
+
+  if http_stat["res"] < 0 then
+    report_bad_url(url["url"])
+    return wget.actions.EXIT
+  end
 
   if string.match(url["url"], "^https?://[^/]+%.onion/") then
     onion_urls[""][url["url"]] = current_url
@@ -1436,11 +1454,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   if status_code ~= 0
     and status_code < 500 then
     local base_url = string.match(url["url"], "^(https?://[^/]+)")
-    if string.match(url["url"], "^https?://[^/]+/.") then
-      queue_monthly_url(base_url .. "/")
-    elseif string.match(url["url"], "^https?://[^/]+/$") then
-      for path, _ in pairs(paths) do
-        queue_monthly_url(base_url .. path)
+    if base_url then
+      if string.match(url["url"], "^https?://[^/]+/.") then
+        queue_monthly_url(base_url .. "/")
+      elseif string.match(url["url"], "^https?://[^/]+/$") then
+        for path, _ in pairs(paths) do
+          queue_monthly_url(base_url .. path)
+        end
       end
     end
   end
