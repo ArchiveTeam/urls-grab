@@ -1332,7 +1332,7 @@ wget.callbacks.write_to_warc = function(url, http_stat)
     queue_url(url["url"])
     return false
   end
-  if bad_code(http_stat["statcode"]) or http_stat["res"] ~= 0 then
+  if bad_code(http_stat["statcode"]) then
     return false
   elseif http_stat["statcode"] >= 300 and http_stat["statcode"] <= 399 then
     local newloc = urlparse.absolute(url["url"], http_stat["newloc"])
