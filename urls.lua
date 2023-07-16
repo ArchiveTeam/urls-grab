@@ -217,11 +217,6 @@ local filter_pattern_sets = {
     ["sitemap"]="sitemap%.xml$"
   },
   ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?.?"]={
-    --[[["doc"]={
-      "%.xlsx?$",
-      "%.pptx?$",
-      "%.docx?$"
-    },]]
     --["swf"]="%.swf$",
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
     ["tupian"]={
@@ -229,7 +224,13 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%.]+%.[a-z]+/templates/moban"
     },
     ["slash"]="^https?://[^/]+%.[^%.]+%.[a-z]+/[^/]+/$",
-    ["slashnum"]="^https?://[^/]+%.[^%.]+%.[a-z]+/[^/]+/[0-9]+/$"
+    ["other"]={
+      "%.xlsx?$",
+      "%.pptx?$",
+      "%.docx?$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/[^/]+/[0-9]+/$",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/cnki/images/"
+    }
   },
   ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?.?.?"]={
     ["search"]="^https?://[^/]+/.*/?search/",
