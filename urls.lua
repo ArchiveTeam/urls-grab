@@ -221,7 +221,8 @@ local filter_pattern_sets = {
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
     ["tupian"]={
       "^https?://[^/]+%.[^%.]+%.[a-z]+/tupian_1/[^%.]+%.jpg$",
-      "^https?://[^/]+%.[^%.]+%.[a-z]+/templates/moban"
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/templates/moban",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/templates/[^/]+/moban"
     },
     ["slash"]="^https?://[^/]+%.[^%.]+%.[a-z]+/[^/]+/$",
     ["other"]={
@@ -241,6 +242,9 @@ local filter_pattern_sets = {
   ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?.?.?.?"]={
     ["article"]="^https?://[^/]+/article/2023[01][1-9][0-9A-Za-z%.html$",
     ["article2"]="^https?://[^/]+/2023[01][1-9][0-9A-Za-z%.html$"
+  },
+  ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?.?.?.?.?"]={
+    ["appsstore.cdf"]="^https?://download%.appsstore%.cfd/"
   }
 }
 
