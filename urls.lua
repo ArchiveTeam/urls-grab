@@ -1466,8 +1466,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     end
   end
 
-  if status_code ~= 0
-    and status_code < 500 then
+  if status_code == 200 then
     local base_url = string.match(url["url"], "^(https?://[^/]+)")
     if base_url then
       if string.match(url["url"], "^https?://[^/]+/.") then
