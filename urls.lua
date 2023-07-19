@@ -1467,7 +1467,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   end
 
   if status_code == 200 then
-    local base_url = string.match(url["url"], "^(https?://[^/]+)")
+    local base_url = string.match(url["url"], "^(https://[^/]+)")
     if base_url then
       if string.match(url["url"], "^https?://[^/]+/.") then
         queue_monthly_url(base_url .. "/")
