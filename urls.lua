@@ -187,7 +187,9 @@ local filter_pattern_sets = {
     },]]
     ["images"]={
       "^https?://[^/]+%.[^%.]+%.[a-z]+/uploads/images/",
-      "^https?://[^/]+%.[^%.]+%.[a-z]+/{{pasePath}}images/"
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/{{pasePath}}images/",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/redian/",
+      "^https?://[^/]+%.[^%.]+%.[a-z]+/template/news/.*images/"
     },
     --["main"]="^https?://[^/]+%.[^%.]+%.[a-z]+/",
     ["news"]={
