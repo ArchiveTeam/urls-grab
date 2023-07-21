@@ -242,8 +242,8 @@ local filter_pattern_sets = {
     ["brackets"]="【[^%.】]+%.[a-zA-Z0-9]+】"
   },
   ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?.?.?.?"]={
-    ["article"]="^https?://[^/]+/article/2023[01][1-9][0-9A-Za-z%.html$",
-    ["article2"]="^https?://[^/]+/2023[01][1-9][0-9A-Za-z%.html$"
+    ["article"]="^https?://[^/]+/article/2023[01][1-9][0-9A-Za-z]+%.html$",
+    ["article2"]="^https?://[^/]+/2023[01][1-9][0-9A-Za-z]+%.html$"
   },
   ["^https?://[^/]+%.[^%.]+%.[a-z]+/.?.?.?.?.?.?"]={
     ["appsstore.cdf"]="^https?://download%.appsstore%.cfd/"
