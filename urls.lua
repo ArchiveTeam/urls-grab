@@ -1304,7 +1304,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     if string.match(url, "^https?://[^/]+/.*%.[xX][mM][lL]")
       and string.match(string.lower(read_file(file, 200)), "sitemap") then
       html = read_file(file)
-      for xmlns_url in string.gmatch(html, 'xmlns:n="([^"]+)"') do
+      for xmlns_url in string.gmatch(html, 'xmlns:[a-z]+="([^"]+)"') do
         if string.match(xmlns_url, "sitemap%-news") then
           urls_sitemap_news[""][url] = true
         end
