@@ -68,7 +68,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20230722.03'
+VERSION = '20230725.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -113,7 +113,18 @@ class CheckIP(SimpleTask):
                 **kwargs
             )
             assert returned.returncode == 0, 'Invalid return code {} on {}.'.format(returned.returncode, url)
-            assert re.match(b'^HTTP/1\\.1 200 OK\r\nServer: openresty\r\nDate: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nContent-Type: text/plain\r\nConnection: keep-alive\r\nContent-Length: 1[0-9]\r\nCache-Control: no-store\r\n\r\n[0-9]{10}\\.[0-9]{1,3}$', returned.stdout, flags=re.M), 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
+            assert re.match(
+                b'^HTTP/1\\.1 200 OK\r\n'
+                b'Server: openresty\r\n'
+                b'Date: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\n'
+                b'Content-Type: text/plain\r\n'
+                b'Connection: keep-alive\r\n'
+                b'Content-Length: 1[0-9]\r\n'
+                b'Cache-Control: no-store\r\n'
+                b'\r\n'
+                b'[0-9]{10}\\.[0-9]{1,3}$',
+                returned.stdout
+            ), 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
 
             actual_time = float(returned.stdout.rsplit(b'\n', 1)[1])
             local_time = time.time()
@@ -133,7 +144,10 @@ class CheckIP(SimpleTask):
                     **kwargs
                 )
                 assert len(returned.stdout) == 0, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
-                assert b'failed: No IPv4/IPv6 addresses for host.\nwget-at: unable to resolve host address' in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
+                assert (
+                    b'failed: No IPv4/IPv6 addresses for host.\n'
+                    b'wget-at: unable to resolve host address'
+                ) in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
                 assert returned.returncode == 4, 'Invalid return code {} on {}.'.format(returned.returncode, url)
 
             url = 'https://on.quad9.net/'
@@ -142,7 +156,20 @@ class CheckIP(SimpleTask):
                 **kwargs
             )
             assert returned.returncode == 0, 'Invalid return code {} on {}.'.format(returned.returncode, url)
-            assert re.match(b'^HTTP/1\\.1 200 OK\r\nServer: nginx/1\\.20\\.1\r\nDate: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nContent-Type: text/html\r\nContent-Length: [56][0-9]{3}\r\nLast-Modified: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\nETag: "[^"]+"\r\nAccept-Ranges: bytes\r\nStrict-Transport-Security: max-age=31536000; includeSubdomains; preload\r\nX-Content-Type-Options: nosniff\r\n\r\n', returned.stdout), 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
+            assert re.match(
+                b'^HTTP/1\\.1 200 OK\r\n'
+                b'Server: nginx/1\\.20\\.1\r\n'
+                b'Date: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\n'
+                b'Content-Type: text/html\r\n'
+                b'Content-Length: [56][0-9]{3}\r\n'
+                b'Last-Modified: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\n'
+                b'ETag: "[^"]+"\r\n'
+                b'Accept-Ranges: bytes\r\n'
+                b'Strict-Transport-Security: max-age=31536000; includeSubdomains; preload\r\n'
+                b'X-Content-Type-Options: nosniff\r\n'
+                b'\r\n',
+                returned.stdout
+            ), 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
             for b in (
                 b'<title>Yes, you ARE using quad9</title>',
                 b'<font color=#dc205e>YES</font>',
@@ -157,7 +184,11 @@ class CheckIP(SimpleTask):
             )
             assert len(returned.stdout) == 0, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
             assert returned.returncode == 8, 'Invalid return code {} on {}.'.format(returned.returncode, url)
-            assert b'301 Moved Permanently\nLocation: https://on.quad9.net/ [following]\n0 redirections exceeded.\n' in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
+            assert (
+                b'301 Moved Permanently\n'
+                b'Location: https://on.quad9.net/ [following]\n'
+                b'0 redirections exceeded.\n'
+            ) in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
 
         # Check only occasionally
         if self._counter <= 0:
