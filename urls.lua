@@ -270,6 +270,7 @@ local telegram_channels = {
 local urls_sitemap_news = {[""]={}}
 local ftp_urls = {[""]={}}
 local onion_urls = {[""]={}}
+local urls_news = {[""]={}}
 local urls_all = {}
 
 local month_timestamp = os.date("%Y%m", timestamp)
@@ -1307,6 +1308,11 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       for xmlns_url in string.gmatch(html, 'xmlns:[a-z]+="([^"]+)"') do
         if string.match(xmlns_url, "sitemap%-news") then
           urls_sitemap_news[""][url] = true
+          for tag, url in string.gmatch(html, "<([^>]+)>%s*(https?://[^%s<]+)%s*<") do
+            if tag and url and tag ~= "sitemap" then
+              urls_news[""][url] = true
+            end
+          end
         end
       end
       for sitemap in string.gmatch(html, "<sitemap>(.-)</sitemap>") do
@@ -1599,7 +1605,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["urls-onion-d943namwkczqavdw"] = onion_urls,
     ["urls-all-tx2vacclx396i0h"] = urls_all,
     ["zippyshare-urls-jtelkase24jmz0z"] = zippyshare_urls_items,
-    ["urls-sitemap-news-hu1y8xj3h0ildh1k"] = urls_sitemap_news
+    ["urls-sitemap-news-hu1y8xj3h0ildh1k"] = urls_sitemap_news,
+    ["urls-news-6t9uc9xxz06gpt93"] = urls_news
   }) do
     local project_name = string.match(key, "^(.+)%-")
     for shard, url_data in pairs(items_data) do
