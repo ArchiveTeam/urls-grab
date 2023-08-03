@@ -103,6 +103,7 @@ local exit_url_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
 local extract_outlinks_domains = {}
+local one_time_patterns = {}
 local paths = {}
 local extract_from_domain = {}
 local item_first_url = nil
@@ -320,6 +321,12 @@ for pattern in page_requisite_patterns_file:lines() do
 end
 page_requisite_patterns_file:close()
 
+local one_time_patterns_file = io.open("static-one-time-patterns.txt", "r")
+for pattern in one_time_patterns_file:lines() do
+  table.insert(one_time_patterns, pattern)
+end
+one_time_patterns_file:close()
+
 --[[local extract_outlinks_domains_file = io.open("static-extract-outlinks-domains.txt", "r")
 for pattern in extract_outlinks_domains_file:lines() do
   extract_outlinks_domains[pattern] = true
@@ -504,6 +511,14 @@ queue_url = function(url, withcustom)
   local shard = ""
   if string.match(url, "&random=") then
     shard = "periodic"
+  end
+  if shard == "" then
+    for _, pattern in pairs(one_time_patterns) do
+      if string.match(url, pattern) then
+        shard = "onetime"
+        break
+      end
+    end
   end
   if not queued_urls[shard] then
     queued_urls[shard] = {}

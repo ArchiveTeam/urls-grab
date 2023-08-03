@@ -1,0 +1,2 @@
+^https?://[^/]+%.amazon%-adsystem%.com/.
+^https?://[^/]+%.yahoo%.com/adcount
