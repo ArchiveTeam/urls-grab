@@ -1,3 +1,8 @@
 ^https?://[^/]+%.amazon%-adsystem%.com/.
 ^https?://[^/]+%.yahoo%.com/adcount.
 ^https?://[^/]+%.doubleclick%.net/.
+^https?://sb%.scorecardresearch%.com/.
+^https?://eb2%.3lift%.com/xuid.
+^https?://bs%.serving%-sys%.com/.
+^https?://[^/]*analytics%.yahoo%.com/.
+^https?://[^/]*gemini%.yahoo%.com/.
