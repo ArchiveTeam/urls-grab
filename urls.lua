@@ -853,10 +853,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  --[[if same_domain and current_settings
+  if same_domain and current_settings
     and current_settings["comment"] == SPECIAL_INTEREST_FROM_MAIN then
     queue_url(url)
-  end]]
+  end
 
   if string.match(parenturl, "%?content=[a-zA-Z0-9%%]+$")
     and string.match(url, "%?content=[a-zA-Z0-9%%]+$") then
