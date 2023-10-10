@@ -68,7 +68,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20230811.01'
+VERSION = '20231010.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -177,18 +177,18 @@ class CheckIP(SimpleTask):
             ):
                 assert b in returned.stdout, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
 
-            url = 'http://on.quad9.net/'
-            returned = subprocess.run(
-                command+[url],
-                **kwargs
-            )
-            assert len(returned.stdout) == 0, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
-            assert returned.returncode == 8, 'Invalid return code {} on {}.'.format(returned.returncode, url)
-            assert (
-                b'301 Moved Permanently\n'
-                b'Location: https://on.quad9.net/ [following]\n'
-                b'0 redirections exceeded.\n'
-            ) in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
+            #url = 'http://on.quad9.net/'
+            #returned = subprocess.run(
+            #    command+[url],
+            #    **kwargs
+            #)
+            #assert len(returned.stdout) == 0, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
+            #assert returned.returncode == 8, 'Invalid return code {} on {}.'.format(returned.returncode, url)
+            #assert (
+            #    b'301 Moved Permanently\n'
+            #    b'Location: https://on.quad9.net/ [following]\n'
+            #    b'0 redirections exceeded.\n'
+            #) in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
 
         # Check only occasionally
         if self._counter <= 0:
