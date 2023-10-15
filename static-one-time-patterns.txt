@@ -6,3 +6,5 @@
 ^https?://bs%.serving%-sys%.com/.
 ^https?://[^/]*analytics%.yahoo%.com/.
 ^https?://[^/]*gemini%.yahoo%.com/.
+^https?://[^/]*googlesyndication%.com/.
+^https?://[^/]*googletagmanager%.com/.
