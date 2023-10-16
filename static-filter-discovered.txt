@@ -294,6 +294,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://www%.rosarioalerta%.com/
 ^https?://www%.topleiter%.de/.*force_sid=
 ^https?:/epicvin%.com/
+^https?://[^/]+/read/[0-9]+/[0-9]+%.html$
 _e998d88
 arrFilter.+arrFilter
 clickrmedia=clickrmedia_
