@@ -195,6 +195,7 @@ local filter_pattern_sets = {
     --["main"]="^https?://[^/]+%.[^%./]+%.[a-z]+/",
     ["news"]={
       "^https?://[^/]+%.[^%./]+%.[a-z]+/news/[0-9a-zA-Z/]+%.html$",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/newshtml/[0-9a-zA-Z/]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/show/[0-9a-zA-Z/]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/html/[0-9a-zA-Z/]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/txt/[0-9a-zA-Z/]+%.html$",
@@ -215,6 +216,7 @@ local filter_pattern_sets = {
   ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?"]={
     ["htmlnews"]={
       "^https?://[^/]+%.[^%./]+%.[a-z]+/html/[a-z0-9]+%.html$",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/newshtml/[a-z0-9]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/news/[a-z0-9]+%.html$"
     },
     ["baidu"]="^https?://[^/]*baidu%.com/",
