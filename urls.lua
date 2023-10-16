@@ -118,7 +118,10 @@ local filter_pattern_sets = {
   ["^https?://[^%./]+%.[^%./]+%.[a-z]+/"]={
     ["pics"]="^https?://[^%./]+%.[^%./]+%.[a-z]+/pics/[a-zA-Z0-9%-_]+%.[a-z]+$",
     --["vicom"]="/[vV][iI]com[0-9]+/",
-    ["k8"]="^https?://[kK]8"
+    ["k8"]={
+      "^https?://[kK]8",
+      "^https?://[^/]+/pics/[kK]888"
+    }
   },
   ["^https?://[a-z0-9]+%.[^%./]+%.de/pages/"]={
     ["pages"]="^https?://[a-z0-9]+%.[^%./]+%.de/pages/.+%.html",
