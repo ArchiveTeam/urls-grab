@@ -250,6 +250,10 @@ local filter_pattern_sets = {
   },
   ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?"]={
     ["appsstore.cdf"]="^https?://download%.appsstore%.cfd/"
+  },
+  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?"]={
+    ["yamaxun"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/yamaxun/",
+    ["upluds"]="^https?://[^/]+%.[^%./]+%.[a-z]+/upluds/"
   }
 }
 
