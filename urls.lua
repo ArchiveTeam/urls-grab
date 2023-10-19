@@ -1126,10 +1126,16 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     html = read_file(file)
     if not url then
       html = string.gsub(html, "&#160;", " ")
-      html = string.gsub(html, "&lt;", "<")
-      html = string.gsub(html, "&gt;", ">")
-      html = string.gsub(html, "&quot;", '"')
-      html = string.gsub(html, "&apos;", "'")
+      for pattern, replacement in pairs({
+        ["&lt;"]="<",
+        ["&gt;"]=">",
+        ["&quot;"]='"',
+        ["&apos;"]="'",
+        [" +dot +"]="%.",
+        [" +[%[%(]dot[%]%)] +"]="%."
+      }) do
+        html = string.gsub(html, pattern, replacement)
+      end
       for _, pattern in pairs({
         "https?://www([^\032-\126]+)",
         "https?://[^/%.]+([^\032-\126]+)[^/%.]+/"
@@ -1154,8 +1160,8 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         if remove ~= "" then
           temp = string.gsub(temp, remove, "")
         end
-        temp2 = string.gsub(temp, "%s+\n", "\n")
-        temp2 = string.gsub(temp2, "([^>\"'\\`}%)%]%.,])\n", "%1")
+        temp2 = string.gsub(temp, "%s*\n%s*", "\n")
+        temp2 = string.gsub(temp2, "([^>\"'\\`}%)%]%.,])\n%s*", "%1")
         for _, newline_white in pairs({" ", ""}) do
           temp3 = string.gsub(temp2, "\n", newline_white)
           local url_patterns = {
