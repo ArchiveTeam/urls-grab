@@ -8,3 +8,7 @@
 ^https?://[^/]*gemini%.yahoo%.com/.
 ^https?://[^/]*googlesyndication%.com/.
 ^https?://[^/]*googletagmanager%.com/.
+^https?://[^/]*google%-analytics%.com/collect.
+^https?://[^/]*googleadservices%.com/.
+^https?://analytics%.yahoo%.com/.
+^https?://[^/]*beap[^/]*%.yahoo%.com/.
