@@ -92,8 +92,6 @@ UniqueDomainsSessionIdSharingApi
 ^http://msongbad%.com/.*%.html$
 ^http://villamc%.cl/fonts/
 ^http://www%.villamc%.cl/fonts/
-^https://[^%./]+%.[^%./]+%.de/en/.*
-^https://[^%./]+%.[^%./]+%.de/mobile/.*
 ^https://[^%.]+%.ae%-388%.cyou/
 ^https://[^%.]+%.carlospizza%.net/
 ^https://[^%.]+%.cockatielcare%.net/
@@ -113,7 +111,6 @@ UniqueDomainsSessionIdSharingApi
 ^https://[^%.]+%.wls%-surgery%.com/
 ^https://[^%.]+%.womansblogs%.net/
 ^https://[^%.]+%.zarathos%.net/
-^https://[^/]*wordpress%.org/
 ^https://animemeow%.xyz/
 ^https://www%.il%-trust%-in%-italia%.it/.*[%?&]docx=
 ^https?://3d%-salledebains%.geberit%.fr/
@@ -204,7 +201,6 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+%.ipshu%.com/
 ^https?://[^/]+%.jtbpbnj%.cn/
 ^https?://[^/]+%.nepu%.io%.?/.
-^https?://[^/]+%.pl/.+:image/
 ^https?://[^/]+%.pl/.+:image/.+:image/
 ^https?://[^/]+%.proxy%.guilin%.gov%.cn/
 ^https?://[^/]+%.translate%.goog/
@@ -218,7 +214,6 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+/.+%.[a-z]+%?/.+%.[a-z][a-z][a-z]$
 ^https?://[^/]+/Identity/Login%?
 ^https?://[^/]+/[a-z%-]*%.?[0-9]*%?x=[^&]+$
-^https?://[a-z]+%.[^%.]+%.de/.*
 ^https?://[a-z]+%.[a-z]+%.ru/15%?keyword=[a-z0-9-]+&charset=utf%-8$
 ^https?://[a-z][a-z][a-z][a-z][a-z][a-z][a-z]?[a-z]?%.[a-z0-9]+%.ru/[0-9]/[0-9][0-9]/[a-z0-9-]+$
 ^https?://academy%.rawlplug%.com/login%?pcip=
