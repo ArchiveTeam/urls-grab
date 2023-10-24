@@ -1158,46 +1158,62 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       local temp = html
       for _, remove in pairs({"", "<br/>", "</?p[^>]*>"}) do
         if remove ~= "" then
-          temp = string.gsub(temp, remove, "")
+          temp = string.gsub(temp, remove, "\0")
         end
         temp2 = string.gsub(temp, "%s*\n%s*", "\n")
-        temp2 = string.gsub(temp2, "([^>\"'\\`}%)%]%.,])\n%s*", "%1")
+        temp2 = string.gsub(temp2, "([^>\"'\\`}%)%]%.,])\n%s*", "%1\0")
         for _, newline_white in pairs({" ", ""}) do
           temp3 = string.gsub(temp2, "\n", newline_white)
           local url_patterns = {
             "([hH][tT][tT][pP][sS]?://[^%s<>#\"'\\`{}%)%]]+)",
             '"([hH][tT][tT][pP][sS]?://[^"]+)',
             "'([hH][tT][tT][pP][sS]?://[^']+)",
-            ">%s*([hH][tT][tT][pP][sS]?://[^<%s]+)"
+            ">[%s%z]*([hH][tT][tT][pP][sS]?://[^<%s]+)"
           }
           if newline_white == " " then
-            table.insert(url_patterns, "([a-zA-Z0-9%-%.]+%.[a-zA-Z0-9%-%.]+)")
-            table.insert(url_patterns, "([a-zA-Z0-9%-%.]+%.[a-zA-Z0-9%-%.]+/[^%s<>#\"'\\`{}%)%]]+)")
+            table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z]+)")
+            table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z]+/[^%s<>#\"'\\`{}%)%]]+)")
           end
           for _, pattern in pairs(url_patterns) do
-            for newurl in string.gmatch(temp3, pattern) do
-              while string.match(newurl, ".[%.&,!;]$") do
-                newurl = string.match(newurl, "^(.+).$")
+            for raw_newurl in string.gmatch(temp3, pattern) do
+              local candidate_urls = {}
+              local i = 0
+              for s in string.gmatch(raw_newurl, "([^%z]+)") do
+                local current_candidate = s
+                local j = 0
+                for t in string.gmatch(raw_newurl, "([^%z]+)") do
+                  if j > i then
+                    current_candidate = current_candidate .. t
+                  end
+                  candidate_urls[current_candidate] = true
+                  j = j + 1
+                end
+                i = i + 1
               end
-              if string.match(newurl, "^[hH][tT][tT][pP][sS]?://") then
-                local a, b = string.match(newurl, "^([hH][tT][tT][pP][sS]?://[^/]+)(.*)")
-                newurl = string.lower(a) .. b
-                check(newurl)
-                check(html_entities.decode(newurl))
-              elseif string.match(newurl, "^[a-zA-Z0-9]") then
-                if not string.find(newurl, "/") then
-                  newurl = newurl .. "/"
+              for newurl, _ in pairs(candidate_urls) do
+                while string.match(newurl, ".[%.&,!;]$") do
+                  newurl = string.match(newurl, "^(.+).$")
                 end
-                local a, b = string.match(newurl, "^([^/]+)(/.*)$")
-                newurl = string.lower(a) .. b
-                local tld = string.match(newurl, "^[^/]+%.([a-z]+)/")
-                if not tld then
-                  tld = string.match(newurl, "^[^/]+%.(xn%-%-[a-z0-9]+)/")
-                end
-                --print(newurl, tld, tlds[tld])
-                if tld and tlds[tld] then
-                  check("http://" .. newurl)
-                  check("https://" .. newurl)
+                if string.match(newurl, "^[hH][tT][tT][pP][sS]?://") then
+                  local a, b = string.match(newurl, "^([hH][tT][tT][pP][sS]?://[^/]*)(.-)$")
+                  newurl = string.lower(a) .. b
+                  check(newurl)
+                  check(html_entities.decode(newurl))
+                elseif string.match(newurl, "^[a-zA-Z0-9]") then
+                  if not string.find(newurl, "/") then
+                    newurl = newurl .. "/"
+                  end
+                  local a, b = string.match(newurl, "^([^/]+)(/.*)$")
+                  newurl = string.lower(a) .. b
+                  local tld = string.match(newurl, "^[^/]+%.([a-z]+)/")
+                  if not tld then
+                    tld = string.match(newurl, "^[^/]+%.(xn%-%-[a-z0-9]+)/")
+                  end
+                  --print(newurl, tld, tlds[tld])
+                  if tld and tlds[tld] then
+                    check("http://" .. newurl)
+                    check("https://" .. newurl)
+                  end
                 end
               end
             end
@@ -1660,7 +1676,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
             local filtered = false
             for _, pattern in pairs(filter_discovered) do
               if string.match(url, pattern) then
-                io.stdout:write("Skipping URL " .. url .. ".\n")
+                io.stdout:write("Skipping URL " .. url .. " due to " .. pattern .. ".\n")
                 io.stdout:flush()
                 filtered = true
                 break
