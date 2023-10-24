@@ -298,3 +298,4 @@ custom:.*https?%%3a%%2f%%2fwww%%2ecxsltd%%2ecom%%2flocal%%2fsearch%%2f
 custom:.*url=https%%3a%%2f%%2froyalcitizen%%2eca%%2fsitemap%%2d
 login%.error%.sessionSecurityMismatch
 symplicity%.com/.+%.php/pid[0-9]
+' %+ [a-z%.]+ %+ '$
