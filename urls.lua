@@ -193,7 +193,8 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/{{pasePath}}images/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/redian/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/.*images/"
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/.*images/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/baike"
     },
     --["main"]="^https?://[^/]+%.[^%./]+%.[a-z]+/",
     ["news"]={
@@ -259,6 +260,10 @@ local filter_pattern_sets = {
   ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?"]={
     ["yamaxun"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/yamaxun/",
     ["upluds"]="^https?://[^/]+%.[^%./]+%.[a-z]+/upluds/"
+  },
+  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?.?"]={
+    ["company-en"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/en[0-9]+/static/",
+    ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
   }
 }
 
