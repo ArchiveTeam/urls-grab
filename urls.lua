@@ -1251,6 +1251,33 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     end]]
   end
   if url then
+    --[[for _, extension in {
+      "docx",
+      "epub",
+      "odt",
+      "rtf"
+    } do
+      if string.match(string.lower(url, "[^a-z0-9]" .. extension .. "$")) then
+        io.stdout:write("Converting to PDF.\n")
+        io.stdout:flush()
+        local copied_to = file .. "." .. extension
+        os.execute("cp " .. file .. " " .. copied_to)
+        local temp_file = copied_to .. ".pdf"
+        local check_file = io.open(temp_file)
+        if check_file then
+          check_file:close()
+          os.remove(temp_file)
+        end
+        os.execute("pandoc " .. copied_to .. " -o " .. temp_file .. " --pdf-engine pdfroff")
+        os.remove(copied_to)
+        check_file = io.open(temp_file)
+        if check_file then
+          check_file:close()
+          wget.callbacks.get_urls(temp_file, url .. ".pdf", nil, nil)
+          os.remove(temp_file)
+        end
+      end
+    end]]
     if string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF]$")
       or string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF][^a-z0-9A-Z]")
       or string.match(read_file(file, 4), "%%[pP][dD][fF]") then
