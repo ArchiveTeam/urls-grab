@@ -1137,7 +1137,8 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         ["&quot;"]='"',
         ["&apos;"]="'",
         [" +dot +"]="%.",
-        [" +[%[%(]dot[%]%)] +"]="%."
+        [" +[%[%(]dot[%]%)] +"]="%.",
+        ["˜"]="~"
       }) do
         html = string.gsub(html, pattern, replacement)
       end
@@ -1178,6 +1179,8 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           if newline_white == " " then
             table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z]+)")
             table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z]+/[^%s<>#\"'\\`{}%)%]]+)")
+            table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z:]+)")
+            table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z:]+/[^%s<>#\"'\\`{}%)%]]+)")
           end
           for _, pattern in pairs(url_patterns) do
             for raw_newurl in string.gmatch(temp3, pattern) do
@@ -1210,9 +1213,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
                   end
                   local a, b = string.match(newurl, "^([^/]+)(/.*)$")
                   newurl = string.lower(a) .. b
-                  local tld = string.match(newurl, "^[^/]+%.([a-z]+)/")
+                  local tld = string.match(newurl, "^[^/]+%.([a-z]+)[:/]")
                   if not tld then
-                    tld = string.match(newurl, "^[^/]+%.(xn%-%-[a-z0-9]+)/")
+                    tld = string.match(newurl, "^[^/]+%.(xn%-%-[a-z0-9]+)[:/]")
                   end
                   --print(newurl, tld, tlds[tld])
                   if tld and tlds[tld] then
