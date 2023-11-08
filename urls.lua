@@ -556,7 +556,7 @@ queue_monthly_item = function(item, t)
   if not t[month_timestamp] then
     t[month_timestamp] = {}
   end
---print("monthly", url)
+--print("monthly", item)
   t[month_timestamp][item] = current_url
 end
 
@@ -1610,13 +1610,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
         string.match(url["url"], "^https?://www%.(.+)")
         or string.match(url["url"], "^https?://(.+)")
       )
-      or (
-        status_code == 301
-        and not string.match(newloc, "^https?://[^/]+$")
-      )
+      or status_code == 301
       or status_code == 303
       or status_code == 308 then
-      queue_url(newloc)
+      if status_code ~= 301
+        or not string.match(newloc, "^https?://[^/]+$") then
+        queue_url(newloc)
+      end
       return wget.actions.EXIT
     end
   else
