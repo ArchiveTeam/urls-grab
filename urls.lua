@@ -194,7 +194,9 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/{{pasePath}}images/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/redian/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/.*images/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/baike"
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/baike",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/xzx",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/b1/"
     },
     --["main"]="^https?://[^/]+%.[^%./]+%.[a-z]+/",
     ["news"]={
@@ -236,12 +238,14 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/templates/[^/]+/moban"
     },
     ["slash"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[^/]+/$",
+    ["tk88"]="tk88",
     ["other"]={
       "%.xlsx?$",
       "%.pptx?$",
       "%.docx?$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/[^/]+/[0-9]+/$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/cnki/images/"
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/cnki/images/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]%-[a-z0-9%-]+%.html$"
     }
   },
   ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?"]={
