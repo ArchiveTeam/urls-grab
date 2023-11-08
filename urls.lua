@@ -1337,14 +1337,14 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           for line in string.gmatch(html, "(.-)\n") do
             if not string.match(line, "^#") then
               local site = string.match(line, "^([^,%s]+),")
-              if site then
+              --[[if site then
                 if string.match(site, "^https?://") then
                   queue_url(site)
                 else
                   queue_url("http://" .. site .. "/")
                   queue_url("https://" .. site .. "/")
                 end
-              end
+              end]]
             end
           end
         end

@@ -80,11 +80,11 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20231108.03'
+VERSION = '20231108.04'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
-MULTI_ITEM_SIZE = 40
+MULTI_ITEM_SIZE = 100
 MAX_DUPES_LIST_SIZE = 10000
 DNS_SERVERS = ['9.9.9.10', '149.112.112.10' ,'2620:fe::10' ,'2620:fe::fe:10'] #Quad9
 with open('user-agents.txt', 'r') as f:
