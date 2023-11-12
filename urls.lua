@@ -271,9 +271,6 @@ local filter_pattern_sets = {
   }
 }
 
-local zippyshare_urls_items = {
-  [""]={}
-}
 local imgur_items = {
   [""] = {}
 }
@@ -747,8 +744,6 @@ queue_services = function(url)
     queue_pastebin(rest)
   elseif domain == "mediafire.com" or domain == "mfi.re" then
     queue_mediafire(rest)
-  elseif domain == "zippyshare.com" then
-    zippyshare_urls_items[""][url] = current_url
   elseif domain == "imgur.com" then
     queue_imgur(rest)
   end
@@ -1747,7 +1742,6 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
     ["urls-onion-d943namwkczqavdw"] = onion_urls,
     ["urls-all-tx2vacclx396i0h"] = urls_all,
-    ["zippyshare-urls-jtelkase24jmz0z"] = zippyshare_urls_items,
     ["urls-sitemap-news-hu1y8xj3h0ildh1k"] = urls_sitemap_news,
     ["urls-news-6t9uc9xxz06gpt93"] = urls_news
   }) do
