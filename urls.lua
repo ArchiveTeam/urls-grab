@@ -274,6 +274,9 @@ local filter_pattern_sets = {
 local zippyshare_urls_items = {
   [""]={}
 }
+local imgur_items = {
+  [""] = {}
+}
 local pastebin_items = {
   [""]={}
 }
@@ -675,6 +678,51 @@ queue_pastebin = function(rest)
   end
 end
 
+queue_imgur = function(rest)
+  local imgur_item_type = nil
+  for s in string.gmatch(rest, "[^A-Za-z0-9]([a-z]+)[^A-Za-z0-9]") do
+    if s == "gallery" or s == "ajaxalbums" then
+      imgur_item_type = "gallery"
+    elseif s == "album" then
+      imgur_item_type = "album"
+    end
+    if imgur_item_type then
+      break
+    end
+  end
+  if not imgur_item_type then
+    if string.match(rest, "^/g/") then
+      imgur_item_type = "gallery"
+    elseif string.match(rest, "^/user/") then
+      imgur_items[""]["user:" .. string.match(rest, "^/user/([a-zA-Z0-9_%-]+)")] = current_url
+      return nil
+    else
+      imgur_item_type = "i"
+    end
+  end
+  for s in string.gmatch(rest, "[/%?&;=]([a-zA-Z0-9,]+)") do
+    for t in string.gmatch(s, "([^,]+)") do
+      if imgur_item_type == "album" or imgur_item_type == "gallery" then
+        imgur_items[""][imgur_item_type .. ":" .. t] = current_url
+      elseif imgur_item_type == "i" then
+        if string.len(t) > 3 then
+          local start, ending = string.match(t, "^(.+)(...)$")
+          if ending == "jpg" or ending == "png" or ending == "gif" or ending == "mp4" then
+            t = start
+          end
+        end
+        local l = string.len(t)
+        if l == 6 or l == 8 then
+          imgur_items[""][imgur_item_type .. ":" .. string.match(t, "^(.+).$")] = current_url
+        end
+        if l == 5 or l == 7 then
+          imgur_items[""][imgur_item_type .. ":" .. t] = current_url
+        end
+      end
+    end
+  end
+end
+
 queue_mediafire = function(rest)
   for s in string.gmatch(rest, "([a-zA-Z0-9]+)") do
     s = string.lower(s)
@@ -701,6 +749,8 @@ queue_services = function(url)
     queue_mediafire(rest)
   elseif domain == "zippyshare.com" then
     zippyshare_urls_items[""][url] = current_url
+  elseif domain == "imgur.com" then
+    queue_imgur(rest)
   end
 end
 
@@ -1692,6 +1742,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["telegram-channels-c8cixci89uv1exw"] = telegram_channels,
     ["pastebin-xa5xj5bx2no3qc1"] = pastebin_items,
     ["mediafire-9cmzz6b3jawqbih"] = mediafire_items,
+    ["imgur-6fzz6lxvpk9kgug7"] = imgur_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
     ["urls-onion-d943namwkczqavdw"] = onion_urls,
