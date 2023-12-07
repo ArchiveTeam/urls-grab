@@ -35,6 +35,7 @@
 [%?&;]state_uuid=
 [%?&;]state=
 [%?&;]flow=
+[%?&;]xoid=
 [%?&;]request_?[iI][dD]=
 [%?&;][jJ][fF][pP]_[tT][oO][kK][eE][nN]=
 [%?&;]_event_transid=
