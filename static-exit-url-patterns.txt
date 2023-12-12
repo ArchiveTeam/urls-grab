@@ -12,6 +12,7 @@
 [%?&;]_flowexecutionkey=
 [%?&;][sS]?[sS][iI][dD]=
 [%?&;]cid=
+[%?&;]ver=[0-9]+$
 [%?&;]script_case_session=
 [%?&;]Dilid=
 [%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
