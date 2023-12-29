@@ -229,6 +229,9 @@ local filter_pattern_sets = {
     ["a"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]+/$",
     ["sitemap"]="sitemap%.xml$"
   },
+  ["^https?://[^/]*%.de/[^/]+_fonts/.*woff"]={
+    ["fonts"]="^https?://[^/]*%.de/[^/]+_fonts/.*woff"
+  },
   ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?"]={
     --["swf"]="%.swf$",
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
