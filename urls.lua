@@ -931,45 +931,47 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  for _, extension in pairs({
-    "pdf",
-    "doc[mx]?",
-    "xls[mx]?",
-    "ppt[mx]?",
-    "dot[mx]?",
-    "pot[mx]?",
-    "pps[mx]?",
-    "xlt[mx]?",
-    "txt",
-    "rtf",
-    "jar",
-    "swf",
-    "csv",
-    --"zip",
-    "odt",
-    "odm",
-    "ods",
-    "odp",
-    "xml",
-    "json",
-    "torrent"
-  }) do
-    local prefix = "[%.%?/&]"
-    if string.match(parenturl, prefix .. extension .. "$")
-      or string.match(parenturl, prefix .. extension .. "[^a-z0-9A-Z]")
-      or string.match(parenturl, prefix .. string.upper(extension) .. "$")
-      or string.match(parenturl, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]")
-      -- get rid of loop on sites from chinese origin (also various non-.cn domains)
-      or string.match(url, "^https?://[^/]+/%?/.+%." .. extension .. "$")
-      or string.match(url, "^https?://[^/]+/.+%.[a-z]+%?/.+%." .. extension .. "$") then
-      return false
-    end
-    if string.match(url, prefix .. extension .. "$")
-      or string.match(url, prefix .. extension .. "[^a-z0-9A-Z]")
-      or string.match(url, prefix .. string.upper(extension) .. "$")
-      or string.match(url, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]") then
-      queue_url(url)
-      return false
+  if not string.match(url, "^https?://[^%./]+%.[^%./]+%.[a-z]+/sitemapa%.xml") then -- remove loop due to sitemapa.xml pointing to other domains
+    for _, extension in pairs({
+      "pdf",
+      "doc[mx]?",
+      "xls[mx]?",
+      "ppt[mx]?",
+      "dot[mx]?",
+      "pot[mx]?",
+      "pps[mx]?",
+      "xlt[mx]?",
+      "txt",
+      "rtf",
+      "jar",
+      "swf",
+      "csv",
+      --"zip",
+      "odt",
+      "odm",
+      "ods",
+      "odp",
+      "xml",
+      "json",
+      "torrent"
+    }) do
+      local prefix = "[%.%?/&]"
+      if string.match(parenturl, prefix .. extension .. "$")
+        or string.match(parenturl, prefix .. extension .. "[^a-z0-9A-Z]")
+        or string.match(parenturl, prefix .. string.upper(extension) .. "$")
+        or string.match(parenturl, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]")
+        -- get rid of loop on sites from chinese origin (also various non-.cn domains)
+        or string.match(url, "^https?://[^/]+/%?/.+%." .. extension .. "$")
+        or string.match(url, "^https?://[^/]+/.+%.[a-z]+%?/.+%." .. extension .. "$") then
+        return false
+      end
+      if string.match(url, prefix .. extension .. "$")
+        or string.match(url, prefix .. extension .. "[^a-z0-9A-Z]")
+        or string.match(url, prefix .. string.upper(extension) .. "$")
+        or string.match(url, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]") then
+        queue_url(url)
+        return false
+      end
     end
   end
 
