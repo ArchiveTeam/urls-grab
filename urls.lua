@@ -552,7 +552,7 @@ queue_url = function(url, withcustom)
     end
   end
   local target_project = queued_urls
-  if string.match(origurl, "^https?://[^/]+%.([a-z]+)/") == "onion" then
+  if string.match(origurl, "^https?://[^/]+%.([a-z]+)") == "onion" then
     target_project = onion_urls
     local newurl = string.match(origurl, "^(https?://[^/]+)")
     queue_monthly_url(newurl)
@@ -581,7 +581,7 @@ queue_monthly_url = function(url, comment)
     comment_string = "comment=" .. urlparse.escape(tostring(comment)) .. "&"
   end
   local target_project = queued_urls
-  if string.match(origurl, "^https?://[^/]+%.([a-z]+)/") then
+  if string.match(origurl, "^https?://[^/]+%.([a-z]+)") == "onion" then
     target_project = onion_urls
   end
   queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. "&url=" .. urlparse.escape(tostring(url)), target_project)
