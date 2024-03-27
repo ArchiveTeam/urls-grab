@@ -552,7 +552,7 @@ queue_url = function(url, withcustom)
     end
   end
   local target_project = queued_urls
-  if string.match(origurl, "^https?://[^/]+%.onion") then
+  if string.match(origurl, "^https?://[^/]+%.([a-z]+)/") == "onion" then
     target_project = onion_urls
     local newurl = string.match(origurl, "^(https?://[^/]+)")
     queue_monthly_url(newurl)
@@ -581,7 +581,7 @@ queue_monthly_url = function(url, comment)
     comment_string = "comment=" .. urlparse.escape(tostring(comment)) .. "&"
   end
   local target_project = queued_urls
-  if string.match(origurl, "^https?://[^/]+%.onion") then
+  if string.match(origurl, "^https?://[^/]+%.([a-z]+)/") then
     target_project = onion_urls
   end
   queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. "&url=" .. urlparse.escape(tostring(url)), target_project)
@@ -794,7 +794,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   if string.match(url, "^https?://[^/]+%.onion/")
-    and string.match(url, "^https?://([^/]+)") ~= string.match(parenturl, "^https?://([^/]+)")  then
+    and not string.match(parenturl, "^https?://[^/]+%.onion/") then
     queue_url(url)
     return false
   end
@@ -1500,10 +1500,6 @@ wget.callbacks.write_to_warc = function(url, http_stat)
   current_file_url = url["url"]
   current_file_html = nil
   set_current_url(url["url"])
-  if string.match(url["url"], "^https?://[^/]+%.onion/") then
-    onion_urls[""][url["url"]] = current_url
-    return false
-  end
   if current_settings and not current_settings["random"] then
     queue_url(url["url"])
     return false
@@ -1603,13 +1599,11 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   io.stdout:write(url_count .. "=" .. status_code .. err_string .. " " .. url["url"] .. "  \n")
   io.stdout:flush()
 
-  if http_stat["res"] < 0 then
-    report_bad_url(url["url"])
-    return wget.actions.EXIT
+  if string.match(url["url"], "^https?://[^/]+%.onion/") then
+    queue_url(url["url"])
   end
 
-  if string.match(url["url"], "^https?://[^/]+%.onion/") then
-    onion_urls[""][url["url"]] = current_url
+  if http_stat["res"] < 0 then
     report_bad_url(url["url"])
     return wget.actions.EXIT
   end
