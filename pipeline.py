@@ -83,7 +83,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20240327.03'
+VERSION = '20240327.04'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -342,13 +342,13 @@ class ZstdDict(object):
     data = None
 
     @classmethod
-    def get_dict(cls):
+    def get_dict(cls, item):
         if cls.data is not None and time.time() - cls.created < 1800:
             return cls.data
         response = requests.get(
             'https://legacy-api.arpa.li/dictionary',
             params={
-                'project': TRACKER_ID
+                'project': item['dict_project']
             }
         )
         response.raise_for_status()
@@ -426,11 +426,11 @@ class WgetArgs(object):
             '--header', 'Accept-Language: en-US;q=0.9, en;q=0.8'
         ]
 
-        dict_data = ZstdDict.get_dict()
+        item['dict_project'] = TRACKER_ID
+        dict_data = ZstdDict.get_dict(item)
         with open(os.path.join(item['item_dir'], 'zstdict'), 'wb') as f:
             f.write(dict_data['dict'])
         item['dict_id'] = dict_data['id']
-        item['dict_project'] = TRACKER_ID
         wget_args.extend([
             '--warc-zstd-dict', ItemInterpolation('%(item_dir)s/zstdict'),
         ])
