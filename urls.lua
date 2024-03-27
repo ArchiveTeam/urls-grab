@@ -473,6 +473,7 @@ queue_url = function(url, withcustom)
   if not url then
     return nil
   end
+  local origurl = url
   --[[if string.match(url, "^http://")
     and string.match(current_url, "^http://")
     and string.match(url, "^http://([^/]+)") ~= string.match(current_url, "^http://([^/]+)") then
@@ -550,16 +551,40 @@ queue_url = function(url, withcustom)
       end
     end
   end
-  if not queued_urls[shard] then
-    queued_urls[shard] = {}
+  local target_project = queued_urls
+  if string.match(origurl, "^https?://[^/]+%.onion") then
+    target_project = onion_urls
+    local newurl = string.match(origurl, "^(https?://[^/]+)")
+    queue_monthly_url(newurl)
   end
-  if not duplicate_urls[url] and not queued_urls[shard][url] then
+  if not target_project[shard] then
+    target_project[shard] = {}
+  end
+  if not duplicate_urls[url] and not target_project[shard][url] then
     if find_path_loop(url, 2) then
       return false
     end
 --print("queuing",original, url)
-    queued_urls[shard][url] = current_url
+    target_project[shard][url] = current_url
   end
+end
+
+queue_monthly_url = function(url, comment)
+  if find_path_loop(url, 3) then
+    return nil
+  end
+  local origurl = url
+  url = percent_encode_url(url)
+  url = string.match(url, "^([^#]+)")
+  local comment_string = ""
+  if comment then
+    comment_string = "comment=" .. urlparse.escape(tostring(comment)) .. "&"
+  end
+  local target_project = queued_urls
+  if string.match(origurl, "^https?://[^/]+%.onion") then
+    target_project = onion_urls
+  end
+  queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. "&url=" .. urlparse.escape(tostring(url)), target_project)
 end
 
 queue_monthly_item = function(item, t)
@@ -568,19 +593,6 @@ queue_monthly_item = function(item, t)
   end
 --print("monthly", item)
   t[month_timestamp][item] = current_url
-end
-
-queue_monthly_url = function(url, comment)
-  if find_path_loop(url, 3) then
-    return nil
-  end
-  url = percent_encode_url(url)
-  url = string.match(url, "^([^#]+)")
-  local comment_string = ""
-  if comment then
-    comment_string = "comment=" .. urlparse.escape(tostring(comment)) .. "&"
-  end
-  queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. "&url=" .. urlparse.escape(tostring(url)), queued_urls)
 end
 
 remove_param = function(url, param_pattern)
@@ -782,7 +794,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   if string.match(url, "^https?://[^/]+%.onion/") then
-    onion_urls[""][url] = current_url
+    queue_url(url)
     return false
   end
 

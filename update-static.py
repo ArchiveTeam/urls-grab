@@ -7,6 +7,7 @@ def main():
     response = requests.get(IANA_TLDS)
     assert response.status_code == 200 and len(response.content) > 0
     with open('static-tlds.txt', 'w') as f:
+        f.write('onion\n')
         for line in response.text.splitlines():
             line = line.strip()
             if len(line) == 0 or line.startswith('#'):
