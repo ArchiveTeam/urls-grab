@@ -793,7 +793,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  if string.match(url, "^https?://[^/]+%.onion/") then
+  if string.match(url, "^https?://[^/]+%.onion/")
+    and string.match(url, "^https?://([^/]+)") ~= string.match(parenturl, "^https?://([^/]+)")  then
     queue_url(url)
     return false
   end
