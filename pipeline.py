@@ -83,14 +83,13 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20240327.04'
+VERSION = '20240327.05'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
 MULTI_ITEM_SIZE = 100
 MAX_DUPES_LIST_SIZE = 10000
 DNS_SERVERS = ['9.9.9.10', '149.112.112.10' ,'2620:fe::10' ,'2620:fe::fe:10'] #Quad9
-USE_DNS_SECURITY = True
 with open('user-agents.txt', 'r') as f:
     USER_AGENTS = [l.strip() for l in f]
 
@@ -109,14 +108,10 @@ class CheckIP(SimpleTask):
         if self._counter <= 0:
             command = WGET_AT_COMMAND + [
                 '-U', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:63.0) Gecko/20100101 Firefox/63.0',
-            ] + (
-                [
-                    '--host-lookups', 'dns',
-                    '--hosts-file', '/dev/null',
-                    '--resolvconf-file', 'resolv.conf',
-                    '--dns-servers', ','.join(DNS_SERVERS),
-                ] if USE_DNS_SECURITY else []
-            ) + [
+                '--host-lookups', 'dns',
+                '--hosts-file', '/dev/null',
+                '--resolvconf-file', 'resolv.conf',
+                '--dns-servers', ','.join(DNS_SERVERS),
                 '--output-document', '-',
                 '--max-redirect', '0',
                 '--save-headers',
@@ -171,33 +166,32 @@ class CheckIP(SimpleTask):
                 ) in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
                 assert returned.returncode == 4, 'Invalid return code {} on {}.'.format(returned.returncode, url)
 
-            if USE_DNS_SECURITY:
-                url = 'https://on.quad9.net/'
-                returned = subprocess.run(
-                    command+[url],
-                    **kwargs
-                )
-                assert returned.returncode == 0, 'Invalid return code {} on {}.'.format(returned.returncode, url)
-                assert re.match(
-                    b'^HTTP/1\\.1 200 OK\r\n'
-                    b'Server: nginx/1\\.20\\.1\r\n'
-                    b'Date: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\n'
-                    b'Content-Type: text/html\r\n'
-                    b'Content-Length: [56][0-9]{3}\r\n'
-                    b'Last-Modified: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\n'
-                    b'ETag: "[^"]+"\r\n'
-                    b'Accept-Ranges: bytes\r\n'
-                    b'Strict-Transport-Security: max-age=31536000; includeSubdomains; preload\r\n'
-                    b'X-Content-Type-Options: nosniff\r\n'
-                    b'\r\n',
-                    returned.stdout
-                ), 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
-                for b in (
-                    b'<title>Yes, you ARE using quad9</title>',
-                    b'<font color=#dc205e>YES</font>',
-                    b'You ARE using <font color=#ffffff>quad</font><font color=#dc205e>9</font>'
-                ):
-                    assert b in returned.stdout, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
+            url = 'https://on.quad9.net/'
+            returned = subprocess.run(
+                command+[url],
+                **kwargs
+            )
+            assert returned.returncode == 0, 'Invalid return code {} on {}.'.format(returned.returncode, url)
+            assert re.match(
+                b'^HTTP/1\\.1 200 OK\r\n'
+                b'Server: nginx/1\\.20\\.1\r\n'
+                b'Date: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\n'
+                b'Content-Type: text/html\r\n'
+                b'Content-Length: [56][0-9]{3}\r\n'
+                b'Last-Modified: [A-Z][a-z]{2}, [0-9]{2} [A-Z][a-z]{2} 202[0-9] [0-9]{2}:[0-9]{2}:[0-9]{2} GMT\r\n'
+                b'ETag: "[^"]+"\r\n'
+                b'Accept-Ranges: bytes\r\n'
+                b'Strict-Transport-Security: max-age=31536000; includeSubdomains; preload\r\n'
+                b'X-Content-Type-Options: nosniff\r\n'
+                b'\r\n',
+                returned.stdout
+            ), 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
+            for b in (
+                b'<title>Yes, you ARE using quad9</title>',
+                b'<font color=#dc205e>YES</font>',
+                b'You ARE using <font color=#ffffff>quad</font><font color=#dc205e>9</font>'
+            ):
+                assert b in returned.stdout, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
 
             #url = 'http://on.quad9.net/'
             #returned = subprocess.run(
@@ -390,15 +384,10 @@ class WgetArgs(object):
         wget_args = command + [
             '-U', USER_AGENT,
             '-v',
-        ] + (
-            [
-                '--host-lookups', 'dns',
-                '--hosts-file', '/dev/null',
-                '--resolvconf-file', 'resolv.conf',
-                '--dns-servers', ','.join(random.sample(DNS_SERVERS, k=4)),
-            ]
-            if USE_DNS_SECURITY else []
-        ) + [
+            '--host-lookups', 'dns',
+            '--hosts-file', '/dev/null',
+            '--resolvconf-file', 'resolv.conf',
+            '--dns-servers', ','.join(random.sample(DNS_SERVERS, k=4)),
             '--reject-reserved-subnets',
             '--content-on-error',
             '--lua-script', 'urls.lua',
