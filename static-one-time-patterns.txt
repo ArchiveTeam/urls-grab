@@ -12,3 +12,4 @@
 ^https?://[^/]*googleadservices%.com/.
 ^https?://analytics%.yahoo%.com/.
 ^https?://[^/]*beap[^/]*%.yahoo%.com/.
+^https?://smetrics%.elsevier%.com/.

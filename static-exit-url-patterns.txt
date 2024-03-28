@@ -40,6 +40,9 @@
 [%?&;]request_?[iI][dD]=
 [%?&;][jJ][fF][pP]_[tT][oO][kK][eE][nN]=
 [%?&;]_event_transid=
+[%?&;]timestamp=
+%?new=[0-9]+$
+[%?&;]cachebuster=
 %.php%?JSON=[0-9a-zA-Z]+$
 ^https?://[^/]+/index%.php%?s=
 [%?&;]stamp=[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]
