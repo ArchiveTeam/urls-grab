@@ -1676,15 +1676,15 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       or string.match(newloc, "^magnet:") then
       return wget.actions.EXIT
     elseif string.match(url["url"], "^https?://[^/]*telegram%.org/dl%?tme=")
+      or (
+        string.match(url["url"], "^https?://[^/]+%.onion/")
+        and not string.match(newloc, "^https?://[^/]+%.onion/")
+      )
       or matching_domain
       or status_code == 301
       or status_code == 303
       or status_code == 308 then
-      if status_code ~= 301
-        or not string.match(newloc, "^https?://[^/]+/?$")
-        or matching_domain then
-        queue_url(newloc)
-      end
+      queue_url(newloc)
       return wget.actions.EXIT
     end
   else
