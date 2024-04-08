@@ -3,6 +3,7 @@ contact
 terms
 cookies
 dmca
+condition
 conditions
 about
 privacy
@@ -13,12 +14,14 @@ security
 status
 press
 support
+career
 careers
 jobs
 canary
 policy
 team
 faq
+faqs
 help
 tos
 news
@@ -26,6 +29,17 @@ lawyer
 legal
 blog
 report
+noscript
+donate
+people
+accessibility
+advertise
+advertising
+ads
+setting
+settings
+guidelines
+editorial
 
 # german
 agb
