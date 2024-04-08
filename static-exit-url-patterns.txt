@@ -16,7 +16,7 @@
 [%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
 [%?&;]wtd=
 [%?&;]n?once=
-[%?&;]ra?nd=
+[%?&;]_?ra?nd=
 [%?&;][sS]ession[iI][dD]=
 [%?&;]session=
 [%?&;]fk=
@@ -39,6 +39,7 @@
 [%?&;][jJ][fF][pP]_[tT][oO][kK][eE][nN]=
 [%?&;]_event_transid=
 [%?&;]timestamp=
+[%?&;]misc=202[0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9][0-9][0-9][0-9]
 %?new=[0-9]+$
 [%?&;]cachebuster=
 %.php%?JSON=[0-9a-zA-Z]+$
