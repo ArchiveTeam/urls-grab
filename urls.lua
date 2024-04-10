@@ -202,7 +202,8 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/.*images/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/baike",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/xzx",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/b1/"
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/b1/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/3dm/"
     },
     --["main"]="^https?://[^/]+%.[^%./]+%.[a-z]+/",
     ["news"]={
