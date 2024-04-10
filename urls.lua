@@ -8,6 +8,7 @@ local item_dir = os.getenv("item_dir")
 local item_name = os.getenv("item_name")
 local custom_items = os.getenv("custom_items")
 local warc_file_base = os.getenv("warc_file_base")
+local extract_outlinks_domains_data = os.getenv("extract_outlinks_domains")
 
 local SPECIAL_INTEREST_FROM_MAIN = "special-interest-from-main"
 
@@ -52,6 +53,11 @@ for k, v in pairs(urls_settings) do
   k = normalize_url(k)
   urls_settings[k] = v
   urls[k] = true
+end
+
+local extract_outlinks_domains = {}
+for _, domain in pairs(JSON:decode(extract_outlinks_domains_data)) do
+  extract_outlinks_domains[string.gsub(domain, "([^%w])", "%%%1")] = true
 end
 
 local status_code = nil
@@ -102,7 +108,6 @@ local filter_discovered = {}
 local exit_url_patterns = {}
 local page_requisite_patterns = {}
 local duplicate_urls = {}
-local extract_outlinks_domains = {}
 local one_time_patterns = {}
 local skip_double_patterns = {}
 local paths = {}
@@ -357,12 +362,6 @@ for pattern in one_time_patterns_file:lines() do
 end
 one_time_patterns_file:close()
 
---[[local extract_outlinks_domains_file = io.open("static-extract-outlinks-domains.txt", "r")
-for pattern in extract_outlinks_domains_file:lines() do
-  extract_outlinks_domains[pattern] = true
-end
-extract_outlinks_domains_file:close()]]
-
 local paths_file = io.open("static-paths.txt", "r")
 for line in paths_file:lines() do
   paths[line] = true
@@ -408,18 +407,6 @@ table_length = function(t)
     count = count + 1
   end
   return count
-end
-
-check_domain_outlinks = function(url, target)
-  local parent = string.match(url, "^https?://([^/]+)")
-  while parent do
-    if (not target and extract_outlinks_domains[parent])
-      or (target and parent == target) then
-      return parent
-    end
-    parent = string.match(parent, "^[^%.]+%.(.+)$")
-  end
-  return false
 end
 
 bad_code = function(status_code)
@@ -997,33 +984,13 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  local domain_match = checked_domains[item_first_url]
-  if not domain_match then
-    domain_match = check_domain_outlinks(item_first_url)
-    if not domain_match then
-      domain_match = "none"
-    end
-    checked_domains[item_first_url] = domain_match
-  end
-  if domain_match ~= "none" then
-    extract_page_requisites = true
-    local newurl_domain = string.match(url, "^https?://([^/]+)")
-    local to_queue = true
-    for domain, _ in pairs(redirect_domains) do
-      if check_domain_outlinks(url, domain) then
-        to_queue = false
-        break
-      end
-    end
-    if to_queue then
+  for domain, _ in pairs(extract_outlinks_domains) do
+    if string.match(string.match(parenturl, "^https?://([^/:]+)"), domain .. "$") 
+      and not string.match(string.match(url, "^https?://([^/:]+)"), domain .. "$") then
       queue_url(url)
       return false
     end
   end
-
-  --[[if not extract_page_requisites then
-    return false
-  end]]
 
   if (status_code < 200 or status_code >= 300 or not verdict)
     and not current_settings_all then

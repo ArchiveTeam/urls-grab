@@ -83,7 +83,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20240408.05'
+VERSION = '20240410.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -92,6 +92,8 @@ MAX_DUPES_LIST_SIZE = 10000
 DNS_SERVERS = ['9.9.9.10', '149.112.112.10' ,'2620:fe::10' ,'2620:fe::fe:10'] #Quad9
 with open('user-agents.txt', 'r') as f:
     USER_AGENTS = [l.strip() for l in f]
+with open('static-extract-outlinks-domains.txt', 'r') as f:
+    EXTRACT_OUTLINKS = [l.strip() for l in f]
 
 ###########################################################################
 # This section defines project-specific tasks.
@@ -434,6 +436,7 @@ class WgetArgs(object):
         item['item_name_newline'] = item['item_name'].replace('\0', '\n')
         item_urls = []
         custom_items = {}
+        extract_outlinks_domains = set()
 
         for item_name in item['item_name'].split('\0'):
             wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
@@ -447,9 +450,15 @@ class WgetArgs(object):
                 custom_items[normalize_url(url)] = data
             else:
                 url = item_name
+            url_domain = url.split('/')[2]
+            for domain in EXTRACT_OUTLINKS:
+                if url_domain.endswith(domain):
+                    extract_outlinks_domains.add(domain)
+                    break
             item_urls.append(url)
             wget_args.append(url)
 
+        item['extract_outlinks_domains'] = json.dumps(list(extract_outlinks_domains))
         item['item_urls'] = item_urls
         item['custom_items'] = json.dumps(custom_items)
 
@@ -490,7 +499,8 @@ pipeline = Pipeline(
             'item_dir': ItemValue('item_dir'),
             'item_name': ItemValue('item_name_newline'),
             'custom_items': ItemValue('custom_items'),
-            'warc_file_base': ItemValue('warc_file_base')
+            'warc_file_base': ItemValue('warc_file_base'),
+            'extract_outlinks_domains': ItemValue('extract_outlinks_domains')
         }
     ),
     SetBadUrls(),
