@@ -1587,12 +1587,11 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   end
 
   local url_path = string.match(url["url"], "^https?://[^/]+(/[a-zA-Z0-9_%-%./]*)[^a-zA-Z0-9_%-%./]")
-  if url_path and url_path ~= "/" and url_path ~= "/sitemap.xml" then
-    for path, _ in pairs(paths) do
-      if path == url_path then
-        return wget.actions.EXIT
-      end
-    end
+  if url_path
+    and url_path ~= "/"
+    and url_path ~= "/sitemap.xml"
+    and paths[url_path] then
+    return wget.actions.EXIT
   end
 
   if status_code == 200 then
@@ -1633,6 +1632,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       queued_urls[""][newloc] = true
       return wget.actions.EXIT
     end]]
+    if status_code == 301
+      and string.match(newloc, "^https?://[^/]+/?$") then
+      local url_path = string.match(url["url"], "^https?://[^/]+(/+)")
+      if url_path and paths[url_path] then
+        return wget.actions.EXIT
+      end
+    end
     local matching_domain = (
       string.match(newloc, "^https?://www%.(.+)")
       or string.match(newloc, "^https?://(.+)")
