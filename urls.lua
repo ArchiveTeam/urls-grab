@@ -1781,7 +1781,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
                 newurls = newurls .. "\0" .. url
               end
               count = count + 1
-              if count == 100 then
+              if count == 400 then
                 submit_backfeed(newurls, key, shard)
                 newurls = nil
                 count = 0
