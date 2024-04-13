@@ -6,3 +6,4 @@
 [%?&;]update[dD]t=
 [%?&;]crumb=
 ^https?://[^/]+/%?ver=[0-9a-zA-Z%.]+$
+^https?://[a-z]+%.[^%.]+%.de/[^/]+%.html$
