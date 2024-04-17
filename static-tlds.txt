@@ -85,7 +85,6 @@ auspost
 author
 auto
 autos
-avianca
 aw
 aws
 ax
