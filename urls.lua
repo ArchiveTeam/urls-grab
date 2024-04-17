@@ -247,11 +247,16 @@ local filter_pattern_sets = {
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
     ["tupian"]={
       "^https?://[^/]+%.[^%./]+%.[a-z]+/tupian_1/[^%./]+%.jpg$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates/moban",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates/[^/]+/moban"
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates/moban[0-9]*/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates/[^/]+/moban[0-9]*/"
     },
     ["slash"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[^/]+/$",
-    ["tk88"]="tk88",
+    ["other1"]={
+      "tk88",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/list_[a-z]+/$",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/news/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][^0-9]",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/static/logo%.jpg"
+    },
     ["other"]={
       "%.xlsx?$",
       "%.pptx?$",
