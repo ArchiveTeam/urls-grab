@@ -83,7 +83,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20240417.03'
+VERSION = '20240418.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -450,11 +450,13 @@ class WgetArgs(object):
                 custom_items[normalize_url(url)] = data
             else:
                 url = item_name
+            matches = set()
             url_domain = url.split('/')[2]
             for domain in EXTRACT_OUTLINKS:
                 if url_domain.endswith(domain):
-                    extract_outlinks_domains.add(domain)
-                    break
+                    matches.add(domain)
+            if len(matches) > 0:
+                extract_outlinks_domains.add(sorted(matches, key=len)[-1])
             item_urls.append(url)
             wget_args.append(url)
 
