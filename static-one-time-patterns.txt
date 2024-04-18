@@ -41,3 +41,4 @@
 ^https?://telegram%.me/share/.
 ^https?://t%.me/share/.
 ^https?://wa%.me/.
+^https?://[^/]*reddit%.com/submit%?
