@@ -1003,7 +1003,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
   for domain, _ in pairs(extract_outlinks_domains) do
     if string.match(string.match(parenturl, "^https?:/(/[^/:]+)"), "[^a-zA-Z0-9%-]" .. domain .. "$")
-      and string.match(parenturl, "^https?://([^/:]+)") ~= string.match(url, "^https?://([^/:]+)") then
+      and not string.match(string.match(url, "^https?:/(/[^/:]+)"), "[^a-zA-Z0-9%-]" .. domain .. "$") then
       queue_url(url)
 --print(domain)
       return false
