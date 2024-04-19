@@ -286,7 +286,15 @@ local filter_pattern_sets = {
   ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?.?"]={
     ["company-en"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/en[0-9]+/static/",
     ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
-  }
+  },
+  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
+    ["search"]="^https?://[^/]+/.*search/",
+    ["catalogsearch"]="^https?://[^/]+/.*catalogsearch/",
+    ["brackets"]="【[^】]+】",
+    ["zonghe"]="^https?://[^/]+/styles/zonghe/",
+    ["html"]="^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
+    ["sitemap"]="^https?://[^/]+/[a-z0-9]+/sitemap%.xml$"
+  },
 }
 
 local imgur_items = {
