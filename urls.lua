@@ -1368,7 +1368,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         io.stdout:write("Could not process PDF, attempting to repair.\n")
         io.stdout:flush()
         local repaired_file = file .. ".repaired"
-        local returned = os.execute("ghostscript -o " .. repaired_file .. " -dQUIET -sDEVICE=pdfwrite -dPDFSETTINGS=/default " .. file)
+        local returned = os.execute("ghostscript -o " .. repaired_file .. " -dQUIET -sDEVICE=pdfwrite -dPDFSETTINGS=/default " .. file .. " >/dev/null 2>&1")
         if returned == 0 then
           io.stdout:write("Repaired PDF.\n")
           io.stdout:flush()
