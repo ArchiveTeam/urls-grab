@@ -1339,18 +1339,14 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         end
       end
     end]]
-    if string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF]$")
-      or string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF][^a-z0-9A-Z]")
-      or string.match(read_file(file, 4), "%%[pP][dD][fF]") then
-      io.stdout:write("Extracting links from PDF.\n")
-      io.stdout:flush()
-      local temp_file = file .. "-html.html"
+    local function extract_from_pdf(filepath)
+      local temp_file = filepath .. "-html.html"
       local check_file = io.open(temp_file)
       if check_file then
         check_file:close()
         os.remove(temp_file)
       end
-      os.execute("pdftohtml -nodrm -hidden -i -s -q " .. file)
+      os.execute("pdftohtml -nodrm -hidden -i -s -q " .. filepath)
       check_file = io.open(temp_file)
       if check_file then
         check_file:close()
@@ -1359,9 +1355,36 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
         io.stdout:write("Found " .. tostring(table_length(queued_urls[""])-temp_length) .. " URLs.\n")
         io.stdout:flush()
         os.remove(temp_file)
-      else
-        io.stdout:write("Not a PDF.\n")
+        return true
+      end
+      return false
+    end
+    if string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF]$")
+      or string.match(url, "^https?://[^/]+/.*[^a-z0-9A-Z][pP][dD][fF][^a-z0-9A-Z]")
+      or string.match(read_file(file, 4), "%%[pP][dD][fF]") then
+      io.stdout:write("Extracting links from PDF.\n")
+      io.stdout:flush()
+      if not extract_from_pdf(file) then
+        io.stdout:write("Could not process PDF, attempting to repair.\n")
         io.stdout:flush()
+        local repaired_file = file .. ".repaired"
+        local returned = os.execute("ghostscript -o " .. repaired_file .. " -dQUIET -sDEVICE=pdfwrite -dPDFSETTINGS=/default " .. file)
+        if returned == 0 then
+          io.stdout:write("Repaired PDF.\n")
+          io.stdout:flush()
+          if not extract_from_pdf(repaired_file) then
+            io.stdout:write("Could not process repaired PDF.\n")
+            io.stdout:flush()
+          end
+        else
+          io.stdout:write("Could not repair PDF.\n")
+          io.stdout:flush()
+        end
+        local check_file = io.open(repaired_file)
+        if check_file then
+          check_file:close()
+          os.remove(repaired_file)
+        end
       end
     end
     if status_code == 200 then
