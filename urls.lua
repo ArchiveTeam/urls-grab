@@ -998,12 +998,16 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
           or string.match(parenturl, "(" .. prefix .. extension .. "[^a-z0-9A-Z])")
           or string.match(parenturl, "(" .. prefix .. string.upper(extension) .. ")$")
           or string.match(parenturl, "(" .. prefix .. string.upper(extension) .. "[^a-z0-9A-Z])")
-        --print(match_extension_url, match_extension_parenturl)
-        --print(string.match(url, "^https?://([^/]+)"), string.match(parenturl, "^https?://([^/]+)"))
-        --print(string.gsub(url, "([^/%.]+)", ""), string.gsub(parenturl, "([^/%.]+)", ""))
-        if match_extension_url ~= match_extension_parenturl
+        --[[print('checking', url, parenturl)
+        print(match_extension_url, match_extension_parenturl)
+        print(string.match(url, "^https?://([^/]+)"), string.match(parenturl, "^https?://([^/]+)"))
+        print(string.gsub(url, "([^/%.]+)", ""), string.gsub(parenturl, "([^/%.]+)", ""))]]
+        local baseurl = string.match(url, "^([^%?]+)")
+        local baseparenturl = string.match(parenturl, "^([^%?]+)")
+        if baseurl ~= baseparenturl and (
+          match_extension_url ~= match_extension_parenturl
           or string.match(url, "^https?://([^/]+)") ~= string.match(parenturl, "^https?://([^/]+)")
-          or string.gsub(string.match(url, "^([^%?]+)"), "([^/%.]+)", "") ~= string.gsub(string.match(parenturl, "^([^%?]+)"), "([^/%.]+)", "") then
+          or string.gsub(baseurl, "([^/%.]+)", "") ~= string.gsub(baseparenturl, "([^/%.]+)", "")) then
           queue_url(url)
           return false
         end
