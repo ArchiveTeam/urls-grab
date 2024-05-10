@@ -988,8 +988,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       "json",
       "torrent"
     }) do
-      local prefix = "[%.%?/&]"
-      if string.match(parenturl, prefix .. extension .. "$")
+      local prefix = "[%-:;%.%?/&]"
+      --[[if string.match(parenturl, prefix .. extension .. "$")
         or string.match(parenturl, prefix .. extension .. "[^a-z0-9A-Z]")
         or string.match(parenturl, prefix .. string.upper(extension) .. "$")
         or string.match(parenturl, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]")
@@ -997,7 +997,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
         or string.match(url, "^https?://[^/]+/%?/.+%." .. extension .. "$")
         or string.match(url, "^https?://[^/]+/.+%.[a-z]+%?/.+%." .. extension .. "$") then
         return false
-      end
+      end]]
       if string.match(url, prefix .. extension .. "$")
         or string.match(url, prefix .. extension .. "[^a-z0-9A-Z]")
         or string.match(url, prefix .. string.upper(extension) .. "$")
