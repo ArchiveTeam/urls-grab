@@ -112,6 +112,7 @@ local one_time_patterns = {}
 local skip_double_patterns = {}
 local paths = {}
 local extract_from_domain = {}
+local nothing_on_3xx = {}
 local item_first_url = nil
 local redirect_domains = {}
 local checked_domains = {}
@@ -354,6 +355,12 @@ for pattern in filter_discovered_file:lines() do
   table.insert(filter_discovered, pattern)
 end
 filter_discovered_file:close()
+
+local nothing_on_3xx_file = io.open("static-nothing-on-3xx.txt", "r")
+for pattern in nothing_on_3xx_file:lines() do
+  table.insert(nothing_on_3xx, pattern)
+end
+nothing_on_3xx_file:close()
 
 local exit_url_patterns_file = io.open("static-exit-url-patterns.txt", "r")
 for pattern in exit_url_patterns_file:lines() do
@@ -1689,15 +1696,26 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     if downloaded[newloc]
       or string.match(newloc, "^magnet:") then
       return wget.actions.EXIT
-    elseif string.match(url["url"], "^https?://[^/]*telegram%.org/dl%?tme=")
-      or (
-        string.match(url["url"], "^https?://[^/]+%.onion/")
-        and not string.match(newloc, "^https?://[^/]+%.onion/")
-      )
-      or matching_domain
-      or status_code == 301
-      or status_code == 303
-      or status_code == 308 then
+    end
+    local should_continue = false
+    for _, pattern in pairs(nothing_on_3xx) do
+      if string.match(url["url"], pattern) then
+        should_continue = true
+        break
+      end
+    end
+    if not should_continue
+      and (
+        string.match(url["url"], "^https?://[^/]*telegram%.org/dl%?tme=")
+        or (
+          string.match(url["url"], "^https?://[^/]+%.onion/")
+          and not string.match(newloc, "^https?://[^/]+%.onion/")
+        )
+        or matching_domain
+        or status_code == 301
+        or status_code == 303
+        or status_code == 308
+      ) then
       queue_url(newloc)
       return wget.actions.EXIT
     end
