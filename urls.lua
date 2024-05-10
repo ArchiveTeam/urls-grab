@@ -1003,7 +1003,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
         --print(string.gsub(url, "([^/%.]+)", ""), string.gsub(parenturl, "([^/%.]+)", ""))
         if match_extension_url ~= match_extension_parenturl
           or string.match(url, "^https?://([^/]+)") ~= string.match(parenturl, "^https?://([^/]+)")
-          or string.gsub(url, "([^/%.]+)", "") ~= string.gsub(parenturl, "([^/%.]+)", "") then
+          or string.gsub(string.match(url, "^([^%?]+)"), "([^/%.]+)", "") ~= string.gsub(string.match(parenturl, "^([^%?]+)"), "([^/%.]+)", "") then
           queue_url(url)
           return false
         end
