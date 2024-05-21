@@ -986,7 +986,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       "odp",
       "xml",
       "json",
-      "torrent"
+      "torrent",
+      "epub",
+      "djvu",
+      "mobi"
     }) do
       local prefix = "[%-:;%.%?/&]"
       if string.match(parenturl, prefix .. extension .. "$")
