@@ -12,6 +12,8 @@ USER_AGENTS = 'https://www.useragents.me/'
 def write_file(filename: str, data: typing.Union[str, typing.List[str]]) -> int:
     if type(data) is list:
         data = '\n'.join(data) + '\n'
+    if type(data) is str:
+        data = bytes(data, 'utf8')
     result = None
     temp_filename = filename + '.bak'
     if os.path.isfile(temp_filename):
@@ -22,7 +24,7 @@ def write_file(filename: str, data: typing.Union[str, typing.List[str]]) -> int:
     if os.path.isfile(filename):
         os.rename(filename, temp_filename)
     try:
-        with open(filename, 'w') as f:
+        with open(filename, 'wb') as f:
             result = f.write(data)
     except Exception:
         traceback.print_exc()
@@ -39,7 +41,6 @@ def write_file(filename: str, data: typing.Union[str, typing.List[str]]) -> int:
 
 
 def update_tlds() -> typing.List[str]:
-    print('Updating TLDs.')
     response = requests.get(IANA_TLDS)
     assert response.status_code == 200 and len(response.content) > 0
     tlds = ['onion']
@@ -53,7 +54,6 @@ def update_tlds() -> typing.List[str]:
 
 
 def update_uas() -> typing.List[str]:
-    print('Updating user-agents.')
     response = requests.get(USER_AGENTS)
     assert response.status_code == 200 and len(response.content) > 0
     user_agents = {}
@@ -76,7 +76,6 @@ def update_uas() -> typing.List[str]:
 
 
 def update_outlinks_domains() -> typing.List[str]:
-    print('Updating outlinks list.')
     lines = {'arpa', 'gov', 'mil', 'museum', 'edu'} # 'org'
     tlds = update_tlds()
     with open('static-extract-outlinks-domains.txt', 'r') as f:
@@ -92,7 +91,10 @@ def update_outlinks_domains() -> typing.List[str]:
     return lines
 
 if __name__ == '__main__':
+    print('Updating TLDs.')
     update_tlds()
+    print('Updating user-agents.')
     update_uas()
+    print('Updating outlinks list.')
     update_outlinks_domains()
 
