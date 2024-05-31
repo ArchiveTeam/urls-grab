@@ -33,6 +33,10 @@
 ^https?://twitter%.com/home%?status=
 ^https?://twitter%.com/intent/tweet/.
 ^https?://twitter%.com/share%?
+^https?://x%.com/%?logout=
+^https?://x%.com/home%?status=
+^https?://x%.com/intent/tweet/.
+^https?://x%.com/share%?
 ^https?://[^/]*whatsapp%.com/send%?
 ^https?://[^/]*%.app%.goo%.gl/%?link=
 ^https?://lineit%.line%.me/.
