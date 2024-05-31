@@ -1,6 +1,7 @@
 # encoding=utf8
 import datetime
 from distutils.version import StrictVersion
+import functools
 import hashlib
 import json
 import os
@@ -83,7 +84,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20240528.01'
+VERSION = '20240531.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -92,8 +93,29 @@ MAX_DUPES_LIST_SIZE = 10000
 DNS_SERVERS = ['9.9.9.10', '149.112.112.10' ,'2620:fe::10' ,'2620:fe::fe:10'] #Quad9
 with open('user-agents.txt', 'r') as f:
     USER_AGENTS = [l.strip() for l in f]
+EXTRACT_OUTLINKS = {}
+
+@functools.lru_cache(maxsize=1024)
+def lookup_domain(domain, add=False):
+    parts = EXTRACT_OUTLINKS
+    domain = domain.split('.')
+    for i, part in enumerate(domain[::-1]+['']):
+        if not add and '' in parts:
+            break
+        if part not in parts:
+            if add:
+                parts[part] = {} if len(part) > 0 else True
+            else:
+                return None
+        parts = parts[part]
+    return '.'.join(domain[-i:]).strip('.')
+
 with open('static-extract-outlinks-domains.txt', 'r') as f:
-    EXTRACT_OUTLINKS = [l.strip() for l in f]
+    for line in f:
+        line = line.strip()
+        if len(line) == 0:
+            continue
+        lookup_domain(line, add=True)
 
 ###########################################################################
 # This section defines project-specific tasks.
