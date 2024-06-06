@@ -298,6 +298,15 @@ local filter_pattern_sets = {
     ["html"]="^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
     ["sitemap"]="^https?://[^/]+/[a-z0-9]+/sitemap%.xml$"
   },
+  ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
+    ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",
+    ["show"]="^https?://[^/]+/show/[a-z0-9%.]+$",
+    ["slots"]="^https?://[^/]+/slots/[a-z0-9%.]+$",
+    ["news"]="^https?://[^/]+/news/[a-z0-9%.]+$",
+    ["html"]="^https?://[^/]+/html/[a-z0-9%.]+$",
+    ["uploads"]="^https?://[^/]+/uploads/image/",
+    ["casinoguru"]="^https?://static%.casino%.guru/",
+  }
 }
 
 local imgur_items = {
