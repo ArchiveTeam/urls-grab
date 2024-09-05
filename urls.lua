@@ -250,13 +250,18 @@ local filter_pattern_sets = {
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
     ["tupian"]={
       "^https?://[^/]+%.[^%./]+%.[a-z]+/tupian_1/[^%./]+%.jpg$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates/moban[0-9]*/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates/[^/]+/moban[0-9]*/"
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates?/moban[0-9]*/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates?/[^/]+/moban[0-9]*/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/templates?/[^/]+/chahua[0-9]*/"
     },
-    ["slash"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[^/]+/$",
+    ["slash"]={
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/[^/]+/$",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/$"
+    },
     ["other1"]={
       "tk88",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/list_[a-z]+/$",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/booklist%-[0-9]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/news/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][^0-9]",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/static/logo%.jpg"
     },
@@ -266,7 +271,9 @@ local filter_pattern_sets = {
       "%.docx?$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/[^/]+/[0-9]+/$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/cnki/images/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]%-[a-z0-9%-]+%.html$"
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/allimg/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]%-[a-z0-9%-]+%.html$",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/books/[^/]+/[0-9]+%.html$"
     }
   },
   ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?"]={
