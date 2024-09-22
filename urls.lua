@@ -605,6 +605,7 @@ queue_monthly_url = function(url, comment)
   local origurl = url
   url = percent_encode_url(url)
   url = string.match(url, "^([^#]+)")
+  local extra_params = ""
   local comment_string = ""
   if comment then
     comment_string = "comment=" .. urlparse.escape(tostring(comment)) .. "&"
@@ -612,8 +613,9 @@ queue_monthly_url = function(url, comment)
   local target_project = queued_urls
   if string.match(origurl, "^https?://[^/]+%.([a-z]+)") == "onion" then
     target_project = onion_urls
+    extra_params = "&depth=1&all=1&keep_all=1&any_domain=1"
   end
-  queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. "&url=" .. urlparse.escape(tostring(url)), target_project)
+  queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. extra_params .. "&url=" .. urlparse.escape(tostring(url)), target_project)
 end
 
 queue_monthly_item = function(item, t)
@@ -823,7 +825,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   if string.match(url, "^https?://[^/]+%.onion/")
-    and not string.match(parenturl, "^https?://[^/]+%.onion/") then
+    and string.match(url, "^https?://([^/]+)/") ~= string.match(parenturl, "^https?://([^/]+)/") then
     queue_url(url)
     return false
   end
@@ -1641,6 +1643,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   io.stdout:flush()
 
   if string.match(url["url"], "^https?://[^/]+%.onion/") then
+    if status_code == 0 then
+      local onion_length = string.len(string.match(url["url"], "https?://[^/]-([a-zA-Z0-9]+)%.onion/") or "")
+      if onion_length ~= 16
+        and onion_length ~= 56 then
+        return wget.actions.EXIT
+      end
+    end
     queue_url(url["url"])
   end
 
