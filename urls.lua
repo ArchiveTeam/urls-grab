@@ -1647,6 +1647,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       local onion_length = string.len(string.match(url["url"], "https?://[^/]-([a-zA-Z0-9]+)%.onion/") or "")
       if onion_length ~= 16
         and onion_length ~= 56 then
+        report_bad_url(url["url"])
         return wget.actions.EXIT
       end
     end
