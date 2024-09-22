@@ -84,7 +84,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20240922.03'
+VERSION = '20240922.04'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -403,11 +403,24 @@ def normalize_url(url):
 
 class WgetArgs(object):
     def realize(self, item):
-        USER_AGENT = random.choice(USER_AGENTS)
+        item['dict_project'] = TRACKER_ID
+        dict_data = ZstdDict.get_dict(item)
+        with open(os.path.join(item['item_dir'], 'zstdict'), 'wb') as f:
+            f.write(dict_data['dict'])
+        item['dict_id'] = dict_data['id']
+
+        if len(item['item_name']) == 0:
+            item['item_name_newline'] = ''
+            item['extract_outlinks_domains'] = '{}'
+            item['item_urls'] = '[]'
+            item['custom_items'] = '{}'
+            return realize(['sleep', '0'], item)
+
         command = ['timeout', str(int((item['item_name'].count('\0')+1)*40))] + WGET_AT_COMMAND
         print('Using global timeout', command[1])
+
         wget_args = command + [
-            '-U', USER_AGENT,
+            '-U', random.choice(USER_AGENTS),
             '-v',
             '--host-lookups', 'dns',
             '--hosts-file', '/dev/null',
@@ -440,11 +453,6 @@ class WgetArgs(object):
             '--header', 'Accept-Language: en-US;q=0.9, en;q=0.8'
         ]
 
-        item['dict_project'] = TRACKER_ID
-        dict_data = ZstdDict.get_dict(item)
-        with open(os.path.join(item['item_dir'], 'zstdict'), 'wb') as f:
-            f.write(dict_data['dict'])
-        item['dict_id'] = dict_data['id']
         wget_args.extend([
             '--warc-zstd-dict', ItemInterpolation('%(item_dir)s/zstdict'),
         ])
