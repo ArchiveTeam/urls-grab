@@ -297,7 +297,6 @@ cy
 cymru
 cyou
 cz
-dabur
 dad
 dance
 data
@@ -1038,7 +1037,6 @@ sg
 sh
 shangrila
 sharp
-shaw
 shell
 shia
 shiksha
