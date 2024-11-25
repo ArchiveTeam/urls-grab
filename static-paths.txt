@@ -12,3 +12,8 @@
 /.well-known/dnt-policy.txt
 /.well-known/trust.txt
 /.well-known/ai-plugin.json
+/feed.xml
+/atom.xml
+/feed/
+/feeds/all.atom.xml
+/index.xml

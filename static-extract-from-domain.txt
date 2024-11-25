@@ -40,6 +40,12 @@ setting
 settings
 guidelines
 editorial
+rss
+feed
+feeds
+atom
+index
+podcast
 
 # german
 agb
