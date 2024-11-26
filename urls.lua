@@ -1097,14 +1097,14 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       end
     end
   end
-
+--[[
   local parent_in_bloom = site_in_bloomfilter(parenturl)
   local new_in_bloom = site_in_bloomfilter(url)
   if (parent_in_bloom or new_in_bloom)
     and parent_in_bloom ~= new_in_bloom then
     queue_url(url)
     return false
-  end
+  end]]
 
   if (status_code < 200 or status_code >= 300 or not verdict)
     and not current_settings_all then
