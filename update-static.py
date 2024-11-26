@@ -76,7 +76,7 @@ def update_uas() -> typing.List[str]:
 
 
 def update_outlinks_domains() -> typing.List[str]:
-    lines = {'arpa', 'gov', 'mil', 'museum', 'edu'} # 'org'
+    lines = {'arpa', 'gov', 'mil', 'museum', 'edu', 'org'}
     tlds = update_tlds()
     with open('static-extract-outlinks-domains.txt', 'r') as f:
         for line in f:
