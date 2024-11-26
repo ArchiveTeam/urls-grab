@@ -2,13 +2,13 @@ local urlparse = require("socket.url")
 local http = require("socket.http")
 local idn2 = require("idn2")
 local html_entities = require("htmlEntities")
+local minibloom = require("minibloom")
 JSON = (loadfile "JSON.lua")()
 
 local item_dir = os.getenv("item_dir")
 local item_name = os.getenv("item_name")
 local custom_items = os.getenv("custom_items")
 local warc_file_base = os.getenv("warc_file_base")
-local extract_outlinks_domains_data = os.getenv("extract_outlinks_domains")
 
 local SPECIAL_INTEREST_FROM_MAIN = "special-interest-from-main"
 
@@ -53,11 +53,6 @@ for k, v in pairs(urls_settings) do
   k = normalize_url(k)
   urls_settings[k] = v
   urls[k] = true
-end
-
-local extract_outlinks_domains = {}
-for _, domain in pairs(JSON:decode(extract_outlinks_domains_data)) do
-  extract_outlinks_domains[string.gsub(domain, "([^%w])", "%%%1")] = true
 end
 
 local status_code = nil
@@ -417,6 +412,72 @@ for pattern in extract_from_domain_file:lines() do
   end
 end
 extract_from_domain_file:close()
+
+local bloomfile = nil
+local bloomfilter = nil
+local bloomcache = {}
+
+load_bloomfilter = function()
+  local filename = 'bloomfilter.bin'
+  local exists = io.open(filename)
+  if not exists then
+    print("Creating bloom filter.")
+    local domains = io.open("static-extract-outlinks-domains.txt", "r")
+    local count = 0
+    for line in domains:lines() do
+      count = count + 1
+    end
+    local bfile = minibloom.make(filename, count, 1/10000000)
+    local bfilter = minibloom.bloom(bfile)
+    domains:seek("set")
+    for line in domains:lines() do
+      if string.len(line) > 0 then
+        minibloom.set(bfilter, line .. ".")
+      end
+    end
+    domains:close()
+    minibloom.close(bfile)
+  end
+  bloomfile = minibloom.open(filename)
+  bloomfilter = minibloom.bloom(bloomfile)
+end
+
+is_in_bloomfilter = function(s)
+  local cached = bloomcache[s]
+  if cached ~= nil then
+    return cached
+  end
+  if not bloomfilter then
+    load_bloomfilter()
+  end
+  if minibloom.get(bloomfilter, s) == 1 then
+    bloomcache[s] = true
+  else
+    bloomcache[s] = false
+  end
+  return bloomcache[s]
+end
+
+site_in_bloomfilter = function(s)
+  local domain = string.match(s, "^https?://([^/:]+)")
+  domain = domain .. "."
+  local partial = ""
+  local depth = 0
+  while string.len(domain) > 0 do
+    depth = depth + 1
+    local a, b = string.match(domain, "^(.-)([^%.]+%.)$")
+    domain = a
+    partial = b .. partial
+    local result = is_in_bloomfilter(partial)
+    if result then
+      if depth == 1 then
+        partial = string.match(domain, "([^%.]+%.)$") .. partial
+      end
+      return partial
+    end
+  end
+  return false
+end
 
 kill_grab = function(item)
   io.stdout:write("Aborting crawling.\n")
@@ -1037,13 +1098,12 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  for domain, _ in pairs(extract_outlinks_domains) do
-    if string.match(string.match(parenturl, "^https?:/(/[^/:]+)"), "[^a-zA-Z0-9%-]" .. domain .. "$")
-      and not string.match(string.match(url, "^https?:/(/[^/:]+)"), "[^a-zA-Z0-9%-]" .. domain .. "$") then
-      queue_url(url)
---print(domain)
-      return false
-    end
+  local parent_in_bloom = site_in_bloomfilter(parenturl)
+  local new_in_bloom = site_in_bloomfilter(url)
+  if (parent_in_bloom or new_in_bloom)
+    and parent_in_bloom ~= new_in_bloom then
+    queue_url(url)
+    return false
   end
 
   if (status_code < 200 or status_code >= 300 or not verdict)
@@ -1897,6 +1957,9 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
 end
 
 wget.callbacks.before_exit = function(exit_status, exit_status_string)
+  if bloomfile then
+    minibloom.close(bloomfile)
+  end
   if killgrab then
     return wget.exits.IO_FAIL
   end

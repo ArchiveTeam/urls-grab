@@ -84,7 +84,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20241125.03'
+VERSION = '20241125.04'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -94,28 +94,6 @@ DNS_SERVERS = ['9.9.9.10', '149.112.112.10' ,'2620:fe::10' ,'2620:fe::fe:10'] #Q
 with open('user-agents.txt', 'r') as f:
     USER_AGENTS = [l.strip() for l in f]
 EXTRACT_OUTLINKS = {}
-
-@functools.lru_cache(maxsize=1024)
-def lookup_domain(domain, add=False):
-    parts = EXTRACT_OUTLINKS
-    domain = domain.split('.')
-    for i, part in enumerate(domain[::-1]+['']):
-        if not add and '' in parts:
-            break
-        if part not in parts:
-            if add:
-                parts[part] = {} if len(part) > 0 else True
-            else:
-                return None
-        parts = parts[part]
-    return '.'.join(domain[-i:]).strip('.')
-
-with open('static-extract-outlinks-domains.txt', 'r') as f:
-    for line in f:
-        line = line.strip()
-        if len(line) == 0:
-            continue
-        lookup_domain(line, add=True)
 
 ###########################################################################
 # This section defines project-specific tasks.
@@ -411,7 +389,6 @@ class WgetArgs(object):
 
         if len(item['item_name']) == 0:
             item['item_name_newline'] = ''
-            item['extract_outlinks_domains'] = '{}'
             item['item_urls'] = '[]'
             item['custom_items'] = '{}'
             return realize(['sleep', '0'], item)
@@ -467,7 +444,6 @@ class WgetArgs(object):
         item['item_name_newline'] = item['item_name'].replace('\0', '\n')
         item_urls = []
         custom_items = {}
-        extract_outlinks_domains = set()
 
         for item_name in item['item_name'].split('\0'):
             wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
@@ -481,16 +457,9 @@ class WgetArgs(object):
                 custom_items[normalize_url(url)] = data
             else:
                 url = item_name
-            matches = set()
-            lookup_result = lookup_domain(url.split('/')[2])
-            if lookup_result:
-                matches.add(lookup_result)
-            if len(matches) > 0:
-                extract_outlinks_domains.add(sorted(matches, key=len)[-1])
             item_urls.append(url)
             wget_args.append(url)
 
-        item['extract_outlinks_domains'] = json.dumps(list(extract_outlinks_domains))
         item['item_urls'] = item_urls
         item['custom_items'] = json.dumps(custom_items)
 
@@ -531,8 +500,7 @@ pipeline = Pipeline(
             'item_dir': ItemValue('item_dir'),
             'item_name': ItemValue('item_name_newline'),
             'custom_items': ItemValue('custom_items'),
-            'warc_file_base': ItemValue('warc_file_base'),
-            'extract_outlinks_domains': ItemValue('extract_outlinks_domains')
+            'warc_file_base': ItemValue('warc_file_base')
         }
     ),
     SetBadUrls(),
