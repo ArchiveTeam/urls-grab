@@ -2,8 +2,8 @@ local urlparse = require("socket.url")
 local http = require("socket.http")
 local idn2 = require("idn2")
 local html_entities = require("htmlEntities")
+local cjson = require("cjson")
 local minibloom = require("minibloom")
-JSON = (loadfile "JSON.lua")()
 
 local item_dir = os.getenv("item_dir")
 local item_name = os.getenv("item_name")
@@ -48,7 +48,7 @@ for url in string.gmatch(item_name, "([^\n]+)") do
   urls[normalize_url(url)] = true
 end
 
-local urls_settings = JSON:decode(custom_items)
+local urls_settings = cjson.decode(custom_items)
 for k, v in pairs(urls_settings) do
   k = normalize_url(k)
   urls_settings[k] = v
@@ -1645,7 +1645,7 @@ wget.callbacks.write_to_warc = function(url, http_stat)
         io.stdout:flush()
         os.execute("sleep 10")
       else
-        data = JSON:decode(body)
+        data = cjson.decode(body)
         if not data["items"] or not data["colls"] then
           return true
         end
@@ -1866,7 +1866,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
         newurls .. "\0"
       )
       print(body)
-      if code == 200 then
+      if code == 200 and body ~= nil and cjson.decode(body)["status_code"] == 200 then
         io.stdout:write("Submitted discovered URLs.\n")
         io.stdout:flush()
         break
