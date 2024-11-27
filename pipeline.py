@@ -125,7 +125,7 @@ class CheckIP(SimpleTask):
                 'capture_output': True
             }
 
-            url = 'http://legacy-api.arpa.li/now'
+            url = 'https://legacy-api.arpa.li/now'
             returned = subprocess.run(
                 command+[url],
                 **kwargs
@@ -481,7 +481,7 @@ project = Project(
     title = 'URLs',
     project_html = '''
     <img class="project-logo" alt="logo" src="https://archiveteam.org/images/thumb/f/f3/Archive_team.png/235px-Archive_team.png" height="50px"/>
-    <h2>Archiving sets of discovered outlinks. &middot; <a href="http://tracker.archiveteam.org/urls/">Leaderboard</a></span></h2>
+    <h2>Archiving sets of discovered outlinks. &middot; <a href="https://tracker.archiveteam.org/urls/">Leaderboard</a></span></h2>
     '''
 )
 
