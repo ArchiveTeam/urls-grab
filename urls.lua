@@ -293,12 +293,23 @@ local filter_pattern_sets = {
     ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
   },
   ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
-    ["search"]="^https?://[^/]+/.*search/",
-    ["catalogsearch"]="^https?://[^/]+/.*catalogsearch/result/",
+    ["search"]="^https?://[^/]+.*/search[/%?]",
+    ["catalogsearch"]={
+      "^https?://[^/]+.*/catalogsearch/result/",
+      "%?.+ ",
+      "%?.+dfans%.xyz",
+      "%?.+1024dhz%.com"
+    },
     --["brackets"]="【[^】]+】",
-    ["zonghe"]="^https?://[^/]+/styles/zonghe/",
+    ["style"]={
+      "^https?://[^/]+/styles/zonghe/",
+      "^https?://[^/]+/styles/[a-z][0-9][0-9]/"
+    },
     ["html"]="^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
-    ["sitemap"]="^https?://[^/]+/[a-z0-9]+/sitemap%.xml$"
+    ["sitemap"]={
+      "^https?://[^/]+/[a-z0-9]+/sitemap%.xml$",
+      "^https?://[^/]+/sitemap%.xml$"
+    }
   },
   ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
     ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",
