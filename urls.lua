@@ -271,12 +271,12 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/books/[^/]+/[0-9]+%.html$"
     }
   },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?"]={
+  --[[["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?"]={
     ["search"]="^https?://[^/]+/.*/?search/",
     ["catalogsearch"]="^https?://[^/]+/.*/?catalogsearch/",
     ["s"]="^https?://[^/]+/%?s=",
     ["brackets"]="【[^%.】]+%.[a-zA-Z0-9]+】"
-  },
+  },]]
   ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?"]={
     ["article"]="^https?://[^/]+/article/2023[01][1-9][0-9A-Za-z]+%.html$",
     ["article2"]="^https?://[^/]+/2023[01][1-9][0-9A-Za-z]+%.html$"
@@ -294,8 +294,8 @@ local filter_pattern_sets = {
   },
   ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
     ["search"]="^https?://[^/]+/.*search/",
-    ["catalogsearch"]="^https?://[^/]+/.*catalogsearch/",
-    ["brackets"]="【[^】]+】",
+    ["catalogsearch"]="^https?://[^/]+/.*catalogsearch/result/",
+    --["brackets"]="【[^】]+】",
     ["zonghe"]="^https?://[^/]+/styles/zonghe/",
     ["html"]="^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
     ["sitemap"]="^https?://[^/]+/[a-z0-9]+/sitemap%.xml$"
