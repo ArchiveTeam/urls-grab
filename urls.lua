@@ -293,7 +293,11 @@ local filter_pattern_sets = {
     ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
   },
   ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
-    ["search"]="^https?://[^/]+.*/search[/%?]",
+    ["search"]={
+      "^https?://[^/]+.*/search[/%?]",
+      "%?.+dfans%.xyz",
+      "%?.+1024dhz%.com"
+    },
     ["catalogsearch"]={
       "^https?://[^/]+.*/catalogsearch/result/",
       "%?.+ ",
@@ -308,7 +312,9 @@ local filter_pattern_sets = {
     ["html"]="^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
     ["sitemap"]={
       "^https?://[^/]+/[a-z0-9]+/sitemap%.xml$",
-      "^https?://[^/]+/sitemap%.xml$"
+      "^https?://[^/]+/sitemap%.xml$",
+      "%?.+dfans%.xyz",
+      "%?.+1024dhz%.com"
     }
   },
   ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
