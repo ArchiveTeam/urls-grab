@@ -308,6 +308,9 @@ local filter_pattern_sets = {
     ["style"]={
       "^https?://[^/]+/styles/zonghe/",
       "^https?://[^/]+/styles/sjdy/",
+      "^https?://[^/]+/styles/bjh/",
+      "^https?://[^/]+/styles/zytd/",
+      "^https?://[^/]+/styles/hmseo/",
       "^https?://[^/]+/styles/pceggs/",
       "^https?://[^/]+/styles/zgkxy/",
       "^https?://[^/]+/styles/qinggan/",
