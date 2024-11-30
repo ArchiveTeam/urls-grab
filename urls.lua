@@ -314,7 +314,7 @@ local filter_pattern_sets = {
       "^https?://[^/]+/styles/pceggs/",
       "^https?://[^/]+/styles/zgkxy/",
       "^https?://[^/]+/styles/qinggan/",
-      "^https?://[^/]+/styles/[a-z][0-9][0-9]?/"
+      "^https?://[^/]+/styles/[a-z][0-9][0-9]?[0-9]?/"
     },
     ["html"]="^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
     ["sitemap"]={
