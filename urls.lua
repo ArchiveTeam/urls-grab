@@ -292,6 +292,15 @@ local filter_pattern_sets = {
     ["company-en"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/en[0-9]+/static/",
     ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
   },
+  ["^https?://[a-z%-]+%.[a-z]+/"]={
+    ["css"]="^https?://[a-z%-]+%.[a-z]+/style/style%.css$",
+    ["tld-online"]="^https?://[a-z%-]+%.online/.",
+    ["tld-info"]="^https?://[a-z%-]+%.info/.",
+    ["tld-pro"]="^https?://[a-z%-]+%.pro/.",
+    ["php"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+%.php$",
+    ["html"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+%.html$",
+    ["none"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+$",
+  },
   ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
     ["search"]={
       "^https?://[^/]+.*/search[/%?]",
