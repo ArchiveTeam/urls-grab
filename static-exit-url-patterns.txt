@@ -17,6 +17,7 @@
 [%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
 [%?&;]wtd=
 [%?&;]n?once=
+[%?&;][nN][oO][nN][cC][eE][_%-][tT][oO][kK][eE][nN]=
 [%?&;]_?ra?nd=
 [%?&;][sS]ession[iI][dD]=
 [%?&;]session=
