@@ -537,3 +537,9 @@
 /%${[^}]+}/
 ^https?://kfz%.[^/]+/wkz/controller;
 ^custom:random=[0-9]+&url=https%%3a%%2f%%2fwww%%2emanningmusiccentre%%2ecom%%2fsitemap_[a-zA-Z0-9]+%%2exml$
+^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*1717173%.xyz
+^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*iliiili%.com
+^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*m?[jki][prt]%-edu%.sbs
+^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*linegames%.org
+^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*mit%-edu%.[tb][eu][cz][hz]
+^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*digwow%.net
