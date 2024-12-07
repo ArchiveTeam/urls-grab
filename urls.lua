@@ -292,6 +292,13 @@ local filter_pattern_sets = {
     ["company-en"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/en[0-9]+/static/",
     ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
   },
+  ["^http://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
+    ["numbers"]="^http://[0-9][0-9][0-9][0-9][0-9][0-9]%.[^%.]+%.[^%./]+/",
+    ["slash"]="^http://[^/]+/.+%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]/$",
+    ["noslash"]="^http://[^/]+/.+%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]$",
+    ["numbers-html"]="^http://[^/]+/.+/[0-9][0-9][0-9][0-9][0-9][0-9]%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]%.html$",
+    ["html"]="^http://[^/]+/.+[^0-9]%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]%.html$"
+  },
   ["^https?://[a-z%-]+%.[a-z]+/"]={
     ["css"]="^https?://[a-z%-]+%.[a-z]+/style/style%.css$",
     ["tld-online"]="^https?://[a-z%-]+%.online/.",
@@ -966,7 +973,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
           if all_true then
             io.stdout:write("Skipping all URLs discovered for URL " .. parenturl .. ".\n")
             io.stdout:flush()
-            skip_parent_urls[parenturl] = true
+            skip_parent_urls[normalize_url(parenturl)] = true
           end
         end
       end
