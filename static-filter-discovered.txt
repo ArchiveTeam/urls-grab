@@ -543,3 +543,4 @@
 ^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*linegames%.org
 ^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*mit%-edu%.[tb][eu][cz][hz]
 ^https?://.+[/%?&]aff[0-9a-zA-Z%-]+&.*digwow%.net
+^https?://[^/]*gg123%.icu/
