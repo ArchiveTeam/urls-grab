@@ -203,6 +203,7 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/m[0-9]/static/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/boke[0-9]+/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/hbshgzx/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/movie[0-9]+/movie[0-9]+/",
     },
     --["main"]="^https?://[^/]+%.[^%./]+%.[a-z]+/",
     ["news"]={
@@ -311,35 +312,77 @@ local filter_pattern_sets = {
   ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
     ["search"]={
       "^https?://[^/]+.*/search[/%?]",
-      "%?.+dfans%.xyz",
-      "%?.+1024dhz%.com"
+      "^https?://[^/]+.*[%?/].+dfans%.xyz",
+      "^https?://[^/]+.*[%?/].+1024dhz%.com",
+      "^https?://[^/]+.*[%?/].+ac99%%C2%%B7net",
+      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     },
     ["catalogsearch"]={
       "^https?://[^/]+.*/catalogsearch/result/",
-      "%?.+ ",
-      "%?.+dfans%.xyz",
-      "%?.+1024dhz%.com"
+      "^https?://[^/]+.*[%?/].+ ",
+      "^https?://[^/]+.*[%?/].+dfans%.xyz",
+      "^https?://[^/]+.*[%?/].+1024dhz%.com",
+      "^https?://[^/]+.*[%?/].+ac99%%C2%%B7net",
+      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     },
     --["brackets"]="【[^】]+】",
     ["style"]={
-      "^https?://[^/]+/styles/zonghe/",
-      "^https?://[^/]+/styles/sjdy/",
-      "^https?://[^/]+/styles/bjh/",
-      "^https?://[^/]+/styles/zytd/",
-      "^https?://[^/]+/styles/hmseo/",
-      "^https?://[^/]+/styles/pceggs/",
-      "^https?://[^/]+/styles/zgkxy/",
-      "^https?://[^/]+/styles/qinggan/",
-      "^https?://[^/]+/styles/[a-z][0-9][0-9]?[0-9]?/"
+      "^https?://.+/styles/zonghe/",
+      "^https?://.+/styles/sjdy/",
+      "^https?://.+/styles/bjh/",
+      "^https?://.+/styles/zytd/",
+      "^https?://.+/styles/hmseo/",
+      "^https?://.+/styles/pceggs/",
+      "^https?://.+/styles/zgkxy/",
+      "^https?://.+/styles/qinggan/",
+      "^https?://.+/styles/zzc/",
+      "^https?://.+/styles/[a-z][0-9][0-9]?[0-9]?/",
+      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     },
-    ["html"]="^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
+    ["html"]={
+      "^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
+      "^https?://[^/]+.*[%?/].+ac99%%C2%%B7net",
+      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+    },
     ["sitemap"]={
       "^https?://[^/]+/[a-z0-9]+/sitemap%.xml$",
       "^https?://[^/]+/sitemap%.xml$",
-      "%?.+dfans%.xyz",
-      "%?.+1024dhz%.com"
+      "^https?://[^/]+.*[%?/].+dfans%.xyz",
+      "^https?://[^/]+.*[%?/].+1024dhz%.com",
+      "^https?://[^/]+.*[%?/].+ac99%%C2%%B7net",
+      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     }
   },
+  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?.?"]={
+    ["google"]="^https?://www%.googletagmanager%.com/gtag/",
+    ["betting"]={
+      "^https?://[^/]+/[^/]*bet[^/]*/$",
+      "^https?://[^/]+/[^/]*poker[^/]*/$",
+      "^https?://[^/]+/[^/]*cass?ino[^/]*/$"
+    },
+    ["logo"]="^https?://[^/]+/logo%.png$",
+    ["ico"]="^https?://[^/]+/ico%.png$",
+    ["image"]="^https?://[^/]+/image[0-9]%.jpg$",
+    ["hongbao"]="^https?://[^/]+/hongbao/",
+    ["sitemap"]={
+      "^https?://[^/]+/[a-z0-9]+/sitemap%.xml$",
+      "^https?://[^/]+/sitemap%.xml$"
+    }
+  },
+  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?.?.?"]={
+    ["company"]="^https?://[^/]+/template/company/ncpzsy[^/]*/",
+    ["slash"]="^https?://[^/]+/[^/]+/$",
+    ["slash2"]={
+      "^https?://[^/]+/[a-z]+/[0-9a-f]+/$",
+      "^https?://[^/]+/[a-z]+/[0-9a-f]+%.html$"
+    },
+    ["email-protection"]="/cdn%-cgi/l/email%-protection$"
+  },
+--[[  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?.?.?.?"]={
+    ["xnxx"]="^https?://[^/%.]+%.xnxx%-cdn%.com/",
+    ["dmca-static"]="^https?://[^/]+/dmca/static/",
+    ["dmca"]="^https?://[^/]+/dmca/[^/]+$",
+  },]]
   ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
     ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",
     ["show"]="^https?://[^/]+/show/[a-z0-9%.]+$",
