@@ -383,6 +383,30 @@ local filter_pattern_sets = {
     ["dmca-static"]="^https?://[^/]+/dmca/static/",
     ["dmca"]="^https?://[^/]+/dmca/[^/]+$",
   },]]
+  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+    ["txt"]={
+      "^https?://[^/]+/txt[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/txt[_/][0-9]+/?[0-9]*%.html$",
+      "^https?://[^/]+/xs[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/xs[_/][0-9]+/?[0-9]*%.html$",
+      "^https?://[^/]+/book[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/book[_/][0-9]+/?[0-9]*%.html$",
+      "^https?://[^/]+/xiaoshuo[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/xiaoshuo[_/][0-9]+/?[0-9]*%.html$",
+      "^https?://[^/]+/chang[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/chang[_/][0-9]+/?[0-9]*%.html$",
+    },
+    ["appendix"]='/\\"&$'
+  },
+  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+    ["about"]="%?company/about$",
+    ["policy"]="%?guide/policy$",
+    ["privacy"]="%?guide/privacy$",
+    ["copyright"]="%?guide/copyright$",
+    ["rss"]="%?help/rss$",
+    ["pexels"]="^https?://images%.pexels%.com/photos/.",
+    ["youtube"]="%?youtube%.com/channel/UCVldKkHBWeR0nA35L9ptZ7w$"
+  },
   ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
     ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",
     ["show"]="^https?://[^/]+/show/[a-z0-9%.]+$",
