@@ -569,7 +569,13 @@ is_in_bloomfilter = function(s)
 end
 
 site_in_bloomfilter = function(s)
-  local domain = string.match(s, "^https?://([^/:]+)")
+  local temp = string.match(s, "^https?://([^%.%-/]+%-[^%./]+)%.cdn%.ampproject%.org:?[0-9]*/")
+  local domain = nil
+  if temp then
+    domain = string.gsub(temp, "%-", ".")
+  else
+    domain = string.match(s, "^https?://([^/:]+)")
+  end
   domain = domain .. "."
   local partial = ""
   local depth = 0
