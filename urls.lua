@@ -203,6 +203,7 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/3dm/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/lansem/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/air/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/qinggan/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/mips?[0-9]*/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/blog[0-9]/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/newsmips/",
