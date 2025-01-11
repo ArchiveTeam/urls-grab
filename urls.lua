@@ -202,6 +202,7 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/b1/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/3dm/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/lansem/",
+      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/air/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/mips?[0-9]*/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/blog[0-9]/",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news_?[a-z]*/newsmips/",
@@ -415,6 +416,15 @@ local filter_pattern_sets = {
     ["rss"]="%?help/rss$",
     ["pexels"]="^https?://images%.pexels%.com/photos/.",
     ["youtube"]="%?youtube%.com/channel/UCVldKkHBWeR0nA35L9ptZ7w$"
+  },
+  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+    ["aapanel"]="^https?://www%.aapanel%.com/new/download%.html%?invite_code=aapanele$"
+  },
+  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+    ["offer"]="^https?://.*{offer}",
+    ["mm.bing.net"]="^https?://[^/]*mm%.bing%.net/.",
+    ["url-q"]="^https?://.-/url%?q=",
+    ["url"]="^https?://[^%?]+%?url=",
   },
   ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
     ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",
