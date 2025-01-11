@@ -577,7 +577,7 @@ site_in_bloomfilter = function(s)
   if temp then
     domain = string.gsub(temp, "%-", ".")
   else
-    domain = string.match(s, "^https?://([^/:]+)")
+    domain = string.match(string.match(s, "^https?://([^/:]+)"), "^(.-)%.*$")
   end
   domain = domain .. "."
   local partial = ""
