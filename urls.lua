@@ -1063,9 +1063,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
             end
           end
           if all_true then
-            io.stdout:write("Skipping all URLs discovered for URL " .. parenturl .. ".\n")
+            io.stdout:write("Skipping all URLs discovered for URL " .. current_url .. ".\n")
             io.stdout:flush()
             skip_parent_urls[normalize_url(parenturl)] = true
+            skip_parent_urls[current_url] = true
           end
         end
       end
