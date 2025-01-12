@@ -90,6 +90,19 @@ def update_outlinks_domains() -> typing.List[str]:
     write_file('static-extract-outlinks-domains.txt', lines)
     return lines
 
+
+def dedup_and_sort(filename: str):
+    lines = []
+    with open(filename, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if len(line) > 0:
+                lines.append(line)
+    os.rename(filename, filename+'.bak')
+    with open(filename, 'w') as f:
+        f.write('\n'.join(sorted(set(lines))))
+    os.remove(filename+'.bak')
+
 if __name__ == '__main__':
     print('Updating TLDs.')
     update_tlds()
@@ -97,4 +110,6 @@ if __name__ == '__main__':
     update_uas()
     print('Updating outlinks list.')
     update_outlinks_domains()
+    print('Processing filter patterns.')
+    dedup_and_sort('static-filter-discovered.txt')
 
