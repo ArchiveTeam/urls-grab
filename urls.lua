@@ -468,6 +468,7 @@ local ftp_urls = {[""]={}}
 local onion_urls = {[""]={}}
 local urls_news = {[""]={}}
 local urls_all = {}
+local custom_item_urls = {}
 
 local month_timestamp = os.date("%Y%m", timestamp)
 
@@ -768,6 +769,7 @@ queue_url = function(url, withcustom)
         end
       end
       url = string.sub(url, 1, -2)
+      custom_item_urls[url] = tostring(settings["url"])
     end
   end
   local shard = ""
@@ -817,7 +819,10 @@ queue_monthly_url = function(url, comment)
     target_project = onion_urls
     extra_params = "&depth=1&all=1&keep_all=1&any_domain=1"
   end
-  queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. extra_params .. "&url=" .. urlparse.escape(tostring(url)), target_project)
+  local new_url = tostring(url)
+  local new_item = "custom:" .. comment_string .. "random=" .. month_timestamp .. extra_params .. "&url=" .. urlparse.escape(new_url)
+  custom_item_urls[new_item] = new_url
+  queue_monthly_item(new_item, target_project)
 end
 
 queue_monthly_item = function(item, t)
@@ -2055,9 +2060,10 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
           io.stdout:flush()
           for url, _ in pairs(urls_list) do
             local filtered = false
+            local actual_url = custom_item_urls[url] or url
             for _, pattern in pairs(filter_discovered) do
-              if string.match(url, pattern) then
-                io.stdout:write("Skipping URL " .. url .. " due to " .. pattern .. ".\n")
+              if string.match(actual_url, pattern) then
+                io.stdout:write("Skipping item " .. url .. " due to " .. pattern .. ".\n")
                 io.stdout:flush()
                 filtered = true
                 break
