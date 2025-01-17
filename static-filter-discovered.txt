@@ -375,6 +375,7 @@
 ^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=https?://.
 ^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=site%%2F.
 ^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=site:.
+^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=www
 ^https?://[^/]+/[a-z%-]*%.?[0-9]*%?x=[^&]+$
 ^https?://[^/]+/index%.php%?[0-9a-f]+=[0-9a-f]+$
 ^https?://[^/]+/inventoryphotos/[0-9]+/[a-z0-9]+/ip/[^%.]+%.jpg%?bg%-color=[^&]+&width=
