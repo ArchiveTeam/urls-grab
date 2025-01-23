@@ -455,6 +455,9 @@ local pastebin_items = {
 local mediafire_items = {
   [""]={}
 }
+local blogger_items = {
+  [""]={}
+}
 local telegram_posts = {
   [""]={},
   [periodic_shard]={}
@@ -993,6 +996,16 @@ queue_mediafire = function(rest)
   end
 end
 
+queue_blogger = function(url)
+  local blog = string.match(url, "^https?://([^%.]+)%.blogger%.[a-z][a-z][a-z]?/")
+  if not blog then
+    blog = string.match(url, "^https?://([^%.]+)%.blogspot%.[a-z][a-z][a-z]?/")
+  end
+  if blog then
+    blogger_items[""]["blog:" .. string.lower(blog)] = current_url
+  end
+end
+
 queue_services = function(url)
   if not url then
     return nil
@@ -1006,6 +1019,11 @@ queue_services = function(url)
     queue_mediafire(rest)
   elseif domain == "imgur.com" then
     queue_imgur(rest)
+  elseif domain and (
+    string.match(domain, "^blogger%.")
+    or string.match(domain, "^blogspot%.")
+  ) then
+    queue_blogger(url)
   end
 end
 
@@ -2035,6 +2053,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["pastebin-xa5xj5bx2no3qc1"] = pastebin_items,
     ["mediafire-9cmzz6b3jawqbih"] = mediafire_items,
     ["imgur-6fzz6lxvpk9kgug7"] = imgur_items,
+    ["blogger-2uka2xphhn6ywzuc"] = blogger_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
     --["urls-tor-f6eyk1zzl9ca5pqu"] = onion_urls,
