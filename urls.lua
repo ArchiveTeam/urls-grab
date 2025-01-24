@@ -435,6 +435,15 @@ local filter_pattern_sets = {
     ["url-q"]="^https?://.-/url%?q=",
     ["url"]="^https?://[^%?]+%?url=",
   },
+  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+    ["?"]="^https?://[^/]+/%?[a-z]+=[0-9]+$",
+    ["html"]={
+      "^https?://[^/]+/[a-z0-9]+%.html$",
+      "^https?://[^/]+/[a-z0-9]+/[a-z0-9]+%.html$"
+    },
+    ["temp"]="^https?://[^/]+/temp/[0-9]+/",
+    ["string"]="^https?://[^/]+/[0-9a-z]+$"
+  },
   ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
     ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",
     ["show"]="^https?://[^/]+/show/[a-z0-9%.]+$",
@@ -1036,8 +1045,6 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
---print(url)
-
   local current_settings_all = current_settings and current_settings["all"]
   local current_settings_any_domain = current_settings and current_settings["any_domain"]
   local same_domain = string.match(parenturl, "^(https?://[^/]+)") == string.match(url, "^(https?://[^/]+)")
@@ -1056,9 +1063,12 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  if skip_parent_urls[parenturl] then
+  if skip_parent_urls[normalize_url(parenturl)]
+    or skip_parent_urls[current_url] then
     return false
   end
+
+--print(url)
 
   if url ~= parenturl then
     for parenturl_pattern, pattern_table in pairs(filter_pattern_sets) do
