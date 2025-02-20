@@ -481,6 +481,8 @@ local onion_urls = {[""]={}}
 local urls_news = {[""]={}}
 local urls_all = {}
 local custom_item_urls = {}
+local maybe_discourse = {}
+local discourse_items = {[""]={}}
 
 local month_timestamp = os.date("%Y%m", timestamp)
 
@@ -1070,6 +1072,10 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
 
 --print(url)
 
+  if string.match(url, "[%-/]discourse%-.+%.js$") then
+    maybe_discourse[parenturl] = true
+  end
+
   if url ~= parenturl then
     for parenturl_pattern, pattern_table in pairs(filter_pattern_sets) do
       if string.match(parenturl, parenturl_pattern) then
@@ -1583,6 +1589,28 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     end]]
   end
   if url then
+    if maybe_discourse[url] then
+      html = read_file(file)
+      local discourse_meta = string.match(html, '(<meta [^>]*id="data%-discourse%-setup"[^>]+>)')
+      if discourse_meta then
+        local data_base_url = string.match(discourse_meta, 'data%-base%-url="([^"]+)"')
+        if data_base_url then
+          discourse_items[""][data_base_url] = true
+        end
+      else
+        local discourse_env = string.match(html, '(<meta [^>]*name="discourse/config/environment"[^>]+>)')
+        if discourse_env then
+          local content = string.match(discourse_env, 'content="([^"]+)"')
+          if content then
+            content = urlparse.unescape(content)
+            content = cjson.decode(content)
+            if content["rootURL"] then
+              discourse_items[""][string.match(url, "^(https?://[^/]+)") .. content["rootURL"]] = true
+            end
+          end
+        end
+      end
+    end
     --[[for _, extension in {
       "docx",
       "epub",
@@ -2069,7 +2097,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     --["urls-tor-f6eyk1zzl9ca5pqu"] = onion_urls,
     ["urls-all-tx2vacclx396i0h"] = urls_all,
     ["urls-sitemap-news-hu1y8xj3h0ildh1k"] = urls_sitemap_news,
-    ["urls-news-6t9uc9xxz06gpt93"] = urls_news
+    ["urls-news-6t9uc9xxz06gpt93"] = urls_news,
+    ["discourse-inbox-kkrhbt6xax5ave98"] = discourse_items
   }) do
     local project_name = string.match(key, "^(.+)%-")
     for shard, url_data in pairs(items_data) do
