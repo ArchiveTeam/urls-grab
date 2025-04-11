@@ -1,4 +1,3 @@
-'%%20%+%%20
 :image/[a-z]+;base64,
 :image/svg%+xml,
 ;base64,
@@ -18,6 +17,7 @@
 ^custom:.+%%[23]f_crypt_
 ^custom:.+&url=.*%%2frealtytexas%%2e
 ^custom:.+&url=http%%3a%%2f%%2f[^%%]+%%2eskinlookingyounger%%2ecom
+^custom:.+&url=https?%%3[Aa]%%2[Ff]%%2[Ff][^%%]*linegames
 ^custom:.+&url=https?%%3a%%2f%%2f.*%%2eadventureboxatx%%2ecom%%2f
 ^custom:.+&url=https?%%3a%%2f%%2f.*%%2eaktualnewzory%%2epl%%2f
 ^custom:.+&url=https?%%3a%%2f%%2f.*%%2ebeachvolleyball2005%%2ede%%2f
@@ -57,7 +57,9 @@
 ^custom:random=[0-9]+&url=https%%3a%%2f%%2fwww%%2erecover%%2eec%%2fsitemap_[a-zA-Z0-9]+%%2exml$
 ^custom:random=[0-9]+&url=https%%3a%%2f%%2fwww%%2eyiluproxy%%2eorg%%2fsitemap_[a-zA-Z0-9]+%%2exml$
 ^data:
+^http.+[%?&;]force_sid=
 ^http://bizgbi%.com:443/.
+^http://forum%.free%-gate%.org/do/.
 ^http://go%.nbm%.org/site/Survey;.
 ^http://msongbad%.com/.*%.html$
 ^http://villamc%.cl/fonts/
@@ -92,15 +94,19 @@
 ^https?://.+%([Ss]%([a-zA-Z0-9]+%)%)
 ^https?://.+%.php%?c=theme&
 ^https?://.+%.xcss/DATB/.+%.capp[a-z]+p[0-9]+$
+^https?://.+%?.*=[^&]*[.:]aayyy%.com$
+^https?://.+%?.*=[^&]*[.:]aayyy%.com[/&%%+]
 ^https?://.+%[%[pix:
 ^https?://.+' %+
 ^https?://.+' *%+ *[a-zA-Z0-9_%.]+ *%+ *'$
 ^https?://.+' *%+ *[a-zA-Z0-9_%.]+ *%+ *'%?=[0-9]+$
 ^https?://.+'%%20%+%%20
 ^https?://.+/%${[^}]+}/
+^https?://.+/%%7B%%7B
 ^https?://.+/%([a-zA-Z0-9]+%)/Default%.aspx
 ^https?://.+/%[[a-zA-Z0-9]+%]/%[[a-zA-Z0-9]+%]/
 ^https?://.+/.._latin/.._latin/.._latin/
+^https?://.+//////////////////////
 ^https?://.+/CSM%.php%?requestID=
 ^https?://.+/DNTCaptchaImage/Show%?
 ^https?://.+/Dialog%?_=
@@ -162,12 +168,8 @@
 ^https?://.+;frid=.+;frid=
 ^https?://.+Page%%20not%%20found
 ^https?://.+UniqueDomainsSessionIdSharingApi
-^https?://[^/]+/.+1717173%.xyz
-^https?://[^/]+/.+digwow%.net
-^https?://[^/]+/.+iliiili%.com
-^https?://[^/]+/.+linegames%.org
-^https?://[^/]+/.+m?[jki][prt]%-edu%.sbs
-^https?://[^/]+/.+mit%-edu%.[tb][eu][cz][hz]
+^https?://.+[%?&;]NONCE_TOKEN=
+^https?://.+[%?&][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.*linegames%.org
 ^https?://.+[/%?]_crypt_
 ^https?://.+[0-9][0-9]%.[0-9][0-9]%.[0-9][0-9][0-9][0-9][0-9][0-9]%.[0-9][0-9]%.[0-9][0-9][0-9][0-9][0-9][0-9]%.[0-9][0-9]%.[0-9][0-9][0-9][0-9]
 ^https?://.+[^a-z]filter=.+[^a-z]filter=
@@ -184,6 +186,9 @@
 ^https?://[0-9]+%.[^/%.]+%.[a-z]+/[0-9]+_[wW]omen_[sS]eeking_[mM]en.*%.txt$
 ^https?://[0-9]+%.rril%.org/
 ^https?://[^%./]+%.[^%./]+%.pl/w/.+%.php$
+^https?://[^%./]+%.appjz%.com/
+^https?://[^%./]+%.flywheat%.org/
+^https?://[^%./]+%.icqtest%.com/
 ^https?://[^%./]+%.ifpak%.com/
 ^https?://[^%./]+%.wiki[a-z]+%.org/wiki/[^:]+:[0-9]+%.[0-9]+%.[0-9]+%.[0-9]+$
 ^https?://[^%./]+%.wiki[a-z]+%.org/wiki/[^:]+:[0-9a-f]+%%3A[0-9a-f]+%%3A[0-9a-f]+%%3A[0-9a-f]+%%3A[0-9a-f]+%%3A[0-9a-f]+%%3A[0-9a-f]+%%3A[0-9a-f]+$
@@ -232,6 +237,7 @@
 ^https?://[^/%.]+%.zs5g%.net/
 ^https?://[^/]*%.001sf%.com/
 ^https?://[^/]*%.adventureboxatx%.com/
+^https?://[^/]*%.amazingtv%.pl/
 ^https?://[^/]*%.de/[^/]+_fonts/woff2?/[^/]+_fonts/woff2?/
 ^https?://[^/]*%.dvzon%.com/
 ^https?://[^/]*%.eyrij%.net/
@@ -244,12 +250,14 @@
 ^https?://[^/]*%.potsmaat151%.nl/
 ^https?://[^/]*%.qihuys?[0-9][0-9][0-9]?%.com/
 ^https?://[^/]*%.sauerwein%-partner%.com/
+^https?://[^/]*%.smallships%.eu/
 ^https?://[^/]*%.studi%-auktion%.de/
 ^https?://[^/]*%.ucsf%.edu/blog%?.*&date%%5B.*&date%%5B.*&date%%5B
 ^https?://[^/]*%.xuite%.net/
 ^https?://[^/]*%.xx520av[0-9][0-9]?[0-9]?%.com/
 ^https?://[^/]*%.zhanshiyewu%.com/
 ^https?://[^/]*3xpl%.com/
+^https?://[^/]*aegean%-marinas%.eu/
 ^https?://[^/]*anthroposophia%-de%.de/.
 ^https?://[^/]*aquarwels24%.de/.
 ^https?://[^/]*ascension%-newage%.net/
@@ -280,6 +288,7 @@
 ^https?://[^/]*facebook%.com/flx/warn/.
 ^https?://[^/]*fb%.watch/login/
 ^https?://[^/]*feb%-web%.ru/
+^https?://[^/]*fetalmedicinecentre%.de/
 ^https?://[^/]*ff%-drosendorf%.de/.
 ^https?://[^/]*furcadia%.com/.*%.php
 ^https?://[^/]*gfycat%.com/
@@ -290,6 +299,7 @@
 ^https?://[^/]*hajduszovat%.hu/
 ^https?://[^/]*heliport%.no/
 ^https?://[^/]*huahinnews%.net/
+^https?://[^/]*iliiili%.com/
 ^https?://[^/]*imagineartsacademy%.com/
 ^https?://[^/]*inakiecheverria%.com/.-%.php/.-%.php/
 ^https?://[^/]*inristudio%.com/.
@@ -298,6 +308,7 @@
 ^https?://[^/]*johnbarras%.com/
 ^https?://[^/]*kk[^/]*121[^/]*%.sbs/
 ^https?://[^/]*kotlinews%.com
+^https?://[^/]*linegames%.org/
 ^https?://[^/]*madisonpike%.com/%?domain=
 ^https?://[^/]*mastermag33%.ru/%?pageid=
 ^https?://[^/]*mytaskey%.de/task/.
@@ -333,6 +344,7 @@
 ^https?://[^/]*webreservation%.dyndns%.biz/reservation/PAGE_.
 ^https?://[^/]*wiki[^/]+/wiki/[^:]+:[dD]iff/
 ^https?://[^/]*wiki[^/]+/wiki/[sS]pecial:[a-zA-Z0-9]+/
+^https?://[^/]*wikipedia%.org/.+[%?&]action=history
 ^https?://[^/]*yahoo%.com/.+%%5C.+at%.atwola%.com
 ^https?://[^/]*yandex%.com%.?[a-z]*/search/
 ^https?://[^/]*yibang%-xgb%.com/
@@ -370,6 +382,12 @@
 ^https?://[^/]+/.+%.17production%.ru
 ^https?://[^/]+/.+%.[a-z]+%?/.+%.[a-z][a-z][a-z]$
 ^https?://[^/]+/.+%.tv53%.ru
+^https?://[^/]+/.+1717173%.xyz
+^https?://[^/]+/.+digwow%.net
+^https?://[^/]+/.+iliiili%.com
+^https?://[^/]+/.+linegames%.org
+^https?://[^/]+/.+m?[jki][prt]%-edu%.sbs
+^https?://[^/]+/.+mit%-edu%.[tb][eu][cz][hz]
 ^https?://[^/]+/Identity/Login%?
 ^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=https?%%3A%%2F%%2F.
 ^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=https?://.
@@ -397,6 +415,7 @@
 ^https?://archive%.org/download/
 ^https?://archive%.org/search%.php%?
 ^https?://atibaia%.presconinformatica%.com%.br/apex/atibaia/
+^https?://azbop%.igovsolution%.net/renewal/
 ^https?://baongoc%.vn:?[0-9]*/news/pdf/nhung%-chinh%-sach%-moi%-co%-hieu%-luc%-tu%-thang
 ^https?://beacon%.krxd%.net/
 ^https?://bibliotekanauki%.ceon%.pl/yadda/search/general%.action
@@ -416,11 +435,13 @@
 ^https?://dominiquefrot%.com/media/video/.*%.og[gv]%.[mow]
 ^https?://emmoita%.com/
 ^https?://etherscan%.io/
+^https?://etsy%.app%.link/[0-9a-zA-Z]+%?bid=
 ^https?://extranet%.oga%-as%.fr/doc/_affiche_doc%.php
 ^https?://extranet%.ogaloirevelay%.fr/doc/_affiche_doc%.php%?a=
 ^https?://f%-mirai%-nyusyo%.jp/jidoclub/.
 ^https?://facebook%.1x-upon%.com/
 ^https?://facebook%.com/cookie/
+^https?://facebook%.com/flx/warn/.-linegames
 ^https?://facebook%.com/login%.php
 ^https?://facebook%.com/plugins/
 ^https?://facebook%.com/sharer%.php
@@ -443,6 +464,7 @@
 ^https?://img%.aktuality%.sk/foto/
 ^https?://interactive%.web%.insurance%.ca%.gov/apex_extprd/
 ^https?://interamt%.de/koop/app/
+^https?://intranet%.aoggb%.com/logout/%?
 ^https?://itrack[0-9]+%.valuecommerce%.ne%.jp/
 ^https?://jenwo%.com/
 ^https?://kaigo%.jp/contact/biz/%?token=
@@ -455,9 +477,10 @@
 ^https?://kuechenplaner%.[^/]+/cloud/
 ^https?://lasprov%.las%.ac%.cn/.
 ^https?://lslaoi%.legalserver%.org/modules/matter/extern_intake%.php%?
+^https?://makeitmoveitfx%.com/[^w][^?]*/%?ver=[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$
 ^https?://map%.hot%-map%.com/.*[?&]ctxi?=[a-z0-9]+
 ^https?://maps%.google%.com/maps.
-^https?://maps%.wikimedia%.org/.
+^https?://maps%.wikimedia%.org/img/osm%-intl.
 ^https?://mapserver%.mapy%.cz/.
 ^https?://marsrovers%.nasa%.gov%.land/.
 ^https?://meta3%.toolforge%.org/stalktoy/[0-9]+%.[0-9]+%.[0-9]+%.[0-9]+$
@@ -470,6 +493,7 @@
 ^https?://muntha%.org/cgi%-bin/%?test=
 ^https?://muntha%.org/docs/%?test=
 ^https?://nadod%.ru/.
+^https?://necrologie%.repubblica%.it/.
 ^https?://nnakademia%.pl/login
 ^https?://onlineservices%.osc%.state%.ny%.us/Enrollment/
 ^https?://opac%.spk%-berlin%.de.*/SID=.
@@ -515,6 +539,7 @@
 ^https?://world9%.spcs%.bio/.*[?&]Link_id=
 ^https?://world[0-9]+%.spcs%.bio/.
 ^https?://www%.1717173%.xyz/redirect/
+^https?://www%.aayyy%.com/%?key=
 ^https?://www%.aietta%.ac%.in/cse%-aiml/.
 ^https?://www%.alter%-flugplatz%-karlsruhe%.de/printpdf/%d+%?.*&amp
 ^https?://www%.alter%-flugplatz%-karlsruhe%.de/printpdf/%d+%?.*&ord=[^&]*%%5B[^&]*%%5B
@@ -530,6 +555,7 @@
 ^https?://www%.editorialnigeria%.com/[0-9]+%.html$
 ^https?://www%.elcorteingles%.es/descuentos/[^?]+%%2C%%2C[^?]+%%2C%%2C
 ^https?://www%.elcorteingles%.es/descuentos/[^?]+::[^?]+::[^?]+::
+^https?://www%.etsy%.com/mobile%?bid=
 ^https?://www%.google%.[a-z]+/maps.
 ^https?://www%.google%.[a-z]+/search.
 ^https?://www%.heliport%.no/flights%?
@@ -537,7 +563,7 @@
 ^https?://www%.jobnet%.com%.mm/job/[0-9]+/sl
 ^https?://www%.linegames%.org/redirect/
 ^https?://www%.pa%-report%.com/.
-^https?://www%.paris%.cl/.
+^https?://www%.paris%.cl/.-[%-%+]jar
 ^https?://www%.rcbconline%-corporate%.com/fo/login%?x=
 ^https?://www%.rosarioalerta%.com/
 ^https?://www%.tecnm%.mx/dir_escolares/
