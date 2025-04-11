@@ -627,7 +627,6 @@ kaufen
 kddi
 ke
 kerryhotels
-kerrylogistics
 kerryproperties
 kfh
 kg
@@ -691,7 +690,6 @@ limited
 limo
 lincoln
 link
-lipsy
 live
 living
 lk
