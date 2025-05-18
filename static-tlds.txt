@@ -118,7 +118,6 @@ be
 beats
 beauty
 beer
-bentley
 berlin
 best
 bestbuy
@@ -658,7 +657,6 @@ la
 lacaixa
 lamborghini
 lamer
-lancaster
 land
 landrover
 lanxess
@@ -914,7 +912,6 @@ politie
 porn
 post
 pr
-pramerica
 praxi
 press
 prime
