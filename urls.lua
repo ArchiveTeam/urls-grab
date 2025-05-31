@@ -808,10 +808,10 @@ queue_url = function(url, withcustom)
     target_project[shard] = {}
   end
   if not duplicate_urls[url] and not target_project[shard][url] then
-    if find_path_loop(url, 2) then
+    if find_path_loop(url, 3) then
       return false
     end
---print("queuing",original, url)
+--print("queuing", url)
     target_project[shard][url] = current_url
   end
 end
@@ -1206,7 +1206,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  if find_path_loop(url, 2) then
+  if find_path_loop(url, 3) then
     return false
   end
 
@@ -1512,7 +1512,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
             "([hH][tT][tT][pP][sS]?://[^%s<>#\"'\\`{}%)%]]+)",
             '"([hH][tT][tT][pP][sS]?://[^"]+)',
             "'([hH][tT][tT][pP][sS]?://[^']+)",
-            ">[%s%z]*([hH][tT][tT][pP][sS]?://[^<%s]+)"
+            ">[%s%z]*([hH][tT][tT][pP][sS]?://[^<%s]+)",
+            "[^0-9a-zA-Z](doi[%s%z]*:[%s%z]*10%.[0-9%.%z]+/[0-9a-zA-Z!\"%$%%&'%*%+,:<=>%?@%[%]%^`{|}~%-%._;%(%)/%z]+)",
+            "[^0-9a-zA-Z](doi[%s%z]*:[%s%z]*10%.[0-9%.%z]+/[0-9a-zA-Z%-%._;%(%)/%z]+)",
           }
           if newline_white == " " then
             table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z]+)")
@@ -1522,6 +1524,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           end
           for _, pattern in pairs(url_patterns) do
             for raw_newurl in string.gmatch(temp3, pattern) do
+              if string.match(raw_newurl, "^doi%s*:") then
+                raw_newurl = "https://doi.org/" .. string.match(raw_newurl, "^doi[%s%z]*:[%s%z]*(10%..+)")
+              end
               local candidate_urls = {}
               local i = 0
               for s in string.gmatch(raw_newurl, "([^%z]+)") do
@@ -1537,7 +1542,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
                 i = i + 1
               end
               for newurl, _ in pairs(candidate_urls) do
-                while string.match(newurl, ".[%.&,!;]$") do
+                while string.match(newurl, ".[%.%?&,!;%[]$") do
                   newurl = string.match(newurl, "^(.+).$")
                 end
                 if string.match(newurl, "^[hH][tT][tT][pP][sS]?://") then
