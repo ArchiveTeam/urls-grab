@@ -97,6 +97,7 @@ local current_settings = nil
 local bad_urls = {}
 local queued_urls = {}
 local skip_parent_urls_check = {}
+local skip_parent_urls_checked = {}
 local skip_parent_urls = {}
 local remove_params = {}
 local filter_discovered = {}
@@ -117,33 +118,33 @@ local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t")
 local periodic_shard = "periodic" .. year_month
 
 local filter_pattern_sets = {
-  ["^https?://[^%./]+%.[^%./]+%.[a-z]+/"]={
+  ["^https?://[^%./]+%.[^%./]+%.[a-z]+/"]={{
     ["pics"]="^https?://[^%./]+%.[^%./]+%.[a-z]+/pics/[a-zA-Z0-9%-_]+%.[a-z]+$",
     --["vicom"]="/[vV][iI]com[0-9]+/",
     ["k8"]={
       "^https?://[kK]8",
       "^https?://[^/]+/pics/[kK]888"
     }
-  },
-  ["^https?://[a-z0-9]+%.[^%./]+%.de/pages/"]={
+  }},
+  ["^https?://[a-z0-9]+%.[^%./]+%.de/pages/"]={{
     ["pages"]="^https?://[a-z0-9]+%.[^%./]+%.de/pages/.+%.html",
     --["css"]="%s.*%.css$"
-  },
-  ["^https?://[a-z0-9]+%.[^%./]+%.de/news/"]={
+  }},
+  ["^https?://[a-z0-9]+%.[^%./]+%.de/news/"]={{
     ["news"]="^https?://[a-z0-9]+%.[^%./]+%.de/news/[^&%?/]+$",
     --["css"]="%.css"
-  },
+  }},
   --[[["^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/.*%%20"]={
     ["space"]={
       "^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/.*%s",
       "^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/.*%%20"
     }
   },]]
-  ["^https?://[^/]+.*/X[a-z0-9]+"]={
-    ["x"]="^https?://[^/]+.*/X[a-z0-9]+.*/X[a-z0-9]",
+  ["/X[a-z0-9]+"]={{
+    ["x"]="/X[a-z0-9]+.*/X[a-z0-9]",
     ["tk88"]="[tT][kK]88"
-  },
-  ["^http://"]={
+  }},
+  ["^http://"]={{
     ["index-robots"]={
       "^https?://[^/]+//index%.php%?robots%.txt$",
       "^https?://[^/]+/robots%.txt$"
@@ -159,15 +160,15 @@ local filter_pattern_sets = {
     ["images"]="^https?://[^/]+/uploads/images/[0-9]+%.jpg$",
     ["html"]="^https?://[^/]+/[a-z]+/[0-9]+%.html$",
     ["page"]="^https?://[^/]+/[a-z]+/[0-9]+/$"
-  },
-  ["^http://[a-z0-9]+%.[^%./]+%.[a-z]+/$"]={
+  }},
+  ["^http://[a-z0-9]+%.[^%./]+%.[a-z]+/$"]={{
     ["sinaimgcn"]="^http://n%.sinaimg%.cn/.+%.jpg$",
     ["sitemap"]="^http://[a-z0-9]+%.[^%./]+%.[a-z]+/sitemap%.xml",
     ["template"]="/template/default/04190%-44/",
     ["domain"]="^http://[a-z0-9]+%.[^%./]+%.[a-z]+/$"
-  },
+  }},
   -- fx- spam
-  ["^https?://[a-z0-9]+%.[^/]+%.[a-z]+/.?"]={
+  ["^https?://[a-z0-9]+%.[^/]+%.[a-z]+/"]={{
     ["url"]={
       "^https?://[a-z0-9]+%.[^/]+%.[a-z]+/_static_index/",
       "^https?://[a-z0-9]+%.[^/]+%.[a-z]+/.+/static/",
@@ -183,9 +184,9 @@ local filter_pattern_sets = {
     --["sitemaphtml"]="^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/sitemap%.html$",
     --["announcehtml"]="^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/announce%.html$",
     --["number"]="^https?://[a-z0-9]+%./"
-  },
+  }},
   -- news/show spam
-  ["^https?://[^/]+%.[a-z%-]+/"]={
+  ["^https?://[^/]+%.[a-z%-]+/"]={{
     --[[["newslist"]={
       "^https?://[^/]+%.[a-z%-]+/newslist/[0-9]+/$",
       "^https?://[^/]+%.[a-z%-]+/list/[0-9]+/$",
@@ -238,16 +239,18 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[a-z%-]+/[0-9]+/[0-9a-f]+%.html$"
     },
     ["template"]="^https?://[^/]+%.[a-z%-]+/template/"
-  },
+  }},
+  ["^https?://[^/]*%.de/[^/]+_fonts/.*woff"]={{
+    ["fonts"]="^https?://[^/]*%.de/[^/]+_fonts/.*woff"
+  }},
   -- xml spam
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?"]={
+  ["^https?://[^/]+%.[^%./]+%.[a-z]+/"]={{
     ["num"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[0-9]+/[a-z0-9_]+%.xml$",
     ["num2"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]+/[a-z0-9_]+%.xml$",
     --["vip"]="/[vV][iI][pP]%-[0-9]+%.",
     ["styles"]="^https?://[^/]+%.[^%./]+%.[a-z]+/styles/",
     --["itc"]="^https?://[^/]*itc%.cn/"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?"]={
+  },{
     ["htmlnews"]={
       "^https?://[^/]+%.[^%./]+%.[a-z]+/html/[a-z0-9]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/newshtml/[a-z0-9]+%.html$",
@@ -256,11 +259,7 @@ local filter_pattern_sets = {
     ["baidu"]="^https?://[^/]*baidu%.com/",
     ["a"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]+/$",
     ["sitemap"]="sitemap%.xml$"
-  },
-  ["^https?://[^/]*%.de/[^/]+_fonts/.*woff"]={
-    ["fonts"]="^https?://[^/]*%.de/[^/]+_fonts/.*woff"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?"]={
+  },{
     --["swf"]="%.swf$",
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
     ["tupian"]={
@@ -290,36 +289,32 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]%-[a-z0-9%-]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/books/[^/]+/[0-9]+%.html$"
     }
-  },
-  --[[["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?"]={
+  },--[[{
     ["search"]="^https?://[^/]+/.*/?search/",
     ["catalogsearch"]="^https?://[^/]+/.*/?catalogsearch/",
     ["s"]="^https?://[^/]+/%?s=",
     ["brackets"]="【[^%.】]+%.[a-zA-Z0-9]+】"
   },]]
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?"]={
+  {
     ["article"]="^https?://[^/]+/article/2023[01][1-9][0-9A-Za-z]+%.html$",
     ["article2"]="^https?://[^/]+/2023[01][1-9][0-9A-Za-z]+%.html$"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?"]={
+  },{
     ["appsstore.cdf"]="^https?://download%.appsstore%.cfd/"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?"]={
+  },{
     ["yamaxun"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/yamaxun/",
     ["upluds"]="^https?://[^/]+%.[^%./]+%.[a-z]+/upluds/"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?.?"]={
+  },{
     ["company-en"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/en[0-9]+/static/",
     ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
-  },
-  ["^http://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
+  }},
+  ["^http://[^/]+%.[^%./]+%.[a-z]+/"]={{
     ["numbers"]="^http://[0-9][0-9][0-9][0-9][0-9][0-9]%.[^%.]+%.[^%./]+/",
     ["slash"]="^http://[^/]+/.+%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]/$",
     ["noslash"]="^http://[^/]+/.+%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]$",
     ["numbers-html"]="^http://[^/]+/.+/[0-9][0-9][0-9][0-9][0-9][0-9]%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]%.html$",
     ["html"]="^http://[^/]+/.+[^0-9]%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]%.html$"
-  },
-  ["^https?://[a-z%-]+%.[a-z]+/"]={
+  }},
+  ["^https?://[a-z%-]+%.[a-z]+/"]={{
     ["css"]="^https?://[a-z%-]+%.[a-z]+/style/style%.css$",
     ["tld-online"]="^https?://[a-z%-]+%.online/.",
     ["tld-info"]="^https?://[a-z%-]+%.info/.",
@@ -327,52 +322,51 @@ local filter_pattern_sets = {
     ["php"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+%.php$",
     ["html"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+%.html$",
     ["none"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+$",
-  },
-  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
+  }},
+  ["^https?://[^/]+%.[a-z]+/"]={{
     ["search"]={
-      "^https?://[^/]+.*/search[/%?]",
-      "^https?://[^/]+.*[%?/].+dfans%.xyz",
-      "^https?://[^/]+.*[%?/].+1024dhz%.com",
-      "^https?://[^/]+.*[%?/].+ac99%%C2%%B7net",
-      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+      "/search[/%?]",
+      "[%?/].+dfans%.xyz",
+      "[%?/].+1024dhz%.com",
+      "[%?/].+ac99%%C2%%B7net",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     },
     ["catalogsearch"]={
-      "^https?://[^/]+.*/catalogsearch/result/",
-      "^https?://[^/]+.*[%?/].+ ",
-      "^https?://[^/]+.*[%?/].+dfans%.xyz",
-      "^https?://[^/]+.*[%?/].+1024dhz%.com",
-      "^https?://[^/]+.*[%?/].+ac99%%C2%%B7net",
-      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+      "/catalogsearch/result/",
+      "[%?/].+ ",
+      "[%?/].+dfans%.xyz",
+      "[%?/].+1024dhz%.com",
+      "[%?/].+ac99%%C2%%B7net",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     },
     --["brackets"]="【[^】]+】",
     ["style"]={
-      "^https?://.+/styles/zonghe/",
-      "^https?://.+/styles/sjdy/",
-      "^https?://.+/styles/bjh/",
-      "^https?://.+/styles/zytd/",
-      "^https?://.+/styles/hmseo/",
-      "^https?://.+/styles/pceggs/",
-      "^https?://.+/styles/zgkxy/",
-      "^https?://.+/styles/qinggan/",
-      "^https?://.+/styles/zzc/",
-      "^https?://.+/styles/[a-z][0-9][0-9]?[0-9]?/",
-      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+      "/styles/zonghe/",
+      "/styles/sjdy/",
+      "/styles/bjh/",
+      "/styles/zytd/",
+      "/styles/hmseo/",
+      "/styles/pceggs/",
+      "/styles/zgkxy/",
+      "/styles/qinggan/",
+      "/styles/zzc/",
+      "/styles/[a-z][0-9][0-9]?[0-9]?/",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     },
     ["html"]={
       "^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
-      "^https?://[^/]+.*[%?/].+ac99%%C2%%B7net",
-      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+      "[%?/].+ac99%%C2%%B7net",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     },
     ["sitemap"]={
       "^https?://[^/]+/[a-z0-9]+/sitemap%.xml$",
       "^https?://[^/]+/sitemap%.xml$",
-      "^https?://[^/]+.*[%?/].+dfans%.xyz",
-      "^https?://[^/]+.*[%?/].+1024dhz%.com",
-      "^https?://[^/]+.*[%?/].+ac99%%C2%%B7net",
-      "^https?://[^/]+.*[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+      "[%?/].+dfans%.xyz",
+      "[%?/].+1024dhz%.com",
+      "[%?/].+ac99%%C2%%B7net",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
     }
-  },
-  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?.?"]={
+  },{
     ["google"]="^https?://www%.googletagmanager%.com/gtag/",
     ["betting"]={
       "^https?://[^/]+/[^/]*bet[^/]*/$",
@@ -387,8 +381,7 @@ local filter_pattern_sets = {
       "^https?://[^/]+/[a-z0-9]+/sitemap%.xml$",
       "^https?://[^/]+/sitemap%.xml$"
     }
-  },
-  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?.?.?"]={
+  },{
     ["company"]="^https?://[^/]+/template/company/ncpzsy[^/]*/",
     ["slash"]="^https?://[^/]+/[^/]+/$",
     ["slash2"]={
@@ -396,13 +389,12 @@ local filter_pattern_sets = {
       "^https?://[^/]+/[a-z]+/[0-9a-f]+%.html$"
     },
     ["email-protection"]="/cdn%-cgi/l/email%-protection$"
-  },
---[[  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?.?.?.?"]={
+  },--[[{
     ["xnxx"]="^https?://[^/%.]+%.xnxx%-cdn%.com/",
     ["dmca-static"]="^https?://[^/]+/dmca/static/",
     ["dmca"]="^https?://[^/]+/dmca/[^/]+$",
-  },]]
-  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+  },]]},
+  ["^https?://[^/]+/"]={{
     ["txt"]={
       "^https?://[^/]+/txt[_/][0-9]+/[0-9]*/?$",
       "^https?://[^/]+/txt[_/][0-9]+/?[0-9]*%.html$",
@@ -416,8 +408,7 @@ local filter_pattern_sets = {
       "^https?://[^/]+/chang[_/][0-9]+/?[0-9]*%.html$",
     },
     ["appendix"]='/\\"&$'
-  },
-  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+  },{
     ["about"]="%?company/about$",
     ["policy"]="%?guide/policy$",
     ["privacy"]="%?guide/privacy$",
@@ -425,17 +416,14 @@ local filter_pattern_sets = {
     ["rss"]="%?help/rss$",
     ["pexels"]="^https?://images%.pexels%.com/photos/.",
     ["youtube"]="%?youtube%.com/channel/UCVldKkHBWeR0nA35L9ptZ7w$"
-  },
-  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+  },{
     ["aapanel"]="^https?://www%.aapanel%.com/new/download%.html%?invite_code=aapanele$"
-  },
-  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
-    ["offer"]="^https?://.*{offer}",
+  },{
+    ["offer"]="{offer}",
     ["mm.bing.net"]="^https?://[^/]*mm%.bing%.net/.",
-    ["url-q"]="^https?://.-/url%?q=",
+    ["url-q"]="/url%?q=",
     ["url"]="^https?://[^%?]+%?url=",
-  },
-  ["^https?://[^/]+/.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?"]={
+  },{
     ["?"]="^https?://[^/]+/%?[a-z]+=[0-9]+$",
     ["html"]={
       "^https?://[^/]+/[a-z0-9]+%.html$",
@@ -443,8 +431,8 @@ local filter_pattern_sets = {
     },
     ["temp"]="^https?://[^/]+/temp/[0-9]+/",
     ["string"]="^https?://[^/]+/[0-9a-z]+$"
-  },
-  ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
+  }},
+  ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={{
     ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",
     ["show"]="^https?://[^/]+/show/[a-z0-9%.]+$",
     ["slots"]="^https?://[^/]+/slots/[a-z0-9%.]+$",
@@ -452,7 +440,7 @@ local filter_pattern_sets = {
     ["html"]="^https?://[^/]+/html/[a-z0-9%.]+$",
     ["uploads"]="^https?://[^/]+/uploads/image/",
     ["casinoguru"]="^https?://static%.casino%.guru/",
-  }
+  }}
 }
 
 local imgur_items = {
@@ -848,6 +836,9 @@ queue_monthly_item = function(item, t)
 end
 
 remove_param = function(url, param_pattern)
+  if not string.match(url, param_pattern) then
+    return url
+  end
   local newurl = url
   repeat
     url = newurl
@@ -1076,50 +1067,55 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     maybe_discourse[parenturl] = true
   end
 
-  if url ~= parenturl then
-    for parenturl_pattern, pattern_table in pairs(filter_pattern_sets) do
+  if url ~= parenturl
+    and not skip_parent_urls_checked[url] then
+    for parenturl_pattern, pattern_tables in pairs(filter_pattern_sets) do
       if string.match(parenturl, parenturl_pattern) then
-        local found_any = false
-        local check_string = parenturl_pattern .. parenturl
-        if not skip_parent_urls_check[check_string] then
-          skip_parent_urls_check[check_string] = {}
-          for k, _ in pairs(pattern_table) do
-            skip_parent_urls_check[check_string][k] = false
-          end
-        end
-        for pattern_name, patterns in pairs(pattern_table) do
-          if not skip_parent_urls_check[check_string][pattern_name] then
-            if type(patterns) == "string" then
-              patterns = {patterns}
+        for num, pattern_table in pairs(pattern_tables) do
+          local found_any = false
+          local check_string = parenturl_pattern .. tostring(num) .. parenturl
+          if not skip_parent_urls_check[check_string] then
+            skip_parent_urls_check[check_string] = {}
+            for k, _ in pairs(pattern_table) do
+              skip_parent_urls_check[check_string][k] = false
             end
-            for _, pattern in pairs(patterns) do
-              if string.match(url, pattern) then
-                found_any = true
---print(check_string, pattern_name)
-                skip_parent_urls_check[check_string][pattern_name] = true
-                break
+          end
+          for pattern_name, patterns in pairs(pattern_table) do
+            if not skip_parent_urls_check[check_string][pattern_name] then
+              if type(patterns) == "string" then
+                patterns = {patterns}
+              end
+              for _, pattern in pairs(patterns) do
+                if string.match(url, pattern) then
+                  found_any = true
+  --print(check_string, pattern_name)
+                  skip_parent_urls_check[check_string][pattern_name] = true
+                  break
+                end
               end
             end
           end
-        end
-        if found_any then
-          local all_true = true
-          for _, v in pairs(skip_parent_urls_check[check_string]) do
-            if not v then
-              all_true = false
-              break
+          if found_any then
+            local all_true = true
+            for _, v in pairs(skip_parent_urls_check[check_string]) do
+              if not v then
+                all_true = false
+                break
+              end
             end
-          end
-          if all_true then
-            io.stdout:write("Skipping all URLs discovered for URL " .. current_url .. ".\n")
-            io.stdout:flush()
-            skip_parent_urls[normalize_url(parenturl)] = true
-            skip_parent_urls[current_url] = true
+            if all_true then
+              io.stdout:write("Skipping all URLs discovered for URL " .. current_url .. ".\n")
+              io.stdout:flush()
+              skip_parent_urls[normalize_url(parenturl)] = true
+              skip_parent_urls[current_url] = true
+            end
           end
         end
       end
     end
   end
+
+  skip_parent_urls_checked[url] = true
 
   local parenturl_base = string.match(parenturl, "^(https://[^/]+)")
   if parenturl_base then
@@ -1228,6 +1224,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   if not string.match(url, "^https?://[^%./]+%.[^%./]+%.[a-z]+/sitemapa%.xml") then -- remove loop due to sitemapa.xml pointing to other domains
+    local url_lower = string.lower(url)
+    local parenturl_lower = string.lower(parenturl)
     for _, extension in pairs({
       "pdf",
       "doc[mx]?",
@@ -1259,22 +1257,21 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       "djvu",
       "mobi"
     }) do
-      local prefix = "[%-:;%.%?/&]"
-      if string.match(parenturl, prefix .. extension .. "$")
-        or string.match(parenturl, prefix .. extension .. "[^a-z0-9A-Z]")
-        or string.match(parenturl, prefix .. string.upper(extension) .. "$")
-        or string.match(parenturl, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]")
-        -- get rid of loop on sites from chinese origin (also various non-.cn domains)
-        or string.match(url, "^https?://[^/]+/%?/.+%." .. extension .. "$")
-        or string.match(url, "^https?://[^/]+/.+%.[a-z]+%?/.+%." .. extension .. "$") then
-        return false
-      end
-      if string.match(url, prefix .. extension .. "$")
-        or string.match(url, prefix .. extension .. "[^a-z0-9A-Z]")
-        or string.match(url, prefix .. string.upper(extension) .. "$")
-        or string.match(url, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]") then
-        queue_url(url)
-        return false
+      if string.match(url_lower, extension)
+        or string.match(parenturl_lower, extension) then
+        local prefix = "[%-:;%.%?/&]"
+        if string.match(parenturl_lower, prefix .. extension .. "$")
+          or string.match(parenturl_lower, prefix .. extension .. "[^a-z0-9]")
+          -- get rid of loop on sites from chinese origin (also various non-.cn domains)
+          or string.match(url_lower, "^https?://[^/]+/%?/.+%." .. extension .. "$")
+          or string.match(url_lower, "%.[a-z]+%?/.+%." .. extension .. "$") then
+          return false
+        end
+        if string.match(url_lower, prefix .. extension .. "$")
+          or string.match(url_lower, prefix .. extension .. "[^a-z0-9]") then
+          queue_url(url)
+          return false
+        end
       end
     end
   end
