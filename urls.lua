@@ -422,7 +422,7 @@ local filter_pattern_sets = {
     ["offer"]="{offer}",
     ["mm.bing.net"]="^https?://[^/]*mm%.bing%.net/.",
     ["url-q"]="/url%?q=",
-    ["url"]="^https?://[^%?]+%?url=",
+    ["url"]="%?url=",
   },{
     ["?"]="^https?://[^/]+/%?[a-z]+=[0-9]+$",
     ["html"]={
