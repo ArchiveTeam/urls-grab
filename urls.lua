@@ -1824,7 +1824,8 @@ wget.callbacks.write_to_warc = function(url, http_stat)
       or string.match(newloc, "^https?://misuse%.ncbi%.nlm%.nih%.gov/")
       or string.match(newloc, "^https?://myprivacy%.dpgmedia%.nl/")
       or string.match(newloc, "^https?://idp%.springer%.com/authorize%?")
-      or string.match(newloc, "^https?://[^/]*instagram%.com/accounts/") then
+      or string.match(newloc, "^https?://[^/]*instagram%.com/accounts/")
+      or string.match(newloc, "^https?://[^/]+/remote/check_cookie%.html%?") then
       report_bad_url(url["url"])
       exit_url = true
       return false
