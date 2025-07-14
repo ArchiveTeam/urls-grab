@@ -28,6 +28,7 @@
 [%?&;]_?s=
 [%?&;][vV][iI][dD]=
 [%?&;]SUBSESSION_ID=
+[%?&;][sS][sS]_[hH][tT][tT][pP]_[rR][eE][sS][oO][uU][rR][cC][eE]=
 [%?&;]bslsessionstr=
 [%?&;]anti[Cc]ache=
 [%?&;]anticsrf=
