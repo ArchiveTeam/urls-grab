@@ -84,7 +84,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20250715.01'
+VERSION = '20250715.02'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -426,7 +426,7 @@ class WgetArgs(object):
             '--warc-dedup-url-agnostic',
             '--warc-compression-use-zstd',
             '--warc-zstd-dict-no-include',
-            '--warc-tempdir', ItemInterpolation('%(item_dir)s'),
+            #'--warc-tempdir', ItemInterpolation('%(item_dir)s'),
             '--header', 'Connection: keep-alive',
             '--header', 'Accept-Language: en-US;q=0.9, en;q=0.8'
         ]
