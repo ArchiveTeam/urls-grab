@@ -679,6 +679,8 @@ find_path_loop = function(url, max_repetitions)
     if not tested[s] then
       if s == "" then
         tested[s] = -2
+      elseif string.match(s, "^[0-9]+$") then
+        tested[s] = -1
       else
         tested[s] = 0
       end
@@ -796,7 +798,7 @@ queue_url = function(url, withcustom)
     target_project[shard] = {}
   end
   if not duplicate_urls[url] and not target_project[shard][url] then
-    if find_path_loop(url, 3) then
+    if find_path_loop(url, 2) then
       return false
     end
 --print("queuing", url)
@@ -805,7 +807,7 @@ queue_url = function(url, withcustom)
 end
 
 queue_monthly_url = function(url, comment)
-  if find_path_loop(url, 3) then
+  if find_path_loop(url, 2) then
     return nil
   end
   local origurl = url
@@ -1202,7 +1204,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  if find_path_loop(url, 3) then
+  if find_path_loop(url, 2) then
     return false
   end
 
