@@ -208,11 +208,16 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/mips?[0-9]*/",
       "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/blog[0-9]/",
       "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/newsmips/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/xbws",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/xxfs",
       "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/m[0-9]/static/",
       "^https?://[^/]+%.[a-z%-]+/template/[^/]+/boke[0-9]+/",
       "^https?://[^/]+%.[a-z%-]+/template/company/hbshgzx/",
       "^https?://[^/]+%.[a-z%-]+/template/company/hbshgzx/",
-      "^https?://[^/]+%.[a-z%-]+/template/xiaoshuo/xiaoshuo[0-9]*/",
+      "^https?://[^/]+%.[a-z%-]+/template/xiaz[ia][ai]",
+      "^https?://[^/]+%.[a-z%-]+/template/zzcen",
+      "^https?://[^/]+%.[a-z%-]+/template/Boutique/Dandy",
+      "^https?://[^/]+%.[a-z%-]+/template/xiaoshuo",
       "^https?://[^/]+%.[a-z%-]+/template/movie[0-9]+/movie[0-9]+/",
       "^https?://[^/]+%.[a-z%-]+/template/movie[0-9]+/[^/]+%.[^/]+/",
       "^https?://[^/%.]*%.bbc%.cyou/",
@@ -236,7 +241,9 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[a-z%-]+/product/[a-z]+_[0-9/]+%.html$",
       "^https?://[^/]+%.[a-z%-]+/[a-zA-Z0-9]+%.html$",
       "^https?://[^/]+%.[a-z%-]+/[0-9a-f]+/[0-9]+%.html$",
-      "^https?://[^/]+%.[a-z%-]+/[0-9]+/[0-9a-f]+%.html$"
+      "^https?://[^/]+%.[a-z%-]+/[0-9]+/[0-9a-f]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/web3/[0-9a-z]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/[^%?]+%?m[ia][nx][0-9][0-9][0-9][0-9][0-9][0-9]%.html$"
     },
     ["template"]="^https?://[^/]+%.[a-z%-]+/template/"
   }},
