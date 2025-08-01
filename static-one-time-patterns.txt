@@ -1,4 +1,5 @@
 ^https?://[^/]+%.amazon%-adsystem%.com/.
+^https?://aax%-us%-iad%.amazon%.com/.
 ^https?://[^/]+%.yahoo%.com/adcount.
 ^https?://[^/]+%.doubleclick%.net/.
 ^https?://sb%.scorecardresearch%.com/.
@@ -26,6 +27,7 @@
 ^https?://share%.flipboard%.com/.
 ^https?://[^/]*linkedin%.com/cws/share%?
 ^https?://[^/]*linkedin%.com/share[aA]rticle%?
+^https?://[^/]*linkedin%.com/share%?
 ^https?://[^/]*linkedin%.com/sharing/.
 ^https?://[^/]*linkedin%.com/uas/login%?
 ^https?://[^/]*pinterest%.com/pin/create/.

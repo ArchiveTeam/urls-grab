@@ -17,6 +17,7 @@
 [%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
 [%?&;]wtd=
 [%?&;]n?once=
+[%?&;][nN][oO][nN][cC][eE][_%-][tT][oO][kK][eE][nN]=
 [%?&;]_?ra?nd=
 [%?&;][sS]ession[iI][dD]=
 [%?&;]session=
@@ -27,6 +28,7 @@
 [%?&;]_?s=
 [%?&;][vV][iI][dD]=
 [%?&;]SUBSESSION_ID=
+[%?&;][sS][sS]_[hH][tT][tT][pP]_[rR][eE][sS][oO][uU][rR][cC][eE]=
 [%?&;]bslsessionstr=
 [%?&;]anti[Cc]ache=
 [%?&;]anticsrf=

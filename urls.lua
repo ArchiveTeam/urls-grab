@@ -97,6 +97,7 @@ local current_settings = nil
 local bad_urls = {}
 local queued_urls = {}
 local skip_parent_urls_check = {}
+local skip_parent_urls_checked = {}
 local skip_parent_urls = {}
 local remove_params = {}
 local filter_discovered = {}
@@ -117,33 +118,33 @@ local year_month = os.date("%Y", timestamp) .. tostring(math.floor(os.date("*t")
 local periodic_shard = "periodic" .. year_month
 
 local filter_pattern_sets = {
-  ["^https?://[^%./]+%.[^%./]+%.[a-z]+/"]={
+  ["^https?://[^%./]+%.[^%./]+%.[a-z]+/"]={{
     ["pics"]="^https?://[^%./]+%.[^%./]+%.[a-z]+/pics/[a-zA-Z0-9%-_]+%.[a-z]+$",
     --["vicom"]="/[vV][iI]com[0-9]+/",
     ["k8"]={
       "^https?://[kK]8",
       "^https?://[^/]+/pics/[kK]888"
     }
-  },
-  ["^https?://[a-z0-9]+%.[^%./]+%.de/pages/"]={
+  }},
+  ["^https?://[a-z0-9]+%.[^%./]+%.de/pages/"]={{
     ["pages"]="^https?://[a-z0-9]+%.[^%./]+%.de/pages/.+%.html",
     --["css"]="%s.*%.css$"
-  },
-  ["^https?://[a-z0-9]+%.[^%./]+%.de/news/"]={
+  }},
+  ["^https?://[a-z0-9]+%.[^%./]+%.de/news/"]={{
     ["news"]="^https?://[a-z0-9]+%.[^%./]+%.de/news/[^&%?/]+$",
     --["css"]="%.css"
-  },
+  }},
   --[[["^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/.*%%20"]={
     ["space"]={
       "^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/.*%s",
       "^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/.*%%20"
     }
   },]]
-  ["^https?://[^/]+.*/X[a-z0-9]+"]={
-    ["x"]="^https?://[^/]+.*/X[a-z0-9]+.*/X[a-z0-9]",
+  ["/X[a-z0-9]+"]={{
+    ["x"]="/X[a-z0-9]+.*/X[a-z0-9]",
     ["tk88"]="[tT][kK]88"
-  },
-  ["^http://"]={
+  }},
+  ["^http://"]={{
     ["index-robots"]={
       "^https?://[^/]+//index%.php%?robots%.txt$",
       "^https?://[^/]+/robots%.txt$"
@@ -159,15 +160,15 @@ local filter_pattern_sets = {
     ["images"]="^https?://[^/]+/uploads/images/[0-9]+%.jpg$",
     ["html"]="^https?://[^/]+/[a-z]+/[0-9]+%.html$",
     ["page"]="^https?://[^/]+/[a-z]+/[0-9]+/$"
-  },
-  ["^http://[a-z0-9]+%.[^%./]+%.[a-z]+/$"]={
+  }},
+  ["^http://[a-z0-9]+%.[^%./]+%.[a-z]+/$"]={{
     ["sinaimgcn"]="^http://n%.sinaimg%.cn/.+%.jpg$",
     ["sitemap"]="^http://[a-z0-9]+%.[^%./]+%.[a-z]+/sitemap%.xml",
     ["template"]="/template/default/04190%-44/",
     ["domain"]="^http://[a-z0-9]+%.[^%./]+%.[a-z]+/$"
-  },
+  }},
   -- fx- spam
-  ["^https?://[a-z0-9]+%.[^/]+%.[a-z]+/.?"]={
+  ["^https?://[a-z0-9]+%.[^/]+%.[a-z]+/"]={{
     ["url"]={
       "^https?://[a-z0-9]+%.[^/]+%.[a-z]+/_static_index/",
       "^https?://[a-z0-9]+%.[^/]+%.[a-z]+/.+/static/",
@@ -183,51 +184,73 @@ local filter_pattern_sets = {
     --["sitemaphtml"]="^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/sitemap%.html$",
     --["announcehtml"]="^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/announce%.html$",
     --["number"]="^https?://[a-z0-9]+%./"
-  },
+  }},
   -- news/show spam
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/"]={
+  ["^https?://[^/]+%.[a-z%-]+/"]={{
     --[[["newslist"]={
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/newslist/[0-9]+/$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/list/[0-9]+/$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/product/[a-z]+_?[0-9]+/$"
+      "^https?://[^/]+%.[a-z%-]+/newslist/[0-9]+/$",
+      "^https?://[^/]+%.[a-z%-]+/list/[0-9]+/$",
+      "^https?://[^/]+%.[a-z%-]+/product/[a-z]+_?[0-9]+/$"
     },]]
     ["images"]={
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/{{pasePath}}images/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/redian/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/.*images/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/baike",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/xzx",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/b1/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/3dm/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/m[0-9]/static/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/news/boke[0-9]+/",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/hbshgzx/",
+      "^https?://[^/]+%.[a-z%-]+/uploads/images/",
+      "^https?://[^/]+%.[a-z%-]+/{{pasePath}}images/",
+      "^https?://[^/]+%.[a-z%-]+/redian/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/.*images/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/baike",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/news[0-9]*/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/xzx",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/b1/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/3dm/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/lansem/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/air/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/qinggan/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/mips?[0-9]*/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/blog[0-9]/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/newsmips/",
+      "^https?://[^/]+%.[a-z%-]+/template/news_?[a-z]*/m[0-9]/static/",
+      "^https?://[^/]+%.[a-z%-]+/template/[^/]+/boke[0-9]+/",
+      "^https?://[^/]+%.[a-z%-]+/template/company/hbshgzx/",
+      "^https?://[^/]+%.[a-z%-]+/template/company/hbshgzx/",
+      "^https?://[^/]+%.[a-z%-]+/template/xiaoshuo/xiaoshuo[0-9]*/",
+      "^https?://[^/]+%.[a-z%-]+/template/movie[0-9]+/movie[0-9]+/",
+      "^https?://[^/]+%.[a-z%-]+/template/movie[0-9]+/[^/]+%.[^/]+/",
+      "^https?://[^/%.]*%.bbc%.cyou/",
+      "^https?://[^/%.]*%.gdmx%.org/",
+      "^https?://[^/%.]*%.google1%.vip/",
+      "^https?://[^/%.]*%.awaker%-z%.com/",
+      "^https?://[^/]*sinaimg%.cn/",
     },
-    --["main"]="^https?://[^/]+%.[^%./]+%.[a-z]+/",
+    --["main"]="^https?://[^/]+%.[a-z%-]+/",
     ["news"]={
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/news/[0-9a-zA-Z/]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/newshtml/[0-9a-zA-Z/]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/show/[0-9a-zA-Z/]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/html/[0-9a-zA-Z/]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/txt/[0-9a-zA-Z/]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/xml/[0-9a-zA-Z/]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/product/[a-z]+_[0-9/]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/[a-zA-Z0-9]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/[0-9a-f]+/[0-9]+%.html$",
-      "^https?://[^/]+%.[^%./]+%.[a-z]+/[0-9]+/[0-9a-f]+%.html$"
+      "^https?://[^/]+%.[a-z%-]+/news[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/newshtml[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/show[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/html[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/txt[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/xml[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/list[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/book[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/thread[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/forum[%-/][0-9a-zA-Z/%-%+]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/product/[a-z]+_[0-9/]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/[a-zA-Z0-9]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/[0-9a-f]+/[0-9]+%.html$",
+      "^https?://[^/]+%.[a-z%-]+/[0-9]+/[0-9a-f]+%.html$"
     },
-    ["template"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/"
-  },
+    ["template"]="^https?://[^/]+%.[a-z%-]+/template/"
+  }},
+  ["^https?://[^/]*%.de/[^/]+_fonts/.*woff"]={{
+    ["fonts"]="^https?://[^/]*%.de/[^/]+_fonts/.*woff"
+  }},
   -- xml spam
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?"]={
+  ["^https?://[^/]+%.[^%./]+%.[a-z]+/"]={{
     ["num"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[0-9]+/[a-z0-9_]+%.xml$",
     ["num2"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]+/[a-z0-9_]+%.xml$",
     --["vip"]="/[vV][iI][pP]%-[0-9]+%.",
     ["styles"]="^https?://[^/]+%.[^%./]+%.[a-z]+/styles/",
     --["itc"]="^https?://[^/]*itc%.cn/"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?"]={
+  },{
     ["htmlnews"]={
       "^https?://[^/]+%.[^%./]+%.[a-z]+/html/[a-z0-9]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/newshtml/[a-z0-9]+%.html$",
@@ -236,11 +259,7 @@ local filter_pattern_sets = {
     ["baidu"]="^https?://[^/]*baidu%.com/",
     ["a"]="^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]+/$",
     ["sitemap"]="sitemap%.xml$"
-  },
-  ["^https?://[^/]*%.de/[^/]+_fonts/.*woff"]={
-    ["fonts"]="^https?://[^/]*%.de/[^/]+_fonts/.*woff"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?"]={
+  },{
     --["swf"]="%.swf$",
     --["flashplayer"]="^https?://www%.macromedia%.com/go/getflashplayer$",
     ["tupian"]={
@@ -270,37 +289,150 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[^%./]+%.[a-z]+/[a-z]%-[a-z0-9%-]+%.html$",
       "^https?://[^/]+%.[^%./]+%.[a-z]+/books/[^/]+/[0-9]+%.html$"
     }
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?"]={
+  },--[[{
     ["search"]="^https?://[^/]+/.*/?search/",
     ["catalogsearch"]="^https?://[^/]+/.*/?catalogsearch/",
     ["s"]="^https?://[^/]+/%?s=",
     ["brackets"]="【[^%.】]+%.[a-zA-Z0-9]+】"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?"]={
+  },]]
+  {
     ["article"]="^https?://[^/]+/article/2023[01][1-9][0-9A-Za-z]+%.html$",
     ["article2"]="^https?://[^/]+/2023[01][1-9][0-9A-Za-z]+%.html$"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?"]={
+  },{
     ["appsstore.cdf"]="^https?://download%.appsstore%.cfd/"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?"]={
+  },{
     ["yamaxun"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/yamaxun/",
     ["upluds"]="^https?://[^/]+%.[^%./]+%.[a-z]+/upluds/"
-  },
-  ["^https?://[^/]+%.[^%./]+%.[a-z]+/.?.?.?.?.?.?.?.?"]={
+  },{
     ["company-en"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/en[0-9]+/static/",
     ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
-  },
-  ["^https?://[^/]+%.[a-z]+/.?.?.?.?.?.?.?.?.?"]={
-    ["search"]="^https?://[^/]+/.*search/",
-    ["catalogsearch"]="^https?://[^/]+/.*catalogsearch/",
-    ["brackets"]="【[^】]+】",
-    ["zonghe"]="^https?://[^/]+/styles/zonghe/",
-    ["html"]="^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
-    ["sitemap"]="^https?://[^/]+/[a-z0-9]+/sitemap%.xml$"
-  },
-  ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={
+  }},
+  ["^http://[^/]+%.[^%./]+%.[a-z]+/"]={{
+    ["numbers"]="^http://[0-9][0-9][0-9][0-9][0-9][0-9]%.[^%.]+%.[^%./]+/",
+    ["slash"]="^http://[^/]+/.+%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]/$",
+    ["noslash"]="^http://[^/]+/.+%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]$",
+    ["numbers-html"]="^http://[^/]+/.+/[0-9][0-9][0-9][0-9][0-9][0-9]%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]%.html$",
+    ["html"]="^http://[^/]+/.+[^0-9]%-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]%.html$"
+  }},
+  ["^https?://[a-z%-]+%.[a-z]+/"]={{
+    ["css"]="^https?://[a-z%-]+%.[a-z]+/style/style%.css$",
+    ["tld-online"]="^https?://[a-z%-]+%.online/.",
+    ["tld-info"]="^https?://[a-z%-]+%.info/.",
+    ["tld-pro"]="^https?://[a-z%-]+%.pro/.",
+    ["php"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+%.php$",
+    ["html"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+%.html$",
+    ["none"]="^https?://[a-z%-]+%.[a-z]+/[a-f0-9]+$",
+  }},
+  ["^https?://[^/]+%.[a-z]+/"]={{
+    ["search"]={
+      "/search[/%?]",
+      "[%?/].+dfans%.xyz",
+      "[%?/].+1024dhz%.com",
+      "[%?/].+ac99%%C2%%B7net",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+    },
+    ["catalogsearch"]={
+      "/catalogsearch/result/",
+      "[%?/].+ ",
+      "[%?/].+dfans%.xyz",
+      "[%?/].+1024dhz%.com",
+      "[%?/].+ac99%%C2%%B7net",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+    },
+    --["brackets"]="【[^】]+】",
+    ["style"]={
+      "/styles/zonghe/",
+      "/styles/sjdy/",
+      "/styles/bjh/",
+      "/styles/zytd/",
+      "/styles/hmseo/",
+      "/styles/pceggs/",
+      "/styles/zgkxy/",
+      "/styles/qinggan/",
+      "/styles/zzc/",
+      "/styles/[a-z][0-9][0-9]?[0-9]?/",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+    },
+    ["html"]={
+      "^https?://[^/]+/[a-z0-9]+/[0-9]+%.html$",
+      "[%?/].+ac99%%C2%%B7net",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+    },
+    ["sitemap"]={
+      "^https?://[^/]+/[a-z0-9]+/sitemap%.xml$",
+      "^https?://[^/]+/sitemap%.xml$",
+      "[%?/].+dfans%.xyz",
+      "[%?/].+1024dhz%.com",
+      "[%?/].+ac99%%C2%%B7net",
+      "[%?/].+nba[0-9][0-9]?[0-9]?[0-9]?%.com"
+    }
+  },{
+    ["google"]="^https?://www%.googletagmanager%.com/gtag/",
+    ["betting"]={
+      "^https?://[^/]+/[^/]*bet[^/]*/$",
+      "^https?://[^/]+/[^/]*poker[^/]*/$",
+      "^https?://[^/]+/[^/]*cass?ino[^/]*/$"
+    },
+    ["logo"]="^https?://[^/]+/logo%.png$",
+    ["ico"]="^https?://[^/]+/ico%.png$",
+    ["image"]="^https?://[^/]+/image[0-9]%.jpg$",
+    ["hongbao"]="^https?://[^/]+/hongbao/",
+    ["sitemap"]={
+      "^https?://[^/]+/[a-z0-9]+/sitemap%.xml$",
+      "^https?://[^/]+/sitemap%.xml$"
+    }
+  },{
+    ["company"]="^https?://[^/]+/template/company/ncpzsy[^/]*/",
+    ["slash"]="^https?://[^/]+/[^/]+/$",
+    ["slash2"]={
+      "^https?://[^/]+/[a-z]+/[0-9a-f]+/$",
+      "^https?://[^/]+/[a-z]+/[0-9a-f]+%.html$"
+    },
+    ["email-protection"]="/cdn%-cgi/l/email%-protection$"
+  },--[[{
+    ["xnxx"]="^https?://[^/%.]+%.xnxx%-cdn%.com/",
+    ["dmca-static"]="^https?://[^/]+/dmca/static/",
+    ["dmca"]="^https?://[^/]+/dmca/[^/]+$",
+  },]]},
+  ["^https?://[^/]+/"]={{
+    ["txt"]={
+      "^https?://[^/]+/txt[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/txt[_/][0-9]+/?[0-9]*%.html$",
+      "^https?://[^/]+/xs[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/xs[_/][0-9]+/?[0-9]*%.html$",
+      "^https?://[^/]+/book[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/book[_/][0-9]+/?[0-9]*%.html$",
+      "^https?://[^/]+/xiaoshuo[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/xiaoshuo[_/][0-9]+/?[0-9]*%.html$",
+      "^https?://[^/]+/chang[_/][0-9]+/[0-9]*/?$",
+      "^https?://[^/]+/chang[_/][0-9]+/?[0-9]*%.html$",
+    },
+    ["appendix"]='/\\"&$'
+  },{
+    ["about"]="%?company/about$",
+    ["policy"]="%?guide/policy$",
+    ["privacy"]="%?guide/privacy$",
+    ["copyright"]="%?guide/copyright$",
+    ["rss"]="%?help/rss$",
+    ["pexels"]="^https?://images%.pexels%.com/photos/.",
+    ["youtube"]="%?youtube%.com/channel/UCVldKkHBWeR0nA35L9ptZ7w$"
+  },{
+    ["aapanel"]="^https?://www%.aapanel%.com/new/download%.html%?invite_code=aapanele$"
+  },{
+    ["offer"]="{offer}",
+    ["mm.bing.net"]="^https?://[^/]*mm%.bing%.net/.",
+    ["url-q"]="/url%?q=",
+    ["url"]="%?url=",
+  },{
+    ["?"]="^https?://[^/]+/%?[a-z]+=[0-9]+$",
+    ["html"]={
+      "^https?://[^/]+/[a-z0-9]+%.html$",
+      "^https?://[^/]+/[a-z0-9]+/[a-z0-9]+%.html$"
+    },
+    ["temp"]="^https?://[^/]+/temp/[0-9]+/",
+    ["string"]="^https?://[^/]+/[0-9a-z]+$"
+  }},
+  ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={{
     ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",
     ["show"]="^https?://[^/]+/show/[a-z0-9%.]+$",
     ["slots"]="^https?://[^/]+/slots/[a-z0-9%.]+$",
@@ -308,7 +440,7 @@ local filter_pattern_sets = {
     ["html"]="^https?://[^/]+/html/[a-z0-9%.]+$",
     ["uploads"]="^https?://[^/]+/uploads/image/",
     ["casinoguru"]="^https?://static%.casino%.guru/",
-  }
+  }}
 }
 
 local imgur_items = {
@@ -318,6 +450,9 @@ local pastebin_items = {
   [""]={}
 }
 local mediafire_items = {
+  [""]={}
+}
+local blogger_items = {
   [""]={}
 }
 local telegram_posts = {
@@ -333,6 +468,9 @@ local ftp_urls = {[""]={}}
 local onion_urls = {[""]={}}
 local urls_news = {[""]={}}
 local urls_all = {}
+local custom_item_urls = {}
+local maybe_discourse = {}
+local discourse_items = {[""]={}}
 
 local month_timestamp = os.date("%Y%m", timestamp)
 
@@ -459,7 +597,13 @@ is_in_bloomfilter = function(s)
 end
 
 site_in_bloomfilter = function(s)
-  local domain = string.match(s, "^https?://([^/:]+)")
+  local temp = string.match(s, "^https?://([^%.%-/]+%-[^%./]+)%.cdn%.ampproject%.org:?[0-9]*/")
+  local domain = nil
+  if temp then
+    domain = string.gsub(temp, "%-", ".")
+  else
+    domain = string.match(string.match(s, "^https?://([^/:]+)"), "^(.-)%.*$")
+  end
   domain = domain .. "."
   local partial = ""
   local depth = 0
@@ -535,6 +679,8 @@ find_path_loop = function(url, max_repetitions)
     if not tested[s] then
       if s == "" then
         tested[s] = -2
+      elseif string.match(s, "^[0-9]+$") then
+        tested[s] = -1
       else
         tested[s] = 0
       end
@@ -627,6 +773,7 @@ queue_url = function(url, withcustom)
         end
       end
       url = string.sub(url, 1, -2)
+      custom_item_urls[url] = tostring(settings["url"])
     end
   end
   local shard = ""
@@ -654,13 +801,13 @@ queue_url = function(url, withcustom)
     if find_path_loop(url, 2) then
       return false
     end
---print("queuing",original, url)
+--print("queuing", url)
     target_project[shard][url] = current_url
   end
 end
 
 queue_monthly_url = function(url, comment)
-  if find_path_loop(url, 3) then
+  if find_path_loop(url, 2) then
     return nil
   end
   local origurl = url
@@ -676,7 +823,10 @@ queue_monthly_url = function(url, comment)
     target_project = onion_urls
     extra_params = "&depth=1&all=1&keep_all=1&any_domain=1"
   end
-  queue_monthly_item("custom:" .. comment_string .. "random=" .. month_timestamp .. extra_params .. "&url=" .. urlparse.escape(tostring(url)), target_project)
+  local new_url = tostring(url)
+  local new_item = "custom:" .. comment_string .. "random=" .. month_timestamp .. extra_params .. "&url=" .. urlparse.escape(new_url)
+  custom_item_urls[new_item] = new_url
+  queue_monthly_item(new_item, target_project)
 end
 
 queue_monthly_item = function(item, t)
@@ -688,6 +838,9 @@ queue_monthly_item = function(item, t)
 end
 
 remove_param = function(url, param_pattern)
+  if not string.match(url, param_pattern) then
+    return url
+  end
   local newurl = url
   repeat
     url = newurl
@@ -847,6 +1000,16 @@ queue_mediafire = function(rest)
   end
 end
 
+queue_blogger = function(url)
+  local blog = string.match(url, "^https?://([^%.]+)%.blogger%.[a-z][a-z][a-z]?/")
+  if not blog then
+    blog = string.match(url, "^https?://([^%.]+)%.blogspot%.[a-z][a-z][a-z]?/")
+  end
+  if blog then
+    blogger_items[""]["blog:" .. string.lower(blog)] = current_url
+  end
+end
+
 queue_services = function(url)
   if not url then
     return nil
@@ -860,6 +1023,11 @@ queue_services = function(url)
     queue_mediafire(rest)
   elseif domain == "imgur.com" then
     queue_imgur(rest)
+  elseif domain and (
+    string.match(domain, "^blogger%.")
+    or string.match(domain, "^blogspot%.")
+  ) then
+    queue_blogger(url)
   end
 end
 
@@ -871,8 +1039,6 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   if string.match(url, "^https?://(.+)$") == string.match(parenturl, "^https?://(.+)$") then
     return false
   end
-
---print(url)
 
   local current_settings_all = current_settings and current_settings["all"]
   local current_settings_any_domain = current_settings and current_settings["any_domain"]
@@ -892,53 +1058,66 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     return false
   end
 
-  if skip_parent_urls[parenturl] then
+  if skip_parent_urls[normalize_url(parenturl)]
+    or skip_parent_urls[current_url] then
     return false
   end
 
-  if url ~= parenturl then
-    for parenturl_pattern, pattern_table in pairs(filter_pattern_sets) do
+--print(url)
+
+  if string.match(url, "[%-/]discourse%-.+%.js$") then
+    maybe_discourse[parenturl] = true
+  end
+
+  if url ~= parenturl
+    and not skip_parent_urls_checked[url] then
+    for parenturl_pattern, pattern_tables in pairs(filter_pattern_sets) do
       if string.match(parenturl, parenturl_pattern) then
-        local found_any = false
-        local check_string = parenturl_pattern .. parenturl
-        if not skip_parent_urls_check[check_string] then
-          skip_parent_urls_check[check_string] = {}
-          for k, _ in pairs(pattern_table) do
-            skip_parent_urls_check[check_string][k] = false
-          end
-        end
-        for pattern_name, patterns in pairs(pattern_table) do
-          if not skip_parent_urls_check[check_string][pattern_name] then
-            if type(patterns) == "string" then
-              patterns = {patterns}
+        for num, pattern_table in pairs(pattern_tables) do
+          local found_any = false
+          local check_string = parenturl_pattern .. tostring(num) .. parenturl
+          if not skip_parent_urls_check[check_string] then
+            skip_parent_urls_check[check_string] = {}
+            for k, _ in pairs(pattern_table) do
+              skip_parent_urls_check[check_string][k] = false
             end
-            for _, pattern in pairs(patterns) do
-              if string.match(url, pattern) then
-                found_any = true
---print(check_string, pattern_name)
-                skip_parent_urls_check[check_string][pattern_name] = true
-                break
+          end
+          for pattern_name, patterns in pairs(pattern_table) do
+            if not skip_parent_urls_check[check_string][pattern_name] then
+              if type(patterns) == "string" then
+                patterns = {patterns}
+              end
+              for _, pattern in pairs(patterns) do
+                if string.match(url, pattern) then
+                  found_any = true
+  --print(check_string, pattern_name)
+                  skip_parent_urls_check[check_string][pattern_name] = true
+                  break
+                end
               end
             end
           end
-        end
-        if found_any then
-          local all_true = true
-          for _, v in pairs(skip_parent_urls_check[check_string]) do
-            if not v then
-              all_true = false
-              break
+          if found_any then
+            local all_true = true
+            for _, v in pairs(skip_parent_urls_check[check_string]) do
+              if not v then
+                all_true = false
+                break
+              end
             end
-          end
-          if all_true then
-            io.stdout:write("Skipping all URLs discovered for URL " .. parenturl .. ".\n")
-            io.stdout:flush()
-            skip_parent_urls[parenturl] = true
+            if all_true then
+              io.stdout:write("Skipping all URLs discovered for URL " .. current_url .. ".\n")
+              io.stdout:flush()
+              skip_parent_urls[normalize_url(parenturl)] = true
+              skip_parent_urls[current_url] = true
+            end
           end
         end
       end
     end
   end
+
+  skip_parent_urls_checked[url] = true
 
   local parenturl_base = string.match(parenturl, "^(https://[^/]+)")
   if parenturl_base then
@@ -1047,6 +1226,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   if not string.match(url, "^https?://[^%./]+%.[^%./]+%.[a-z]+/sitemapa%.xml") then -- remove loop due to sitemapa.xml pointing to other domains
+    local url_lower = string.lower(url)
+    local parenturl_lower = string.lower(parenturl)
     for _, extension in pairs({
       "pdf",
       "doc[mx]?",
@@ -1078,22 +1259,21 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       "djvu",
       "mobi"
     }) do
-      local prefix = "[%-:;%.%?/&]"
-      if string.match(parenturl, prefix .. extension .. "$")
-        or string.match(parenturl, prefix .. extension .. "[^a-z0-9A-Z]")
-        or string.match(parenturl, prefix .. string.upper(extension) .. "$")
-        or string.match(parenturl, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]")
-        -- get rid of loop on sites from chinese origin (also various non-.cn domains)
-        or string.match(url, "^https?://[^/]+/%?/.+%." .. extension .. "$")
-        or string.match(url, "^https?://[^/]+/.+%.[a-z]+%?/.+%." .. extension .. "$") then
-        return false
-      end
-      if string.match(url, prefix .. extension .. "$")
-        or string.match(url, prefix .. extension .. "[^a-z0-9A-Z]")
-        or string.match(url, prefix .. string.upper(extension) .. "$")
-        or string.match(url, prefix .. string.upper(extension) .. "[^a-z0-9A-Z]") then
-        queue_url(url)
-        return false
+      if string.match(url_lower, extension)
+        or string.match(parenturl_lower, extension) then
+        local prefix = "[%-:;%.%?/&]"
+        if string.match(parenturl_lower, prefix .. extension .. "$")
+          or string.match(parenturl_lower, prefix .. extension .. "[^a-z0-9]")
+          -- get rid of loop on sites from chinese origin (also various non-.cn domains)
+          or string.match(url_lower, "^https?://[^/]+/%?/.+%." .. extension .. "$")
+          or string.match(url_lower, "%.[a-z]+%?/.+%." .. extension .. "$") then
+          return false
+        end
+        if string.match(url_lower, prefix .. extension .. "$")
+          or string.match(url_lower, prefix .. extension .. "[^a-z0-9]") then
+          queue_url(url)
+          return false
+        end
       end
     end
   end
@@ -1331,7 +1511,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
             "([hH][tT][tT][pP][sS]?://[^%s<>#\"'\\`{}%)%]]+)",
             '"([hH][tT][tT][pP][sS]?://[^"]+)',
             "'([hH][tT][tT][pP][sS]?://[^']+)",
-            ">[%s%z]*([hH][tT][tT][pP][sS]?://[^<%s]+)"
+            ">[%s%z]*([hH][tT][tT][pP][sS]?://[^<%s]+)",
+            "[^0-9a-zA-Z](doi[%s%z]*:[%s%z]*10%.[0-9%.%z]+/[0-9a-zA-Z!\"%$%%&'%*%+,:<=>%?@%[%]%^`{|}~%-%._;%(%)/%z]+)",
+            "[^0-9a-zA-Z](doi[%s%z]*:[%s%z]*10%.[0-9%.%z]+/[0-9a-zA-Z%-%._;%(%)/%z]+)",
           }
           if newline_white == " " then
             table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z]+)")
@@ -1341,6 +1523,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           end
           for _, pattern in pairs(url_patterns) do
             for raw_newurl in string.gmatch(temp3, pattern) do
+              if string.match(raw_newurl, "^doi%s*:") then
+                raw_newurl = "https://doi.org/" .. string.match(raw_newurl, "^doi[%s%z]*:[%s%z]*(10%..+)")
+              end
               local candidate_urls = {}
               local i = 0
               for s in string.gmatch(raw_newurl, "([^%z]+)") do
@@ -1356,7 +1541,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
                 i = i + 1
               end
               for newurl, _ in pairs(candidate_urls) do
-                while string.match(newurl, ".[%.&,!;]$") do
+                while string.match(newurl, ".[%.%?&,!;%[]$") do
                   newurl = string.match(newurl, "^(.+).$")
                 end
                 if string.match(newurl, "^[hH][tT][tT][pP][sS]?://") then
@@ -1408,6 +1593,28 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     end]]
   end
   if url then
+    if maybe_discourse[url] then
+      html = read_file(file)
+      local discourse_meta = string.match(html, '(<meta [^>]*id="data%-discourse%-setup"[^>]+>)')
+      if discourse_meta then
+        local data_base_url = string.match(discourse_meta, 'data%-base%-url="([^"]+)"')
+        if data_base_url then
+          discourse_items[""][data_base_url] = true
+        end
+      else
+        local discourse_env = string.match(html, '(<meta [^>]*name="discourse/config/environment"[^>]+>)')
+        if discourse_env then
+          local content = string.match(discourse_env, 'content="([^"]+)"')
+          if content then
+            content = urlparse.unescape(content)
+            content = cjson.decode(content)
+            if content["rootURL"] then
+              discourse_items[""][string.match(url, "^(https?://[^/]+)") .. content["rootURL"]] = true
+            end
+          end
+        end
+      end
+    end
     --[[for _, extension in {
       "docx",
       "epub",
@@ -1619,7 +1826,8 @@ wget.callbacks.write_to_warc = function(url, http_stat)
       or string.match(newloc, "^https?://misuse%.ncbi%.nlm%.nih%.gov/")
       or string.match(newloc, "^https?://myprivacy%.dpgmedia%.nl/")
       or string.match(newloc, "^https?://idp%.springer%.com/authorize%?")
-      or string.match(newloc, "^https?://[^/]*instagram%.com/accounts/") then
+      or string.match(newloc, "^https?://[^/]*instagram%.com/accounts/")
+      or string.match(newloc, "^https?://[^/]+/remote/check_cookie%.html%?") then
       report_bad_url(url["url"])
       exit_url = true
       return false
@@ -1888,12 +2096,14 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["pastebin-xa5xj5bx2no3qc1"] = pastebin_items,
     ["mediafire-9cmzz6b3jawqbih"] = mediafire_items,
     ["imgur-6fzz6lxvpk9kgug7"] = imgur_items,
+    ["blogger-2uka2xphhn6ywzuc"] = blogger_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
     --["urls-tor-f6eyk1zzl9ca5pqu"] = onion_urls,
     ["urls-all-tx2vacclx396i0h"] = urls_all,
     ["urls-sitemap-news-hu1y8xj3h0ildh1k"] = urls_sitemap_news,
-    ["urls-news-6t9uc9xxz06gpt93"] = urls_news
+    ["urls-news-6t9uc9xxz06gpt93"] = urls_news,
+    ["discourse-inbox-kkrhbt6xax5ave98"] = discourse_items
   }) do
     local project_name = string.match(key, "^(.+)%-")
     for shard, url_data in pairs(items_data) do
@@ -1913,9 +2123,10 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
           io.stdout:flush()
           for url, _ in pairs(urls_list) do
             local filtered = false
+            local actual_url = custom_item_urls[url] or url
             for _, pattern in pairs(filter_discovered) do
-              if string.match(url, pattern) then
-                io.stdout:write("Skipping URL " .. url .. " due to " .. pattern .. ".\n")
+              if string.match(actual_url, pattern) then
+                io.stdout:write("Skipping item " .. url .. " due to " .. pattern .. ".\n")
                 io.stdout:flush()
                 filtered = true
                 break
