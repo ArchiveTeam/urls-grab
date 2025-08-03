@@ -1,5 +1,6 @@
 ^https?://[^/]+%.amazon%-adsystem%.com/.
-^https?://aax%-us%-iad%.amazon%.com/.
+^https?://aax%-[a-z%-]+%.amazon%.
+^https?://fls%-[a-z%-]+%.amazon%.
 ^https?://[^/]+%.yahoo%.com/adcount.
 ^https?://[^/]+%.doubleclick%.net/.
 ^https?://sb%.scorecardresearch%.com/.
@@ -39,6 +40,7 @@
 ^https?://x%.com/home%?status=
 ^https?://x%.com/intent/tweet/.
 ^https?://x%.com/share%?
+^https?://px%.srvcs%.tumblr%.com/impixu%?
 ^https?://[^/]*whatsapp%.com/send%?
 ^https?://[^/]*%.app%.goo%.gl/%?link=
 ^https?://lineit%.line%.me/.
@@ -48,3 +50,4 @@
 ^https?://t%.me/share/.
 ^https?://wa%.me/.
 ^https?://[^/]*reddit%.com/submit%?
+^https?://[^/]*ebay%.[a-z]+/splashui/captcha%?
