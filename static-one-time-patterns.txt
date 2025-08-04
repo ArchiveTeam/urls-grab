@@ -25,6 +25,10 @@
 ^https?://[^/]*facebook%.com/login%?
 ^https?://[^/]*facebook%.com/plugins/like[a-z]*%.php%?
 ^https?://[^/]*facebook%.com/plugins/post%.php%?
+^https?://[^/]*blogger%.com/share%-post%.g%?
+^https?://[^/]*blogger%.com/post%-edit%.g%?
+^https?://[^/]*blogger%.com/blog%-this%.g%?
+^https?://[^/]*blogger%.com/email%-post/
 ^https?://share%.flipboard%.com/.
 ^https?://[^/]*linkedin%.com/cws/share%?
 ^https?://[^/]*linkedin%.com/share[aA]rticle%?
