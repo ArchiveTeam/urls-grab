@@ -968,6 +968,8 @@ queue_imgur = function(rest)
   if not imgur_item_type then
     if string.match(rest, "^/g/") then
       imgur_item_type = "gallery"
+    elseif string.match(rest, "^/a/") then
+      imgur_item_type = "album"
     elseif string.match(rest, "^/user/") then
       imgur_items[""]["user:" .. string.match(rest, "^/user/([a-zA-Z0-9_%-]+)")] = current_url
       return nil
