@@ -30,6 +30,7 @@
 [%?&;]SUBSESSION_ID=
 [%?&;][sS][sS]_[hH][tT][tT][pP]_[rR][eE][sS][oO][uU][rR][cC][eE]=
 [%?&;]bslsessionstr=
+[%?&;]auth_?sess=
 [%?&;]anti[Cc]ache=
 [%?&;]anticsrf=
 [%?&;]rnd=
