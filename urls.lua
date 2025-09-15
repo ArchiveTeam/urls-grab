@@ -451,6 +451,10 @@ local filter_pattern_sets = {
     ["html"]="^https?://[^/]+/html/[a-z0-9%.]+$",
     ["uploads"]="^https?://[^/]+/uploads/image/",
     ["casinoguru"]="^https?://static%.casino%.guru/",
+  }},
+  ["^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/$"]={{
+    ["style"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/zz/style%.css$",
+    ["zy"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/zz/style%.css$",
   }}
 }
 
