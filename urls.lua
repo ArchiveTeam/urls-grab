@@ -460,8 +460,8 @@ local filter_pattern_sets = {
     }
   },{
     ["arrow"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/arrow%.png$",
-    ["gg"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/gg$.png$",
-    ["zd"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/zd/[0-9a-z]+%.php%"
+    ["gg"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/gg%.png$",
+    ["zd"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/zd/[0-9a-z]+%.php$"
   }}
 }
 
