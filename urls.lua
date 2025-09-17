@@ -454,7 +454,14 @@ local filter_pattern_sets = {
   }},
   ["^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/$"]={{
     ["style"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/zz/style%.css$",
-    ["zy"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/zz/style%.css$",
+    ["zy"]={
+      "^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/zz/zy%.php$",
+      "^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/tz%.php$"
+    }
+  },{
+    ["arrow"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/arrow%.png$",
+    ["gg"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/demo/gg$.png$",
+    ["zd"]="^https?://[0-9a-z]+%.[0-9][^%./]+%.top/zd/[0-9a-z]+%.php%"
   }}
 }
 
