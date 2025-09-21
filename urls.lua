@@ -452,19 +452,22 @@ local filter_pattern_sets = {
     ["uploads"]="^https?://[^/]+/uploads/image/",
     ["casinoguru"]="^https?://static%.casino%.guru/",
   }},
-  ["^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/demo/$"]={{
-    ["style"]="^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/demo/zz/style%.css$",
+  ["^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/$"]={{
+    ["style"]={
+      "^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/zz/style%.css$",
+      "^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/css/style%.css$"
+    },
     ["zy"]={
-      "^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/demo/zz/zy%.js$",
-      "^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/demo/tz[0-9]*%.php$"
+      "^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/z[yz]/zy%.js$",
+      "^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/tz[0-9]*%.php$"
     }
   },{
-    ["arrow"]="^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/demo/arrow%.png$",
-    ["gg"]="^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/demo/gg%.png$",
-    ["zd"]="^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/zd/[0-9a-z]+%.php$"
+    ["arrow"]="^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/arrow%.png$",
+    ["gg"]="^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/gg%.png$",
+    ["zd"]="^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/zd/[0-9a-z]+%.php$"
   },{
-    ["bg"]="^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/demo/bg%.gif$",
-    ["php"]="^https?://[0-9a-z]+%.[^%./]+%.[ts][oh][po]p?/demo/[0-9a-zA-Z]+%.php/$"
+    ["bg"]="^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/bg%.gif$",
+    ["php"]="^https?://[0-9a-z]+%.[^%./]+%.[tsi][ohc][pou]p?/demo/[0-9a-zA-Z]+%.php/$"
   }}
 }
 
