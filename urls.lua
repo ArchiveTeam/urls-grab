@@ -587,7 +587,7 @@ local bloomfilter = nil
 local bloomcache = {}
 
 load_bloomfilter = function()
-  local filename = 'bloomfilter.bin'
+  local filename = 'data/bloomfilter.bin'
   local exists = io.open(filename)
   if not exists then
     print("Creating bloom filter.")
