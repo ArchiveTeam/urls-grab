@@ -740,13 +740,16 @@ queue_url = function(url, withcustom)
   if not url then
     return nil
   end
+  if not withcustom and current_settings and current_settings["deep_extract"] then
+    withcustom = true
+  end
   local origurl = url
   --[[if string.match(url, "^http://")
     and string.match(current_url, "^http://")
     and string.match(url, "^http://([^/]+)") ~= string.match(current_url, "^http://([^/]+)") then
     return nil
   end]]
-  queue_new_urls(url)
+  queue_new_urls(url, withcustom)
   if not string.match(url, "^https?://[^/]+%.") then
     return nil
   end
@@ -761,42 +764,57 @@ queue_url = function(url, withcustom)
   url = string.gsub(url, "'%s*%+%s*'", "")
   url = percent_encode_url(url)
   url = string.match(url, "^([^#{<\\]+)")
-  if current_settings and current_settings["all"] and withcustom then
-    local depth = load_setting_depth("depth")
-    local keep_random = load_setting_depth("keep_random")
-    local keep_all = load_setting_depth("keep_all")
-    local any_domain = load_setting_depth("any_domain")
-    if depth >= 0 then
-      local random = current_settings["random"]
-      local comment = current_settings["comment"]
-      if comment then
-        comment = "-" .. comment
+  if withcustom and current_settings
+    and (
+      current_settings["all"]
+      or withcustom == "copy"
+    ) then
+    local settings = nil
+    if withcustom == "copy" then
+      settings = {}
+      for k, v in pairs(current_settings) do
+        settings[k] = v
       end
-      local all = current_settings["all"]
-      if keep_random < 0 or random == "" then
-        random = nil
-        keep_random = nil
+      settings["url"] = url
+    else
+      local depth = load_setting_depth("depth")
+      local keep_random = load_setting_depth("keep_random")
+      local keep_all = load_setting_depth("keep_all")
+      local any_domain = load_setting_depth("any_domain")
+      if depth >= 0 then
+        local random = current_settings["random"]
+        local comment = current_settings["comment"]
+        if comment then
+          comment = "-" .. comment
+        end
+        local all = current_settings["all"]
+        if keep_random < 0 or random == "" then
+          random = nil
+          keep_random = nil
+        end
+        if keep_all < 0 or all == 0 then
+          all = nil
+          keep_all = nil
+        end
+        if any_domain <= 0 then
+          any_domain = nil
+        end
+        settings = {
+          depth=depth,
+          all=all,
+          keep_all=keep_all,
+          random=random,
+          keep_random=keep_random,
+          url=url,
+          any_domain=any_domain,
+          comment=comment
+        }
       end
-      if keep_all < 0 or all == 0 then
-        all = nil
-        keep_all = nil
-      end
-      if any_domain <= 0 then
-        any_domain = nil
-      end
-      local settings = {
-        depth=depth,
-        all=all,
-        keep_all=keep_all,
-        random=random,
-        keep_random=keep_random,
-        url=url,
-        any_domain=any_domain,
-        comment=comment
-      }
+    end
+    if settings then
       url = "custom:"
       for _, k in pairs(
-        {"all", "any_domain", "comment", "depth", "keep_all", "keep_random", "random", "url"}
+        {"all", "any_domain", "comment", "deep_extract", "depth", "keep_all", "keep_random", "random", "url"}
       ) do
         local v = settings[k]
         if v ~= nil then
@@ -880,31 +898,31 @@ remove_param = function(url, param_pattern)
   return string.match(newurl, "^(.-)[%?&;]?$")
 end
 
-queue_new_urls = function(url)
+queue_new_urls = function(url, withcustom)
   if not url then
     return nil
   end
   local newurl = string.gsub(url, "([%?&;])[aA][mM][pP];", "%1")
   if url == current_url then
     if newurl ~= url then
-      queue_url(newurl)
+      queue_url(newurl, withcustom)
     end
   end
   for _, param_pattern in pairs(remove_params) do
     newurl = remove_param(newurl, param_pattern)
   end
   if newurl ~= url then
-    queue_url(newurl)
+    queue_url(newurl, withcustom)
   end
   newurl = string.match(newurl, "^([^%?&]+)")
   if newurl ~= url then
-    queue_url(newurl)
+    queue_url(newurl, withcustom)
   end
   url = string.gsub(url, "&quot;", '"')
   url = string.gsub(url, "&amp;", "&")
   for newurl in string.gmatch(url, '([^"\\]+)') do
     if newurl ~= url then
-      queue_url(newurl)
+      queue_url(newurl, withcustom)
     end
   end
   --[[for newurl in string.gmatch(url, "(https?%%3[aA]%%2[fF][^%?&;]+)") do
@@ -2055,7 +2073,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
         or status_code == 303
         or status_code == 308
       ) then
-      queue_url(newloc)
+      queue_url(newloc, "copy")
       return wget.actions.EXIT
     end
   else
