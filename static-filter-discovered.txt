@@ -110,8 +110,10 @@ UniqueDomainsSessionIdSharingApi
 [/%?]_crypt_
 [0-9][0-9]%.[0-9][0-9]%.[0-9][0-9][0-9][0-9][0-9][0-9]%.[0-9][0-9]%.[0-9][0-9][0-9][0-9][0-9][0-9]%.[0-9][0-9]%.[0-9][0-9][0-9][0-9]
 [^a-z]filter=.+[^a-z]filter=
+^at://
 ^data:
 ^http://[0-9a-z]+%.1/
+^http://[a-z][a-z][0-9][0-9][0-9][0-9][0-9][0-9][0-9]%.[^/%.]+%.[a-z][a-z][a-z][a-z]?/
 ^http://bizgbi%.com:443/.
 ^http://forum%.free%-gate%.org/do/.
 ^http://go%.nbm%.org/site/Survey;.
@@ -141,6 +143,7 @@ UniqueDomainsSessionIdSharingApi
 ^https://[^/]*bloomsbury[^/]+/.+privacy%-policy.*privacy%-policy
 ^https://[^/]*bloomsbury[^/]+/.+term%-and%-conditions.*terms%-and%-conditions
 ^https://animemeow%.xyz/
+^https://cdn%.ampproject%.org/c/s/azureserv%.loyefnbyf4%.workers%.dev/.*%?D[123]?[0-9]&1?[0-9]&[0-9][0-9][0-9][0-9]&[12]?[0-9]&[1-5]?[0-9]&[1-5]?[0-9]&[0-9][0-9]?[0-9]?$
 ^https://innersongs%.com/cpg1%.3%.0beta4/install%.php%?test_gd[12]=1&reload=[0-9a-f]+$
 ^https://v2%.vr%-m%.net%./
 ^https://v2%.vr%-m%.net/
@@ -339,6 +342,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+/%?paytype=
 ^https?://[^/]+/&quot;
 ^https?://[^/]+/Identity/Login%?
+^https?://[^/]+/Session/KeepAlive
 ^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=https?%%3A%%2F%%2F.
 ^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=https?://.
 ^https?://[^/]+/[^%?]*%?[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]&.+=site%%2F.
@@ -358,6 +362,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+google%.[a-z%.]+/amp/s/[^/]+jobs%.info/
 ^https?://[^/]+vokbets%.com/[a-z]*2024[01][0-9][0-3][0-9][^%.]+%.[a-z]+$
 ^https?://[a-z]+%.[a-z]+%.ru/15%?keyword=[a-z0-9-]+&charset=utf%-8$
+^https?://[a-z]+%.e%-vent%.online/web/home/.
 ^https?://[a-z][a-z][a-z][a-z][a-z][a-z][a-z]?[a-z]?%.[a-z0-9]+%.ru/[0-9]/[0-9][0-9]/[a-z0-9-]+$
 ^https?://aax%-us%-iad%.amazon%.com/.
 ^https?://academy%.rawlplug%.com/login%?pcip=
@@ -382,6 +387,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://catalogue%.ni4os%.eu/[^%?&]*[%?&]wtd=
 ^https?://ccpart%.ir/
 ^https?://cdn%.jsdelivr%.net/webjars/
+^https?://cgewho%.in/PDF2013/.
 ^https?://ck%.jp%.ap%.valuecommerce%.com/
 ^https?://consensus%.app/sitemaps/
 ^https?://consents%.prismamedia%.com/[^%?]+%?authId=
@@ -394,6 +400,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://dermatologiamedina%.com/
 ^https?://dmg%.go%-2b%-planer%.de/
 ^https?://dominiquefrot%.com/media/video/.*%.og[gv]%.[mow]
+^https?://edn%-sap%.daihatsu%.astra%.co%.id/index%.php%?t=.
 ^https?://edv%-sps%.de/.*[?&]ITServ=
 ^https?://emmoita%.com/
 ^https?://etherscan%.io/
@@ -484,6 +491,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://sfile%.mobi/download/
 ^https?://shaqhaf%.com/download/%d+/.*/%d%d%d%d%-%d%d%-%d%d%%20%d%d:%d%d:%d%d$
 ^https?://signon%.thomsonreuters%.com/
+^https?://sipd%-ri%.kemendagri%.go%.id/rpjpd/
 ^https?://sjuit%.ac%.tz/home%.php/
 ^https?://solscan%.io/.
 ^https?://somalipressonline%.com/
@@ -496,6 +504,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://systemyerp%.com/.
 ^https?://tama%.seagull%-lc%.com/parthenon/
 ^https?://tesiunam%.dgb%.unam%.mx/F/
+^https?://thecatsite%.com/search/[0-9]+/$
 ^https?://thptnguyenduc%.edu%.vn/images/%?demo=
 ^https?://translate%.google%.com/.
 ^https?://trattoriaallelanghe%.com/[a-zA-Z0-9]
@@ -524,6 +533,8 @@ UniqueDomainsSessionIdSharingApi
 ^https?://www%.audible%.[a-z]+%.?[a-z]*/.+pf_rd_p
 ^https?://www%.bafa%.de/
 ^https?://www%.baoshuwang%.net/book/
+^https?://www%.betfox.com.gh/.*[%?&]referer_redirect=[0-9]
+^https?://www%.cambodiatourismindustry%.org/kh/document/view/
 ^https?://www%.casinotogether%.com/.*/[denfr]*en[denfr]*en[denfr]*en
 ^https?://www%.ccpart%.ir/
 ^https?://www%.code%-brew%.com/[^%?]*%?var=[0-9]
@@ -540,6 +551,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://www%.google%.[a-z]+/search.
 ^https?://www%.heliport%.no/flights%?
 ^https?://www%.huahinnews%.net/[a-zA-Z0-9]+/[0-9]+%.html$
+^https?://www%.icris%.upm%.edu%.my/action%.do%?do=.
 ^https?://www%.jobnet%.com%.mm/job/[0-9]+/sl
 ^https?://www%.linegames%.org/redirect/
 ^https?://www%.myflorencetoday%.com/.*%?[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]
