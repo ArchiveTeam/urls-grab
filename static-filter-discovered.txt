@@ -548,6 +548,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://www%.editorialnigeria%.com/[0-9]+%.html$
 ^https?://www%.elcorteingles%.es/descuentos/[^?]+%%2C%%2C[^?]+%%2C%%2C
 ^https?://www%.elcorteingles%.es/descuentos/[^?]+::[^?]+::[^?]+::
+^https?://os%.platformstud%.io/chat/[0-9a-f]+$
 ^https?://www%.etsy%.com/mobile%?bid=
 ^https?://www%.gescimenet%.com/HFGESCIMENET211/VisuConcess/
 ^https?://www%.google%.[a-z]+/maps.
