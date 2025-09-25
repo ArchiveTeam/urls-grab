@@ -45,6 +45,9 @@
 [%?&;]state=
 [%?&;]flow=
 [%?&;]xoid=
+[%?&;]SSr=
+[%?&;]s2cid=
+[%?&;]refresh=
 [%?&;]request_?[iI][dD]=
 [%?&;][jJ][fF][pP]_[tT][oO][kK][eE][nN]=
 [%?&;]_event_transid=

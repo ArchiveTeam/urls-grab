@@ -40,6 +40,7 @@
 /[iI]nvalid[pP]rocess%.aspx%?
 /[kK]eep[aA]live%.aspx%?
 /[kK]eep[sS]ession[aA]live%.aspx%?
+/[rR]efresh%.aspx%?
 /[sS]cript[cC]hecker%.aspx%?
 /[sS]ession[rR]efresh%.aspx%?
 /[tT][gG]_?[sS]ession[eE]xtend%.aspx%?
@@ -57,6 +58,7 @@
 /conecta;p_p_auth=
 /contact/confirm/%?g=
 /cookies/accept%?
+/defibrillator%.aspx%?
 /entryLINK/design%.aspx%?
 /estado_solicitud%.php[^%?&]*[%?&]ah=
 /expireSession%.do%?
@@ -353,6 +355,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+/bangkokviews[a-z%._%-]*%.aspx?%?
 ^https?://[^/]+/checkout/[0-9]+/
 ^https?://[^/]+/checkouts/cn/
+^https?://[^/]+/idc_[0-9]+_index%.php
 ^https?://[^/]+/index%.php%?[0-9a-f]+=[0-9a-f]+$
 ^https?://[^/]+/inventoryphotos/[0-9]+/[a-z0-9]+/ip/[^%.]+%.jpg%?bg%-color=[^&]+&width=
 ^https?://[^/]+/read/[0-9]+/[0-9]+%.html$
