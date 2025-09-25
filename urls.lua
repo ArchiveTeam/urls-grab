@@ -103,7 +103,7 @@ local remove_params = {}
 local filter_discovered = {}
 local exit_url_patterns = {}
 local page_requisite_patterns = {}
-local duplicate_urls = {}
+--local duplicate_urls = {}
 local one_time_patterns = {}
 local skip_double_patterns = {}
 local paths = {}
@@ -508,11 +508,11 @@ local month_timestamp = os.date("%Y%m", timestamp)
 local parenturl_uuid = nil
 local parenturl_requisite = nil
 
-local dupes_file = io.open("duplicate-urls.txt", "r")
+--[[local dupes_file = io.open("duplicate-urls.txt", "r")
 for url in dupes_file:lines() do
   duplicate_urls[url] = true
 end
-dupes_file:close()
+dupes_file:close()]]
 
 local tlds_file = io.open("static-tlds.txt", "r")
 for tld in tlds_file:lines() do
@@ -828,7 +828,7 @@ queue_url = function(url, withcustom)
   if not target_project[shard] then
     target_project[shard] = {}
   end
-  if not duplicate_urls[url] and not target_project[shard][url] then
+  if --[[not duplicate_urls[url] and]] not target_project[shard][url] then
     if find_path_loop(url, 2) then
       return false
     end

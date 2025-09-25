@@ -84,12 +84,12 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20250925.02'
+VERSION = '20250925.03'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
 MULTI_ITEM_SIZE = 100
-MAX_DUPES_LIST_SIZE = 10000
+#MAX_DUPES_LIST_SIZE = 10000
 DNS_SERVERS = ['9.9.9.10', '149.112.112.10' ,'2620:fe::10' ,'2620:fe::fe:10'] #Quad9
 with open('user-agents.txt', 'r') as f:
     USER_AGENTS = [l.strip() for l in f]
@@ -252,12 +252,12 @@ class PrepareDirectories(SimpleTask):
             time.strftime('%Y%m%d-%H%M%S')
         ])
 
-        if not os.path.isfile('duplicate-urls.txt'):
-            open('duplicate-urls.txt', 'w').close()
+        #if not os.path.isfile('duplicate-urls.txt'):
+        #    open('duplicate-urls.txt', 'w').close()
 
         open('%(item_dir)s/%(warc_file_base)s.warc.zst' % item, 'w').close()
         open('%(item_dir)s/%(warc_file_base)s_bad-urls.txt' % item, 'w').close()
-        open('%(item_dir)s/%(warc_file_base)s_duplicate-urls.txt' % item, 'w').close()
+        #open('%(item_dir)s/%(warc_file_base)s_duplicate-urls.txt' % item, 'w').close()
 
 
 class MoveFiles(SimpleTask):
@@ -507,7 +507,7 @@ pipeline = Pipeline(
         }
     ),
     SetBadUrls(),
-    SetDuplicateUrls(),
+    #SetDuplicateUrls(),
     PrepareStatsForTracker(
         defaults={'downloader': downloader, 'version': VERSION},
         file_groups={
