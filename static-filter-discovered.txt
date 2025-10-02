@@ -479,6 +479,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://onlineservices%.osc%.state%.ny%.us/Enrollment/
 ^https?://opac%.spk%-berlin%.de.*/SID=.
 ^https?://opensky%.xt%.com/pc/personal/
+^https?://os%.platformstud%.io/chat/[0-9a-f]+$
 ^https?://participant%.empower%-retirement%.com/.*no_?[oO]p%.?d?o?%?param=[0-9%.]+
 ^https?://portmillennium%.pl/[^%?]*%?d=[0-9]
 ^https?://printo%.it/accept%-cookies/
@@ -548,7 +549,6 @@ UniqueDomainsSessionIdSharingApi
 ^https?://www%.editorialnigeria%.com/[0-9]+%.html$
 ^https?://www%.elcorteingles%.es/descuentos/[^?]+%%2C%%2C[^?]+%%2C%%2C
 ^https?://www%.elcorteingles%.es/descuentos/[^?]+::[^?]+::[^?]+::
-^https?://os%.platformstud%.io/chat/[0-9a-f]+$
 ^https?://www%.etsy%.com/mobile%?bid=
 ^https?://www%.gescimenet%.com/HFGESCIMENET211/VisuConcess/
 ^https?://www%.google%.[a-z]+/maps.
