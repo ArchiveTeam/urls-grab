@@ -36,6 +36,7 @@ from seesaw.tracker import GetItemFromTracker, PrepareStatsForTracker, \
     UploadWithTracker, SendDoneToTracker
 from seesaw.util import find_executable
 import zstandard
+import validators
 
 if StrictVersion(seesaw.__version__) < StrictVersion('0.8.5'):
     raise Exception('This pipeline needs seesaw version 0.8.5 or higher.')
@@ -84,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20251006.03'
+VERSION = '20251006.04'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -286,7 +287,7 @@ class SetBadUrls(SimpleTask):
                 index = items_lower.index(url)
                 items.pop(index)
                 items_lower.pop(index)
-        item['item_name'] = '\0'.join(items)
+        item['item_name'] = '\0'.join([s for s in items if s not in item['skipped_items']])
 
 
 class SetDuplicateUrls(SimpleTask):
@@ -439,13 +440,14 @@ class WgetArgs(object):
 
         item['item_name'] = '\0'.join([
             item_name for item_name in item['item_name'].split('\0')
-            if (item_name.startswith('custom:') and '&url=' in item_name) \
-                or item_name.startswith('http://') \
-                or item_name.startswith('https://') \
+            if (item_name.startswith('custom:') and '&url=' in item_name)
+                or item_name.startswith('http://')
+                or item_name.startswith('https://')
         ])
 
         item['item_name_newline'] = item['item_name'].replace('\0', '\n')
         item_urls = []
+        skipped_items = []
         custom_items = {}
 
         for item_name in item['item_name'].split('\0'):
@@ -461,9 +463,13 @@ class WgetArgs(object):
             else:
                 url = item_name
             item_urls.append(url)
-            wget_args.append(url)
+            if validators.url('/'.join(url.split('/', 3)[:3])):
+                wget_args.append(url)
+            else:
+                skipped_items.append(item_name)
 
         item['item_urls'] = item_urls
+        item['skipped_items'] = skipped_items
         item['custom_items'] = json.dumps(custom_items)
 
         if 'bind_address' in globals():

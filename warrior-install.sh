@@ -8,5 +8,9 @@ then
   sudo rm -rf /var/lib/apt/lists/*
 fi
 
+if ! python -c "import validators" 2>/dev/null; then
+    python3 -m pip install validators
+fi
+
 exit 0
 
