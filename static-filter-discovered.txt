@@ -575,3 +575,4 @@ login%.error%.sessionSecurityMismatch
 m?[jki][prt]%-edu%.sbs
 mit%-edu%.[tb][eu][cz][hz]
 symplicity%.com/.+%.php/pid[0-9]
+/obrare?q?%.cgi%?cksum=

@@ -14,6 +14,8 @@
 ^https?://[^/]*googleadservices%.com/.
 ^https?://id%.google%.com/.
 ^https?://plus%.google%.com/share%?
+^https?://[^/]*google%.com/share%.google%?
+^https?://accounts%.google%.com/.
 ^https?://analytics%.yahoo%.com/.
 ^https?://[^/]*beap[^/]*%.yahoo%.com/.
 ^https?://smetrics%.elsevier%.com/.
@@ -36,6 +38,7 @@
 ^https?://[^/]*linkedin%.com/sharing/.
 ^https?://[^/]*linkedin%.com/uas/login%?
 ^https?://[^/]*pinterest%.com/pin/create/.
+^https?://clk%.tradedoubler%.com/click%?
 ^https?://twitter%.com/%?logout=
 ^https?://twitter%.com/home%?status=
 ^https?://twitter%.com/intent/tweet/.
@@ -45,6 +48,8 @@
 ^https?://x%.com/intent/tweet/.
 ^https?://x%.com/share%?
 ^https?://px%.srvcs%.tumblr%.com/impixu%?
+^https?://[^/]*tumblr%.com/share.
+^https?://[^/]*tumblr%.com/privacy/consent/.
 ^https?://[^/]*whatsapp%.com/send%?
 ^https?://[^/]*%.app%.goo%.gl/%?link=
 ^https?://lineit%.line%.me/.
@@ -55,3 +60,6 @@
 ^https?://wa%.me/.
 ^https?://[^/]*reddit%.com/submit%?
 ^https?://[^/]*ebay%.[a-z]+/splashui/captcha%?
+^https?://[^/]*affiliate%.dmm%.com/.
+^https?://[^/]*ixd%.dmm%.com/.
+^https?://share%.flipboard%.com/.
