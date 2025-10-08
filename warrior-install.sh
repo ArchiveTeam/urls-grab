@@ -3,8 +3,19 @@
 if ! dpkg-query -Wf'${Status}' ghostscript 2>/dev/null | grep -q '^i'
 then
   echo "Installing ghostscript..."
-  sudo DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical apt-get -qqy --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-unsafe-io update
-  sudo DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical apt-get -qqy --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-unsafe-io install ghostscript || exit 1
+  sudo -n DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical \
+    apt-get -y --no-install-recommends \
+    -o Dpkg::Options::=--force-confdef \
+    -o Dpkg::Options::=--force-confold \
+    -o Dpkg::Use-Pty=0 \
+    update
+  sudo -n DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical \
+    apt-get -y --no-install-recommends \
+    -o Dpkg::Options::=--force-confdef \
+    -o Dpkg::Options::=--force-confold \
+    -o Dpkg::Use-Pty=0 \
+    install ghostscript || exit 1
+  sudo -n apt-get clean
   sudo rm -rf /var/lib/apt/lists/*
 fi
 
