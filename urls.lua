@@ -2036,13 +2036,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       queued_urls[""][newloc] = true
       return wget.actions.EXIT
     end]]
-    if status_code == 301
+    --[[if status_code == 301
       and string.match(newloc, "^https?://[^/]+/?$") then
       local url_path = string.match(url["url"], "^https?://[^/]+(/+)")
       if url_path and paths[url_path] then
         return wget.actions.EXIT
       end
-    end
+    end]]
     local matching_domain = (
       string.match(newloc, "^https?://www%.(.+)")
       or string.match(newloc, "^https?://(.+)")
