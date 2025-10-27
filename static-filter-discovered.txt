@@ -78,6 +78,7 @@
 /oauth/badges/login%?
 /oauth2/authorize%?
 /oauth2callback%?
+/obrare?q?%.cgi%?cksum=
 /site/[Ss][Ss]?urvey.*NONCE_TOKEN=
 /sitemap[^%?]+%?x=
 /tlush/crypt%.
@@ -575,4 +576,3 @@ login%.error%.sessionSecurityMismatch
 m?[jki][prt]%-edu%.sbs
 mit%-edu%.[tb][eu][cz][hz]
 symplicity%.com/.+%.php/pid[0-9]
-/obrare?q?%.cgi%?cksum=
