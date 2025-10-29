@@ -1057,7 +1057,7 @@ queue_blogger = function(url)
     blog = string.match(url, "^https?://([^%.]+)%.blogspot%.[a-z][a-z][a-z]?/")
   end
   if blog then
-    blogger_items[""]["blog:" .. string.lower(blog)] = current_url
+    blogger_items[periodic_shard]["blog:" .. string.lower(blog)] = current_url
   end
 end
 
