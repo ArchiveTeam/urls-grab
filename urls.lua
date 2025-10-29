@@ -484,7 +484,8 @@ local mediafire_items = {
   [""]={}
 }
 local blogger_items = {
-  [""]={}
+  [""]={},
+  [periodic_shard]={}
 }
 local telegram_posts = {
   [""]={},
