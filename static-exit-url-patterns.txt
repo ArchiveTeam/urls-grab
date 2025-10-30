@@ -19,6 +19,8 @@
 [%?&;]cid=
 [%?&;]script_case_session=
 [%?&;]Dilid=
+[%?&;]tmpId=
+[%?&;]securedGetRequest_?[0-9a-z]*=
 [%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
 [%?&;]wtd=
 [%?&;]n?once=
