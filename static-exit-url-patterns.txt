@@ -44,6 +44,8 @@
 [%?&;]checkss=
 [%?&;]auth_?sess=
 [%?&;]auth_?[iI]d=
+[%?&;]_?sessid=
+[%?&;]sid=
 [%?&;]jsc=
 [%?&;]anti[Cc]ache=
 [%?&;]cache_?this=
