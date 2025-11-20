@@ -495,6 +495,7 @@ local telegram_channels = {
   [""]={},
   [periodic_shard]={}
 }
+local gov_youtube_items = {[""]={}}
 local urls_sitemap_news = {[""]={}}
 local ftp_urls = {[""]={}}
 local onion_urls = {[""]={}}
@@ -1097,6 +1098,15 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local same_domain = string.match(parenturl, "^(https?://[^/]+)") == string.match(url, "^(https?://[^/]+)")
 
   queue_services(url)
+
+  if string.match(parenturl, "^https?://[^/]+%.gov%.?[a-z0-9%-]*/")
+    and (
+      string.match(url, "^https?://[^/]*youtube%.[a-z][a-z][a-z]?%.?[a-z0-9%-]*/.")
+      or string.match(url, "^https?://[^/]*youtu%.be/.")
+      or string.match(url, "^https?://[^/]*youtube%-nocookie%.com/.")
+    ) then
+    gov_youtube_items[""][string.match(url, "^([^#]+)") .. "#" .. parenturl] = current_url
+  end
 
   if string.match(url, "^ftp://") then
     ftp_urls[""][url] = current_url
@@ -2156,7 +2166,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["urls-all-tx2vacclx396i0h"] = urls_all,
     ["urls-sitemap-news-hu1y8xj3h0ildh1k"] = urls_sitemap_news,
     ["urls-news-6t9uc9xxz06gpt93"] = urls_news,
-    ["discourse-inbox-kkrhbt6xax5ave98"] = discourse_items
+    ["discourse-inbox-kkrhbt6xax5ave98"] = discourse_items,
+    ["youtube-gov-stash-adxooz0xve21nudy"] = gov_youtube_items
   }) do
     local project_name = string.match(key, "^(.+)%-")
     for shard, url_data in pairs(items_data) do
