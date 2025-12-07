@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20251120.01'
+VERSION = '20251207.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -453,15 +453,25 @@ class WgetArgs(object):
         for item_name in item['item_name'].split('\0'):
             wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
             wget_args.append('item-name://'+item_name)
-            if item_name.startswith('custom:'):
-                data = parse_qs(item_name.split(':', 1)[1])
+            item_name_context = None
+            if '\x1f' in item_name:
+                item_name_url, item_name_context = item_name.rsplit('\x1f', 1)
+            else:
+                item_name_url = item_name
+            custom_item_data = {}
+            if item_name_url.startswith('custom:'):
+                data = parse_qs(item_name_url.split(':', 1)[1])
                 for k, v in data.items():
                     if len(v) == 1:
                         data[k] = v[0]
                 url = data['url']
-                custom_items[normalize_url(url)] = data
+                custom_item_data.update(data)
             else:
-                url = item_name
+                url = item_name_url
+            if item_name_context is not None:
+                custom_item_data['context'] = {k: v[0] for k, v in parse_qs(item_name_context).items()}
+            if len(custom_item_data) > 0:
+                custom_items[normalize_url(url)] = custom_item_data
             item_urls.append(url)
             if validators.url('/'.join(url.split('/', 3)[:3])):
                 wget_args.append(url)

@@ -726,7 +726,7 @@ find_path_loop = function(url, max_repetitions)
   return false
 end
 
-percent_encode_url = function(url)
+percent_encode = function(url)
   temp = ""
   for c in string.gmatch(url, "(.)") do
     local b = string.byte(c)
@@ -736,6 +736,61 @@ percent_encode_url = function(url)
     temp = temp .. c
   end
   return temp
+end
+
+sorted_pairs = function(t)
+  local keys = {}
+  for k, _ in pairs(t) do
+    table.insert(keys, k)
+  end
+  table.sort(keys)
+  local i = 0
+  local sorted = function()
+    i = i + 1
+    if keys[i] == nil then
+      return nil
+    end
+    return keys[i], t[keys[i]]
+  end
+  return sorted
+end
+
+make_query = function(table)
+  local result = ""
+  for k, v in sorted_pairs(table) do
+    if string.len(result) > 0 then
+      result = result .. "&"
+    end
+    if k ~= urlparse.escape(k) then
+      error("Disallowed key " .. k .. ".")
+    end
+    result = result .. k
+    if v ~= nil then
+      if type(v) == "number" then
+        v = tostring(v)
+      end
+      if type(v) ~= "string" then
+        error("Disallowed value type for " .. v .. ".")
+      end
+      if string.len(v) > 0 then
+        result = result .. "=" .. urlparse.escape(v)
+      end
+    end
+  end
+  return result
+end
+
+queue_with_context = function(shard_t, url)
+  local context = {["depth"]=1}
+  if current_settings and current_settings["context"] then
+   if current_settings["context"]["depth"] then
+      context["depth"] = tonumber(current_settings["context"]["depth"]) + 1
+    end
+  end
+  shard_t[url] = {
+    ["parent_url"]=current_url,
+    ["context"]=context
+  }
 end
 
 queue_url = function(url, withcustom)
@@ -764,7 +819,7 @@ queue_url = function(url, withcustom)
     return n - 1
   end
   url = string.gsub(url, "'%s*%+%s*'", "")
-  url = percent_encode_url(url)
+  url = percent_encode(url)
   url = string.match(url, "^([^#{<\\]+)")
   if withcustom and current_settings
     and (
@@ -814,16 +869,7 @@ queue_url = function(url, withcustom)
       end
     end
     if settings then
-      url = "custom:"
-      for _, k in pairs(
-        {"all", "any_domain", "comment", "deep_extract", "depth", "keep_all", "keep_random", "random", "url"}
-      ) do
-        local v = settings[k]
-        if v ~= nil then
-          url = url .. k .. "=" .. urlparse.escape(tostring(v)) .. "&"
-        end
-      end
-      url = string.sub(url, 1, -2)
+      url = "custom:" .. make_query(settings)
       custom_item_urls[url] = tostring(settings["url"])
     end
   end
@@ -853,7 +899,7 @@ queue_url = function(url, withcustom)
       return false
     end
 --print("queuing", url)
-    target_project[shard][url] = current_url
+    queue_with_context(target_project[shard], url)
   end
 end
 
@@ -862,7 +908,7 @@ queue_monthly_url = function(url, comment)
     return nil
   end
   local origurl = url
-  url = percent_encode_url(url)
+  url = percent_encode(url)
   url = string.match(url, "^([^#]+)")
   local extra_params = ""
   local comment_string = ""
@@ -885,7 +931,7 @@ queue_monthly_item = function(item, t)
     t[month_timestamp] = {}
   end
 --print("monthly", item)
-  t[month_timestamp][item] = current_url
+  queue_with_context(t[month_timestamp], item)
 end
 
 remove_param = function(url, param_pattern)
@@ -2121,19 +2167,23 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 end
 
 wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total_downloaded_bytes, total_download_time)
-  local function submit_backfeed(newurls, key, shard)
+  local function submit_backfeed(newurls, key, shard, item_separator)
     local tries = 0
     local maxtries = 10
-    local parameters = ""
-    if shard ~= "" then
-      parameters = "?shard=" .. shard
+    if shard == "" then
+      shard = nil
     end
+    local parameters = make_query({
+      ["shard"] = shard,
+      ["delimiter"] = "\0",
+      ["itemseparator"] = item_separator
+    })
     while tries < maxtries do
       if killgrab then
         return false
       end
       local body, code, headers, status = http.request(
-        "https://legacy-api.arpa.li/backfeed/legacy/" .. key .. parameters,
+        "https://legacy-api.arpa.li/backfeed/legacy/" .. key .. "?" .. parameters,
         newurls .. "\0"
       )
       print(body)
@@ -2175,17 +2225,25 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       local newurls = nil
       print("Queuing to project " .. project_name .. " on shard " .. shard)
       local sorted_data = {}
-      for url, parent_url in pairs(url_data) do
+      local item_separator = nil
+      for url, url_context in pairs(url_data) do
+        if type(url_context) == "string" then
+          url_context = {["parent_url"]=url_context}
+        end
+        if url_context["context"] then
+          item_separator = "\x1f"
+        end
+        local parent_url = url_context["parent_url"]
         if not sorted_data[parent_url] then
           sorted_data[parent_url] = {}
         end
-        sorted_data[parent_url][url] = true
+        sorted_data[parent_url][url] = url_context["context"] or true
       end
       for parent_url, urls_list in pairs(sorted_data) do
         if not skip_parent_urls[parent_url] then
           io.stdout:write("Queuing for parent URL " .. tostring(parent_url) .. ".\n")
           io.stdout:flush()
-          for url, _ in pairs(urls_list) do
+          for url, context in pairs(urls_list) do
             local filtered = false
             local actual_url = custom_item_urls[url] or url
             for _, pattern in pairs(filter_discovered) do
@@ -2202,14 +2260,22 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
               if shard == "" and project_name == "urls" then
                 dup_urls:write(url .. "\n")
               end
+              local backfeed_item = url
+              if item_separator then
+                backfeed_item = backfeed_item .. item_separator .. url
+                local context_params = make_query(context)
+                if string.len(context_params) > 0 then
+                  backfeed_item = backfeed_item .. item_separator .. context_params
+                end
+              end
               if newurls == nil then
-                newurls = url
+                newurls = backfeed_item
               else
-                newurls = newurls .. "\0" .. url
+                newurls = newurls .. "\0" .. backfeed_item
               end
               count = count + 1
               if count == 400 then
-                submit_backfeed(newurls, key, shard)
+                submit_backfeed(newurls, key, shard, item_separator)
                 newurls = nil
                 count = 0
               end
@@ -2218,7 +2284,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
         end
       end
       if newurls ~= nil then
-        submit_backfeed(newurls, key, shard)
+        submit_backfeed(newurls, key, shard, item_separator)
       end
     end
   end
