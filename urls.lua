@@ -643,7 +643,7 @@ site_in_bloomfilter = function(s)
   local depth = 0
   while string.len(domain) > 0 do
     depth = depth + 1
-    local a, b = string.match(domain, "^(.-)([^%.]+%.)$")
+    local a, b = string.match(domain, "^(.-)([^%.]+%.)%.*$")
     domain = a
     partial = b .. partial
     local result = is_in_bloomfilter(partial)
