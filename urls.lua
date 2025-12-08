@@ -1712,7 +1712,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       if discourse_meta then
         local data_base_url = string.match(discourse_meta, 'data%-base%-url="([^"]+)"')
         if data_base_url then
-          discourse_items[""][data_base_url] = true
+          discourse_items[""][data_base_url] = current_url
         end
       else
         local discourse_env = string.match(html, '(<meta [^>]*name="discourse/config/environment"[^>]+>)')
@@ -1722,7 +1722,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
             content = urlparse.unescape(content)
             content = cjson.decode(content)
             if content["rootURL"] then
-              discourse_items[""][string.match(url, "^(https?://[^/]+)") .. content["rootURL"]] = true
+              discourse_items[""][string.match(url, "^(https?://[^/]+)") .. content["rootURL"]] = current_url
             end
           end
         end
@@ -1890,10 +1890,10 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       html = read_file(file)
       for xmlns_url in string.gmatch(html, 'xmlns:[a-z]+="([^"]+)"') do
         if string.match(xmlns_url, "sitemap%-news") then
-          urls_sitemap_news[""][url] = true
+          urls_sitemap_news[""][url] = current_url
           for tag, url in string.gmatch(html, "<([^>]+)>%s*(https?://[^%s<]+)%s*<") do
             if tag and url and tag ~= "sitemap" then
-              urls_news[""][url] = true
+              urls_news[""][url] = current_url
             end
           end
         end
