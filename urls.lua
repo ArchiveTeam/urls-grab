@@ -96,6 +96,7 @@ local current_url = nil
 local current_settings = nil
 local bad_urls = {}
 local queued_urls = {}
+local queued_custom_urls = {}
 local skip_parent_urls_check = {}
 local skip_parent_urls_checked = {}
 local skip_parent_urls = {}
@@ -770,7 +771,7 @@ make_query = function(table)
         v = tostring(v)
       end
       if type(v) ~= "string" then
-        error("Disallowed value type for " .. v .. ".")
+        error("Disallowed value type for " .. cjson.encode(v) .. " in " .. cjson.encode(table) .. ".")
       end
       if string.len(v) > 0 then
         result = result .. "=" .. urlparse.escape(v)
@@ -830,7 +831,9 @@ queue_url = function(url, withcustom)
     if withcustom == "copy" then
       settings = {}
       for k, v in pairs(current_settings) do
-        settings[k] = v
+        if k ~= "context" then
+          settings[k] = v
+        end
       end
       settings["url"] = url
     else
@@ -890,12 +893,14 @@ queue_url = function(url, withcustom)
     target_project = onion_urls
     local newurl = string.match(origurl, "^(https?://[^/]+)")
     queue_monthly_url(newurl)
+  elseif string.match(url, "^custom:") then
+    target_project = queued_custom_urls
   end
   if not target_project[shard] then
     target_project[shard] = {}
   end
   if --[[not duplicate_urls[url] and]] not target_project[shard][url] then
-    if find_path_loop(url, 2) then
+    if find_path_loop(origurl, 2) then
       return false
     end
 --print("queuing", url)
@@ -915,7 +920,7 @@ queue_monthly_url = function(url, comment)
   if comment then
     comment_string = "comment=" .. urlparse.escape(tostring(comment)) .. "&"
   end
-  local target_project = queued_urls
+  local target_project = queued_custom_urls
   if string.match(origurl, "^https?://[^/]+%.([a-z]+)") == "onion" then
     target_project = onion_urls
     extra_params = "&depth=1&all=1&keep_all=1&any_domain=1"
@@ -2211,6 +2216,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["imgur-6fzz6lxvpk9kgug7"] = imgur_items,
     ["blogger-2uka2xphhn6ywzuc"] = blogger_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
+    ["urls-custom-vwk867wl8xqgjed7"] = queued_custom_urls,
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
     --["urls-tor-f6eyk1zzl9ca5pqu"] = onion_urls,
     ["urls-all-tx2vacclx396i0h"] = urls_all,
