@@ -94,6 +94,7 @@ ids_to_ignore["[^0-9a-fA-F]" .. to_ignore .. "$"] = true
 
 local current_url = nil
 local current_settings = nil
+local current_context = nil
 local bad_urls = {}
 local queued_urls = {}
 local queued_custom_urls = {}
@@ -783,9 +784,9 @@ end
 
 queue_with_context = function(shard_t, url)
   local context = {["depth"]=1}
-  if current_settings and current_settings["context"] then
-   if current_settings["context"]["depth"] then
-      context["depth"] = tonumber(current_settings["context"]["depth"]) + 1
+  if current_context then
+   if current_context["depth"] then
+      context["depth"] = tonumber(current_context["depth"]) + 1
     end
   end
   shard_t[url] = {
@@ -1911,11 +1912,25 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   end
 end
 
+table_length = function(t)
+  local l = 0
+  for _ in pairs(t) do
+    l = l + 1
+  end
+  return l
+end
+
 set_current_url = function(url)
   candidate_current = normalize_url(url)
   if candidate_current ~= current_url and urls[candidate_current] then
     current_url = candidate_current
     current_settings = urls_settings[candidate_current]
+    current_context = current_settings["context"]
+    if current_context and table_length(current_settings) == 1 then
+      current_settings = nil
+    else
+      current_settings["context"] = nil
+    end
   end
 end
 
