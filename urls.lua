@@ -784,10 +784,8 @@ end
 
 queue_with_context = function(shard_t, url)
   local context = {["depth"]=1}
-  if current_context then
-   if current_context["depth"] then
-      context["depth"] = tonumber(current_context["depth"]) + 1
-    end
+  if current_context and current_context["depth"] then
+    context["depth"] = tonumber(current_context["depth"]) + 1
   end
   shard_t[url] = {
     ["parent_url"]=current_url,
@@ -1925,11 +1923,16 @@ set_current_url = function(url)
   if candidate_current ~= current_url and urls[candidate_current] then
     current_url = candidate_current
     current_settings = urls_settings[candidate_current]
-    current_context = current_settings["context"]
-    if current_context and table_length(current_settings) == 1 then
-      current_settings = nil
-    else
-      current_settings["context"] = nil
+    current_context = nil
+    if current_settings then
+      current_context = current_settings["context"]
+    end
+    if current_context then
+      if table_length(current_settings) == 1 then
+        current_settings = nil
+      else
+        current_settings["context"] = nil
+      end
     end
   end
 end
