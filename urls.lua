@@ -2251,13 +2251,13 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       local sorted_data = {}
       local item_separator = nil
       for url, url_context in pairs(url_data) do
-        if type(url_context) == "string" then
-          url_context = {["parent_url"]=url_context}
+        if type(url_context) ~= "table" then
+          url_context = {["parent_url"]=tostring(url_context)}
         end
         if url_context["context"] then
           item_separator = "\x1f"
         end
-        local parent_url = url_context["parent_url"]
+        local parent_url = url_context["parent_url"] or "unknown"
         if not sorted_data[parent_url] then
           sorted_data[parent_url] = {}
         end
