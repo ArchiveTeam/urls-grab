@@ -17,13 +17,13 @@ import shlex
 import string
 import sys
 
-
 if sys.version_info[0] < 3:
     from urllib import unquote
     from urlparser import parse_qs
 else:
     from urllib.parse import unquote, parse_qs
 
+import lupa
 import requests
 import seesaw
 from seesaw.config import realize, NumberConfigValue
@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20251209.02'
+VERSION = '20251210.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -94,6 +94,8 @@ MULTI_ITEM_SIZE = 100
 DNS_SERVERS = ['9.9.9.10', '149.112.112.10' ,'2620:fe::10' ,'2620:fe::fe:10'] #Quad9
 with open('user-agents.txt', 'r') as f:
     USER_AGENTS = [l.strip() for l in f]
+with open('static-filter-discovered.txt', 'r') as f:
+    FILTER_PATTERNS = [l.strip() for l in f]
 EXTRACT_OUTLINKS = {}
 
 ###########################################################################
@@ -450,9 +452,12 @@ class WgetArgs(object):
         skipped_items = []
         custom_items = {}
 
+        wget_args_more = []
+
         for item_name in item['item_name'].split('\0'):
-            wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
-            wget_args.append('item-name://'+item_name)
+            wget_args_more.append([])
+            wget_args_more[-1].extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
+            wget_args_more[-1].append('item-name://'+item_name)
             item_name_context = None
             if '\x1f' in item_name:
                 item_name_url, item_name_context = item_name.rsplit('\x1f', 1)
@@ -474,9 +479,36 @@ class WgetArgs(object):
                 custom_items[normalize_url(url)] = custom_item_data
             item_urls.append(url)
             if validators.url('/'.join(url.split('/', 3)[:3])):
-                wget_args.append(url)
+                wget_args_more[-1].append(url)
             else:
                 skipped_items.append(item_name)
+
+        lua = lupa.LuaRuntime(unpack_returned_tuples=True)
+        filtered = lua.eval("""
+            function(urls, patterns)
+                local result = {}
+                for i, url in ipairs(urls) do
+                    local match = false
+                    for _, pattern in ipairs(patterns) do
+                        if string.match(url, pattern) then
+                            match = pattern
+                            break
+                        end
+                    end
+                    result[i] = match
+                end
+                return result
+            end
+        """)(
+            lua.table_from([d[3] if len(d) == 4 else '' for d in wget_args_more]),
+            lua.table_from(FILTER_PATTERNS)
+        )
+        for i, d in enumerate(wget_args_more):
+            if len(d) == 4 and filtered[i+1]:
+                print('Filtering {} by pattern {}.'.format(d[3], filtered[i+1]))
+                #skipped_items.append(d[2].split('/', 2)[2])
+            else:
+                wget_args.extend(d)
 
         item['item_urls'] = item_urls
         item['skipped_items'] = skipped_items

@@ -27,5 +27,11 @@ then
   sudo python3 -m pip install --no-cache-dir validators || exit 1
 fi
 
+if ! python3 -c "import lupa" 2>/dev/null
+then
+  echo "Installing Python3 lupa..."
+  sudo python3 -m pip install --no-cache-dir lupa || exit 1
+fi
+
 exit 0
 
