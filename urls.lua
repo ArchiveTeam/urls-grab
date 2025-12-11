@@ -1116,6 +1116,19 @@ queue_blogger = function(url)
   end
 end
 
+queue_discordapp = function(url)
+print('CHECK', url)
+  local path = string.match(url, "^https?://media%.discordapp%.net(/attachments/.+)$")
+  if path then
+    queue_url("https://cdn.discordapp.com" .. path)
+  end
+  local params, newurl = string.match(url, "^https?://images%-ext%-?[0-9]*%.discordapp%.net/external/[^/]+/([%%;]?[^/]*)/([hf]t[tp][^%?]+)")
+  if newurl then
+    newurl = string.gsub(urlparse.unescape(newurl), "^([a-z]+)/", "%1://") .. urlparse.unescape(params)
+    queue_url(newurl)
+  end
+end
+
 queue_services = function(url)
   if not url then
     return nil
@@ -1129,6 +1142,8 @@ queue_services = function(url)
     queue_mediafire(rest)
   elseif domain == "imgur.com" then
     queue_imgur(rest)
+  elseif domain == "discordapp.com" or domain == "discordapp.net" then
+    queue_discordapp(url)
   elseif domain and (
     string.match(domain, "^blogger%.")
     or string.match(domain, "^blogspot%.")

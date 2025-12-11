@@ -504,6 +504,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://mapserver%.mapy%.cz/.
 ^https?://marifa%.kaust%.edu%.sa/.-%%25252525252525
 ^https?://marsrovers%.nasa%.gov%.land/.
+^https?://media%.discordapp%.net/attachments/[^?]+$
 ^https?://meta3%.toolforge%.org/stalktoy/[0-9]+%.[0-9]+%.[0-9]+%.[0-9]+$
 ^https?://mileskimball%.resultspage%.com/.
 ^https?://minouchet%.com/[a-zA-Z0-9]
