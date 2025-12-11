@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20251211.01'
+VERSION = '20251211.02'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -392,12 +392,6 @@ class WgetArgs(object):
             f.write(dict_data['dict'])
         item['dict_id'] = dict_data['id']
 
-        if len(item['item_name']) == 0:
-            item['item_name_newline'] = ''
-            item['item_urls'] = '[]'
-            item['custom_items'] = '{}'
-            return realize(['sleep', '0'], item)
-
         command = ['timeout', str(int((item['item_name'].count('\0')+1)*100))] + WGET_AT_COMMAND
         print('Using global timeout', command[1])
 
@@ -503,17 +497,25 @@ class WgetArgs(object):
             lua.table_from([d[3] if len(d) == 4 else '' for d in wget_args_more]),
             lua.table_from(FILTER_PATTERNS)
         )
+        total_added = 0
         for i, d in enumerate(wget_args_more):
             if len(d) == 4 and filtered[i+1]:
                 print('Filtering {} by pattern {}.'.format(d[3], filtered[i+1]))
                 #skipped_items.append(d[2].split('/', 2)[2])
             else:
+                if len(d) == 4:
+                    total_added += 1
                 wget_args.extend(d)
 
         item['item_urls'] = item_urls
         item['item_urls_wget'] = json.dumps(item_urls)
         item['skipped_items'] = skipped_items
         item['custom_items'] = json.dumps(custom_items)
+
+        assert len(item_urls) == item['item_name'].count('\0') + 1
+
+        if len(item['item_name']) == 0 or total_added == 0:
+            return realize(['sleep', '0'], item)
 
         if 'bind_address' in globals():
             wget_args.extend(['--bind-address', globals()['bind_address']])
