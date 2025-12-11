@@ -7,6 +7,7 @@ local minibloom = require("minibloom")
 
 local item_dir = os.getenv("item_dir")
 local item_name = os.getenv("item_name")
+local item_urls = os.getenv("item_urls")
 local custom_items = os.getenv("custom_items")
 local warc_file_base = os.getenv("warc_file_base")
 
@@ -45,6 +46,9 @@ end
 
 local urls = {}
 for url in string.gmatch(item_name, "([^\n]+)") do
+  urls[normalize_url(string.match(url, "^([^\x1f]+)"))] = true
+end
+for _, url in pairs(cjson.decode(item_urls)) do
   urls[normalize_url(url)] = true
 end
 

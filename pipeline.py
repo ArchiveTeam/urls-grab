@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20251210.04'
+VERSION = '20251211.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -511,6 +511,7 @@ class WgetArgs(object):
                 wget_args.extend(d)
 
         item['item_urls'] = item_urls
+        item['item_urls_wget'] = json.dumps(item_urls)
         item['skipped_items'] = skipped_items
         item['custom_items'] = json.dumps(custom_items)
 
@@ -550,6 +551,7 @@ pipeline = Pipeline(
         env={
             'item_dir': ItemValue('item_dir'),
             'item_name': ItemValue('item_name_newline'),
+            'item_urls': ItemValue('item_urls_wget'),
             'custom_items': ItemValue('custom_items'),
             'warc_file_base': ItemValue('warc_file_base')
         }
