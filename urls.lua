@@ -100,8 +100,8 @@ local current_url = nil
 local current_settings = nil
 local current_context = nil
 local bad_urls = {}
-local queued_urls = {}
-local queued_custom_urls = {}
+local queued_urls = {[""]={}}
+local queued_custom_urls = {[""]={}}
 local skip_parent_urls_check = {}
 local skip_parent_urls_checked = {}
 local skip_parent_urls = {}
