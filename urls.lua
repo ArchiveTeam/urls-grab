@@ -1121,12 +1121,11 @@ queue_blogger = function(url)
 end
 
 queue_discordapp = function(url)
-print('CHECK', url)
   local path = string.match(url, "^https?://media%.discordapp%.net(/attachments/.+)$")
   if path then
     queue_url("https://cdn.discordapp.com" .. path)
   end
-  local params, newurl = string.match(url, "^https?://images%-ext%-?[0-9]*%.discordapp%.net/external/[^/]+/([%%;]?[^/]*)/([hf]t[tp][^%?]+)")
+  local params, newurl = string.match(url, "^https?://images%-ext%-?[0-9]*%.discordapp%.net/external/[^/]+/([%%;]?[^/]-)/?([hf]t[tp][^%?]+)")
   if newurl then
     newurl = string.gsub(urlparse.unescape(newurl), "^([a-z]+)/", "%1://") .. urlparse.unescape(params)
     queue_url(newurl)
@@ -1930,14 +1929,6 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       end
     end
   end
-end
-
-table_length = function(t)
-  local l = 0
-  for _ in pairs(t) do
-    l = l + 1
-  end
-  return l
 end
 
 set_current_url = function(url)
