@@ -1159,6 +1159,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local url = urlpos["url"]["url"]
   local parenturl = parent["url"]
   local extract_page_requisites = false
+  local depth = tonumber((current_context and current_context["depth"]) or 0)
 
   if string.match(url, "^https?://(.+)$") == string.match(parenturl, "^https?://(.+)$") then
     return false
@@ -1203,6 +1204,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   if url ~= parenturl
+    and depth > 1
     and not skip_parent_urls_checked[url] then
     for parenturl_pattern, pattern_tables in pairs(filter_pattern_sets) do
       if string.match(parenturl, parenturl_pattern) then
