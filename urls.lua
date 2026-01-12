@@ -33,13 +33,25 @@ if urlparse == nil or http == nil or html_entities == nil then
 end
 
 normalize_url = function(url)
-  local candidate_current = url
+  local candidate_current = string.match(url, "^([^#]+)")
   while true do
     local temp = string.lower(urlparse.unescape(candidate_current))
     if temp == candidate_current then
       break
     end
     candidate_current = temp
+  end
+  if not string.match(candidate_current, "^https?://[^/]+/") then
+    candidate_current = candidate_current .. "/"
+  end
+  for _, pattern in pairs({
+    "^(https?://)[^/]*@([^/]+/.*)$",
+    "^(https?://[^/:]+):[^/]+(.*)$"
+  }) do
+    local a, b = string.match(candidate_current, pattern)
+    if a and b then
+      candidate_current = a .. b
+    end
   end
   return candidate_current
 end
