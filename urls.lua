@@ -1166,7 +1166,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   local current_settings_all = current_settings and current_settings["all"]
-  local current_settings_any_domain = current_settings and current_settings["any_domain"]
+  local current_settings_any_domain = true -- current_settings and current_settings["any_domain"]
   local same_domain = string.match(parenturl, "^(https?://[^/]+)") == string.match(url, "^(https?://[^/]+)")
 
   queue_services(url)
