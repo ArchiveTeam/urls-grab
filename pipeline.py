@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260112.03'
+VERSION = '20260113.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -373,6 +373,7 @@ class ZstdDict(object):
 
 
 def normalize_url(url):
+    url = url.split('#')[0]
     while True:
         temp = unquote(url).strip().lower()
         if temp == url:
@@ -386,7 +387,7 @@ def normalize_url(url):
     if ':' in url[2]:
         url[2] = url[2].split(':')[0]
     url = '/'.join(url)
-    return url.split('#')[0]
+    return url
 
 
 class WgetArgs(object):
