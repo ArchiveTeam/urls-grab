@@ -85,13 +85,13 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260116.01'
+VERSION = '20260123.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
 MULTI_ITEM_SIZE = 100
 #MAX_DUPES_LIST_SIZE = 10000
-DNS_SERVERS = ['9.9.9.10', '149.112.112.10' ,'2620:fe::10' ,'2620:fe::fe:10'] #Quad9
+DNS_SERVERS = [os.getenv('ATEAM_DNS_IPv4')]
 with open('user-agents.txt', 'r') as f:
     USER_AGENTS = [l.strip() for l in f]
 with open('static-filter-discovered.txt', 'r') as f:
@@ -407,7 +407,7 @@ class WgetArgs(object):
             '--host-lookups', 'dns',
             '--hosts-file', '/dev/null',
             '--resolvconf-file', 'resolv.conf',
-            '--dns-servers', ','.join(random.sample(DNS_SERVERS, k=4)),
+            '--dns-servers', ','.join(DNS_SERVERS),
             '--reject-reserved-subnets',
             '--content-on-error',
             '--lua-script', 'urls.lua',
@@ -603,4 +603,3 @@ pipeline = Pipeline(
         stats=ItemValue('stats')
     )
 )
-
