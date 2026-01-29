@@ -275,6 +275,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]*databasesets%.com/national%-company/id/[0-9]+$
 ^https?://[^/]*deepdyve%.com/.
 ^https?://[^/]*delaem%-kino%.ru/
+^https?://[^/]*dianasblueroses%.com/
 ^https?://[^/]*digital%-forum%.it/[^%?&]*[%?&]s=
 ^https?://[^/]*ebedzin%.pl/.
 ^https?://[^/]*eggenspieler%.net/EGGENSPIELER_NET[/_]
