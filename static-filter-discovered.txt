@@ -285,6 +285,9 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]*esug%.org/[^%?&]*[%?&]_s=
 ^https?://[^/]*expertini%.com/.
 ^https?://[^/]*facebook%.com/flx/warn/.
+^https?://[^/]*facebook%.com/sharer?%.php%?
+^https?://[^/]*facebook%.com/sharer?%?
+^https?://[^/]*facebook%.com/sharer?/sharer?%.php%?
 ^https?://[^/]*falk%-ross%.eu/.
 ^https?://[^/]*fb%.watch/login/
 ^https?://[^/]*feb%-web%.ru/
