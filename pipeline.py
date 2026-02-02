@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260202.03'
+VERSION = '20260202.04'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -491,21 +491,26 @@ class WgetArgs(object):
         filtered = lua.eval("""
             function(urls, patterns, sites)
                 local result = {}
-                local pattern_sites = {}
-                for _, site in ipairs(sites) do
-                    local new_pattern = "^https?://[^/]*" .. string.gsub(site, "([^0-9a-zA-Z])", "%%%1") .. "[/:]"
-                    pattern_sites[new_pattern] = site
-                    table.insert(patterns, new_pattern)
-                end
                 for i, url in ipairs(urls) do
+                    local url_site = string.match(url, "^https?://([^/:]+)")
                     local match = false
-                    for _, pattern in ipairs(patterns) do
-                        if string.match(url, pattern) then
-                            match = pattern
-                            break
+                    if url_site then
+                        url_site = url_site
+                        for _, site in pairs(sites) do
+                            if string.sub(url_site, -string.len(site)) == site then
+                                match = "site " .. site
+                            end
                         end
                     end
-                    result[i] = pattern_sites[match] or match
+                    if not match then
+                        for _, pattern in ipairs(patterns) do
+                            if string.match(url, pattern) then
+                                match = "pattern " .. pattern
+                                break
+                            end
+                        end
+                    end
+                    result[i] = match
                 end
                 return result
             end
@@ -517,7 +522,7 @@ class WgetArgs(object):
         total_added = 0
         for i, d in enumerate(wget_args_more):
             if len(d) == 4 and filtered[i+1]:
-                print('Filtering {} by pattern {}.'.format(d[3], filtered[i+1]))
+                print('Filtering {} by {}.'.format(d[3], filtered[i+1]))
                 #skipped_items.append(d[2].split('/', 2)[2])
             else:
                 if len(d) == 4:
