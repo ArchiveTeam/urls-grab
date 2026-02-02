@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260202.01'
+VERSION = '20260202.02'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -96,6 +96,8 @@ with open('user-agents.txt', 'r') as f:
     USER_AGENTS = [l.strip() for l in f]
 with open('static-filter-discovered.txt', 'r') as f:
     FILTER_PATTERNS = [l.strip() for l in f]
+with open('static-reject-sites.txt', 'r') as f:
+    REJECT_SITES = [l.strip() for l in f]
 EXTRACT_OUTLINKS = {}
 
 ###########################################################################
@@ -487,8 +489,14 @@ class WgetArgs(object):
 
         lua = lupa.LuaRuntime(unpack_returned_tuples=True)
         filtered = lua.eval("""
-            function(urls, patterns)
+            function(urls, patterns, sites)
                 local result = {}
+                local pattern_sites = {}
+                for _, site in ipairs(sites) do
+                    local new_pattern = "^https?://[^/]*" .. string.gsub(site, "([^0-9a-zA-Z])", "%%%1") .. "[/:]"
+                    pattern_sites[new_pattern] = site
+                    table.insert(patterns, new_pattern)
+                end
                 for i, url in ipairs(urls) do
                     local match = false
                     for _, pattern in ipairs(patterns) do
@@ -497,13 +505,14 @@ class WgetArgs(object):
                             break
                         end
                     end
-                    result[i] = match
+                    result[i] = pattern_sites[match] or match
                 end
                 return result
             end
         """)(
             lua.table_from([d[3] if len(d) == 4 else '' for d in wget_args_more]),
-            lua.table_from(FILTER_PATTERNS)
+            lua.table_from(FILTER_PATTERNS),
+            lua.table_from(REJECT_SITES)
         )
         total_added = 0
         for i, d in enumerate(wget_args_more):

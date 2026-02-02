@@ -602,58 +602,76 @@ for pattern in extract_from_domain_file:lines() do
 end
 extract_from_domain_file:close()
 
-local bloomfile = nil
-local bloomfilter = nil
+local BLOOMACCEPT = "accept"
+local BLOOMREJECT = "reject"
+local bloomfile = {}
+local bloomfilter = {}
 local bloomcache = {}
 
-load_bloomfilter = function()
-  local filename = 'data/bloomfilter.bin'
-  local exists = io.open(filename)
-  if not exists then
-    print("Creating bloom filter.")
-    local domains = io.open("static-extract-outlinks-domains.txt", "r")
-    local count = 0
-    for line in domains:lines() do
-      count = count + 1
-    end
-    local bfile = minibloom.make(filename, count, 1/10000000)
-    local bfilter = minibloom.bloom(bfile)
-    domains:seek("set")
-    for line in domains:lines() do
-      if string.len(line) > 0 then
-        minibloom.set(bfilter, line .. ".")
+load_bloomfilters = function()
+  for action, siteslist in pairs({
+    [BLOOMACCEPT] = "static-extract-outlinks-domains.txt",
+    [BLOOMREJECT] = "static-reject-sites.txt"
+  }) do
+    local filename = "data/bloomfilter_" .. action .. ".bin"
+    local exists = io.open(filename)
+    if not exists then
+      print("Creating bloom filter to " .. action .. " sites.")
+      local domains = io.open(siteslist, "r")
+      local count = 0
+      for line in domains:lines() do
+        count = count + 1
       end
+      local bfile = minibloom.make(filename, count, 1/100000000)
+      local bfilter = minibloom.bloom(bfile)
+      domains:seek("set")
+      for line in domains:lines() do
+        if string.len(line) > 0 and not string.match(line, "^#") then
+          minibloom.set(bfilter, line .. ".")
+        end
+      end
+      domains:close()
+      minibloom.close(bfile)
     end
-    domains:close()
-    minibloom.close(bfile)
+    bloomfile[action] = minibloom.open(filename)
+    bloomfilter[action] = minibloom.bloom(bloomfile[action])
+    bloomcache[action] = {}
   end
-  bloomfile = minibloom.open(filename)
-  bloomfilter = minibloom.bloom(bloomfile)
 end
 
-is_in_bloomfilter = function(s)
-  local cached = bloomcache[s]
+is_in_bloomfilter = function(action, s)
+  if not bloomfilter[action] then
+    load_bloomfilters()
+  end
+  local cached = bloomcache[action][s]
   if cached ~= nil then
     return cached
   end
-  if not bloomfilter then
-    load_bloomfilter()
-  end
-  if minibloom.get(bloomfilter, s) == 1 then
-    bloomcache[s] = true
+  if minibloom.get(bloomfilter[action], s) == 1 then
+    bloomcache[action][s] = true
   else
-    bloomcache[s] = false
+    bloomcache[action][s] = false
   end
-  return bloomcache[s]
+  return bloomcache[action][s]
 end
 
-site_in_bloomfilter = function(s)
+site_in_bloomfilter = function(action, s)
+  if not s then
+    return false
+  end
   local temp = string.match(s, "^https?://([^%.%-/]+%-[^%./]+)%.cdn%.ampproject%.org:?[0-9]*/")
   local domain = nil
   if temp then
     domain = string.gsub(temp, "%-", ".")
   else
-    domain = string.match(string.match(s, "^https?://([^/:]+)"), "^(.-)%.*$")
+    s = string.match(s, "^https?://([^/:]+)")
+    if not s then
+      return false
+    end
+    domain = string.match(s, "^(.-)%.*$")
+  end
+  if not domain then
+    return false
   end
   domain = domain .. "."
   local partial = ""
@@ -666,7 +684,7 @@ site_in_bloomfilter = function(s)
     end
     domain = a
     partial = b .. partial
-    local result = is_in_bloomfilter(partial)
+    local result = is_in_bloomfilter(action, partial)
     if result then
       if depth == 1 then
         partial = string.match(domain, "([^%.]+%.)$") .. partial
@@ -1425,8 +1443,8 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     end
   end
 
-  local parent_in_bloom = site_in_bloomfilter(parenturl)
-  local new_in_bloom = site_in_bloomfilter(url)
+  local parent_in_bloom = site_in_bloomfilter(BLOOMACCEPT, parenturl)
+  local new_in_bloom = site_in_bloomfilter(BLOOMACCEPT, url)
   if (parent_in_bloom or new_in_bloom)
     and parent_in_bloom ~= new_in_bloom then
     queue_url(url)
@@ -2297,12 +2315,18 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
           for url, context in pairs(urls_list) do
             local filtered = false
             local actual_url = custom_item_urls[url] or url
-            for _, pattern in pairs(filter_discovered) do
-              if string.match(actual_url, pattern) then
-                io.stdout:write("Skipping item " .. url .. " due to " .. pattern .. ".\n")
-                io.stdout:flush()
-                filtered = true
-                break
+            if site_in_bloomfilter(BLOOMREJECT, actual_url) then
+              io.stdout:write("Skipping item " .. url .. " due to bloom filter.\n")
+              io.stdout:flush()
+              filtered = true
+            else
+              for _, pattern in pairs(filter_discovered) do
+                if string.match(actual_url, pattern) then
+                  io.stdout:write("Skipping item " .. url .. " due to " .. pattern .. ".\n")
+                  io.stdout:flush()
+                  filtered = true
+                  break
+                end
               end
             end
             if not filtered then
@@ -2349,8 +2373,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
 end
 
 wget.callbacks.before_exit = function(exit_status, exit_status_string)
-  if bloomfile then
-    minibloom.close(bloomfile)
+  for _, bloom_f in pairs(bloomfile) do
+    minibloom.close(bloom_f)
   end
   if killgrab then
     return wget.exits.IO_FAIL
