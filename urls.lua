@@ -522,6 +522,7 @@ local urls_all = {}
 local custom_item_urls = {}
 local maybe_discourse = {}
 local discourse_items = {[""]={}}
+local discord_refresh = {[""]={}}
 
 local month_timestamp = os.date("%Y%m", timestamp)
 
@@ -1159,6 +1160,10 @@ queue_discordapp = function(url)
   if newurl then
     newurl = string.gsub(urlparse.unescape(newurl), "^([a-z]+)/", "%1://") .. urlparse.unescape(params)
     queue_url(newurl)
+  end
+  local attachment = string.match(url, "^https?://[cm][de][nd]i?a?%.discordapp%.[cn][oe][mt]/attachments/([0-9]+/[0-9]+/[a-zA-Z0-9_.-]+)")
+  if attachment then
+   discord_refresh[""][attachment] = current_url
   end
 end
 
@@ -2286,7 +2291,8 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["urls-sitemap-news-hu1y8xj3h0ildh1k"] = urls_sitemap_news,
     ["urls-news-6t9uc9xxz06gpt93"] = urls_news,
     ["discourse-inbox-kkrhbt6xax5ave98"] = discourse_items,
-    ["youtube-gov-stash-adxooz0xve21nudy"] = gov_youtube_items
+    ["youtube-gov-stash-adxooz0xve21nudy"] = gov_youtube_items,
+    ["discord-cdn-refresh-xsdmjfxfdhnp7936"] = discord_refresh
   }) do
     local project_name = string.match(key, "^(.+)%-")
     for shard, url_data in pairs(items_data) do
