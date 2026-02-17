@@ -460,6 +460,10 @@ local filter_pattern_sets = {
     },
     ["temp"]="^https?://[^/]+/temp/[0-9]+/",
     ["string"]="^https?://[^/]+/[0-9a-z]+$"
+  },{
+    ["bengal"]="bengal",
+    ["forensics"]="^https?://[^/]+/js/a9%-tq%-forensics%.min%.js$",
+    ["amazon"]="^https?://m%.media%-amazon%.com/"
   }},
   ["^https?://[^/]+/[a-z]+/[a-z0-9%.]+$"]={{
     ["games"]="^https?://[^/]+/games/[a-z0-9%.]+$",

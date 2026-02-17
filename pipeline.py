@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260202.04'
+VERSION = '20260217.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -482,7 +482,7 @@ class WgetArgs(object):
             if len(custom_item_data) > 0:
                 custom_items[normalize_url(url)] = custom_item_data
             item_urls.append(url)
-            if validators.url('/'.join(url.split('/', 3)[:3])):
+            if validators.url('/'.join(url.replace('_', '-').split('/', 3)[:3])):
                 wget_args_more[-1].append(url)
             else:
                 skipped_items.append(item_name)
