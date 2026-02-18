@@ -1581,7 +1581,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   local function check(url, headers)
     local url = string.match(url, "^([^#]+)")
     url = string.gsub(url, "&amp;", "&")
-    queue_url(url)
+    if not string.match(url, "^https?://[^/]-%.%.") then
+      queue_url(url)
+    end
   end
 
   local function checknewurl(newurl, headers)
