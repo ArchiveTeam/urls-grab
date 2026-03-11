@@ -1160,7 +1160,12 @@ queue_discordapp = function(url)
   if path then
     queue_url("https://cdn.discordapp.com" .. path)
   end
-  local params, newurl = string.match(url, "^https?://images%-ext%-?[0-9]*%.discordapp%.net/external/[^/]+/([%%;]?[^/]-)/?([hf]t[tp][^%?]+)")
+  local subdomain, params, newurl = string.match(url, "^https?://([^%.]+)%.discordapp%.net/external/[^/]+/([%%;]?[^/]-)/?([hf]t[tp][^%?]+)")
+  if subdomain
+    and not string.match(subdomain, "^images%-ext%-?[0-9]*$")
+    and subdomain ~= "media" then
+    newurl = nil
+  end
   if newurl then
     newurl = string.gsub(urlparse.unescape(newurl), "^([a-z]+)/", "%1://") .. urlparse.unescape(params)
     queue_url(newurl)
