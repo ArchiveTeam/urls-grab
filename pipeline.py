@@ -70,7 +70,7 @@ WGET_AT = find_executable(
     ),
     [
         './wget-at',
-        '/home/warrior/data/wget-at'
+        '/home/warrior/data/wget-at-nss'
     ]
 )
 
@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260311.01'
+VERSION = '20260321.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -404,7 +404,7 @@ class WgetArgs(object):
         print('Using global timeout', command[1])
 
         wget_args = command + [
-            '-U', random.choice(USER_AGENTS),
+            #'-U', random.choice(USER_AGENTS),
             '-v',
             '--host-lookups', 'dns',
             '--hosts-file', '/dev/null',
@@ -415,6 +415,7 @@ class WgetArgs(object):
             '--lua-script', 'urls.lua',
             '-o', ItemInterpolation('%(item_dir)s/wget.log'),
             #'--no-check-certificate',
+            '--impersonate', 'firefox148-h1',
             '--output-document', ItemInterpolation('%(item_dir)s/wget.tmp'),
             '--truncate-output',
             '-e', 'robots=off',
@@ -434,15 +435,15 @@ class WgetArgs(object):
             '--warc-dedup-url-agnostic',
             '--warc-compression-use-zstd',
             '--warc-zstd-dict-no-include',
+            '--header', 'Accept-Encoding: identity',
             #'--warc-tempdir', ItemInterpolation('%(item_dir)s'),
-            '--header', 'Connection: keep-alive',
-            '--header', 'Accept-Language: en-US;q=0.9, en;q=0.8'
+            #'--header', 'Connection: keep-alive',
+            #'--header', 'Accept-Language: en-US;q=0.9, en;q=0.8'
         ]
 
         wget_args.extend([
             '--warc-zstd-dict', ItemInterpolation('%(item_dir)s/zstdict'),
         ])
-
         item['item_name'] = '\0'.join([
             item_name for item_name in item['item_name'].split('\0')
             if (item_name.startswith('custom:') and '&url=' in item_name)
