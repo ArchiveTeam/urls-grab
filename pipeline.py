@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260321.01'
+VERSION = '20260323.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -169,7 +169,8 @@ class CheckIP(SimpleTask):
                 assert len(returned.stdout) == 0, 'Bad stdout on {}, got {}.'.format(url, repr(returned.stdout))
                 assert (
                     b'failed: No IPv4/IPv6 addresses for host.\n'
-                    b'wget-at: unable to resolve host address'
+                    + bytes(WGET_AT.split('/')[-1], 'utf8')
+                    + b': unable to resolve host address'
                 ) in returned.stderr, 'Bad stderr on {}, got {}.'.format(url, repr(returned.stderr))
                 assert returned.returncode == 4, 'Invalid return code {} on {}.'.format(returned.returncode, url)
 
