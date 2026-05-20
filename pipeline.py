@@ -85,7 +85,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260511.01'
+VERSION = '20260520.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -558,7 +558,7 @@ class WgetArgs(object):
 project = Project(
     title = 'URLs',
     project_html = '''
-    <img class="project-logo" alt="logo" src="https://archiveteam.org/images/thumb/f/f3/Archive_team.png/235px-Archive_team.png" height="50px"/>
+    <img class="project-logo" alt="logo" src="https://wiki.archiveteam.org/images/thumb/7/77/ArchiveTeamWarriorLogo.png/235px-ArchiveTeamWarriorLogo.png" height="50px"/>
     <h2>Archiving sets of discovered outlinks. &middot; <a href="https://tracker.archiveteam.org/urls/">Leaderboard</a></span></h2>
     '''
 )
