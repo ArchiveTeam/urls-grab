@@ -202,6 +202,11 @@ local filter_pattern_sets = {
     --["sitemaphtml"]="^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/sitemap%.html$",
     --["announcehtml"]="^https?://[a-z0-9]+%.[^%./]+%.[a-z]+/announce%.html$",
     --["number"]="^https?://[a-z0-9]+%./"
+  },{
+    ["numbered-html"]="^https?://[0-9a-z]+%.[^%./]+%.[a-z%-]+/[0-9]+/[0-9]+%.html$",
+    ["list-content-html"]="^https?://[0-9a-z]+%.[^%./]+%.[a-z%-]+/list[0-9]+/content[0-9]+_[0-9]+%.html$",
+    ["list-index-html"]="^https?://[0-9a-z]+%.[^%./]+%.[a-z%-]+/list[0-9]+/[0-9]+_[0-9]+%.html$",
+    ["list-dash-html"]="^https?://[0-9a-z]+%.[^%./]+%.[a-z%-]+/list%-[0-9]+/[0-9]+%.html$"
   }},
   -- news/show spam
   ["^https?://[^/]+%.[a-z%-]+/"]={{
@@ -1210,7 +1215,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   end
 
   local current_settings_all = current_settings and current_settings["all"]
-  local current_settings_any_domain = true -- current_settings and current_settings["any_domain"]
+  local current_settings_any_domain = current_settings and current_settings["any_domain"]
   local same_domain = string.match(parenturl, "^(https?://[^/]+)") == string.match(url, "^(https?://[^/]+)")
 
   queue_services(url)
@@ -1252,6 +1257,9 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
     and not skip_parent_urls_checked[url] then
     for parenturl_pattern, pattern_tables in pairs(filter_pattern_sets) do
       if string.match(parenturl, parenturl_pattern) then
+        if type(pattern_tables[1]) == "string" then
+          pattern_tables = filter_pattern_sets[pattern_tables[1]]
+        end
         for num, pattern_table in pairs(pattern_tables) do
           local found_any = false
           local check_string = parenturl_pattern .. tostring(num) .. parenturl
