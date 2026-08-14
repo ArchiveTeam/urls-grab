@@ -240,6 +240,7 @@ local filter_pattern_sets = {
       "^https?://[^/]+%.[a-z%-]+/template/xiaz[ia][ai]",
       "^https?://[^/]+%.[a-z%-]+/template/zzcen",
       "^https?://[^/]+%.[a-z%-]+/template/zouwen",
+      "^https?://[^/]+%.[a-z%-]+/template/zhizhu",
       "^https?://[^/]+%.[a-z%-]+/template/Boutique/Dandy",
       "^https?://[^/]+%.[a-z%-]+/template/xiaoshuo",
       "^https?://[^/]+%.[a-z%-]+/template/stock/[0-9a-zA-Z%-_]*www%.",
