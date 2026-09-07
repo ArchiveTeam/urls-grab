@@ -307,6 +307,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]*permatabank%.com/karir/
 ^https?://[^/]*petscarepro%.com/
 ^https?://[^/]*poop%-bags%.de/.+[sS]ans[^%./]+%.[a-z]+/.+[sS]ans
+^https?://[^/]*porevo%.cc/
 ^https?://[^/]*prejezdy%.info/
 ^https?://[^/]*railwayman%.ru/index%.php%?s=
 ^https?://[^/]*redd%.it/.*%%5Cu
