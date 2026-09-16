@@ -545942,6 +545942,7 @@ scguard.com
 scguard.joint.afpims.mil
 scguard.ng.mil
 sch-foot.com
+sch.ac
 sch.ac.kr
 sch.ae
 sch.bd
@@ -547069,6 +547070,7 @@ school.gov.ua
 school.hsd4.org
 school.hyogo-u.ac.jp
 school.ikeda.osaka.jp
+school.in
 school.ioffe.ru
 school.lexingtonma.gov
 school.miyoshi.hiroshima.jp

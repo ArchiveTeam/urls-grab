@@ -217,8 +217,8 @@ def dedup_and_sort(filename: str):
 if __name__ == '__main__':
     print('Updating TLDs.')
     update_tlds()
-    print('Updating user-agents.')
-    update_uas()
+    #print('Updating user-agents.')
+    #update_uas()
     print('Updating outlinks list.')
     update_outlinks_domains()
     print('Processing filter patterns.')
