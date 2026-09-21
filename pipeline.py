@@ -88,7 +88,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260921.01'
+VERSION = '20260921.02'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -242,7 +242,7 @@ class UpdateCertificates(SimpleTask):
 
     def process(self, item):
         with LOCK:
-            filename = os.path.abspath(os.path.join(item['data_dir'], 'ca-certificates.crt'))
+            filename = os.path.join(item['data_dir'].rsplit('/', 1)[0], 'ca-certificates.crt')
             if time.time() - self._last_update >= 3600:
                 data = b''
                 with open('/etc/ssl/certs/ca-certificates.crt', 'rb') as f:
@@ -456,7 +456,7 @@ class WgetArgs(object):
             '--lua-script', 'urls.lua',
             '-o', ItemInterpolation('%(item_dir)s/wget.log'),
             #'--no-check-certificate',
-            '--ca-certificate', ItemInterpolation('%(data_dir)s/ca-certificates.crt'),
+            '--ca-certificate', os.path.join(item['data_dir'].rsplit('/', 1)[0], 'ca-certificates.crt'),
             '--impersonate', 'firefox148-h1',
             '--output-document', ItemInterpolation('%(item_dir)s/wget.tmp'),
             '--truncate-output',
