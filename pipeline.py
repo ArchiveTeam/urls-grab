@@ -3,12 +3,14 @@ import datetime
 from distutils.version import StrictVersion
 import functools
 import hashlib
+import io
 import json
 import os
 import random
 import re
 import shutil
 import socket
+import ssl
 import subprocess
 import sys
 import threading
@@ -16,6 +18,7 @@ import time
 import shlex
 import string
 import sys
+import zipfile
 
 if sys.version_info[0] < 3:
     from urllib import unquote
@@ -85,7 +88,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260916.01'
+VERSION = '20260921.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -230,6 +233,46 @@ class CheckRequirements(SimpleTask):
             assert shutil.which('pdftohtml') is not None
             assert shutil.which('gzip') is not None
             self._checked = True
+
+
+class UpdateCertificates(SimpleTask):
+    def __init__(self):
+        SimpleTask.__init__(self, 'UpdateCertificates')
+        self._last_update = 0
+
+    def process(self, item):
+        with LOCK:
+            filename = os.path.abspath(os.path.join(item['data_dir'], 'ca-certificates.crt'))
+            if time.time() - self._last_update >= 3600:
+                data = b''
+                with open('/etc/ssl/certs/ca-certificates.crt', 'rb') as f:
+                    data += f.read() + b'\n'
+                item.log_output('Added {} local CA certificate roots.'.format(data.count(b'-----BEGIN CERTIFICATE-----')))
+                response = requests.get(
+                   'https://ccadb.my.salesforce-sites.com/mozilla/IncludedRootsPEMTxt?TrustBitsInclude=Websites',
+                    timeout=60
+                )
+                response.raise_for_status()
+                data += response.content.rstrip() + b'\n'
+                item.log_output('Added {} Mozilla CA certificate roots'.format(response.content.count(b'-----BEGIN CERTIFICATE-----')))
+                response = requests.get(
+                    'https://firefox-settings-attachments.cdn.mozilla.net/bundles/security-state--intermediates.zip',
+                    timeout=60
+                )
+                response.raise_for_status()
+                count = data.count(b'-----BEGIN CERTIFICATE-----')
+                with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+                    for name in archive.namelist():
+                        if not name.endswith('.meta.json'):
+                            data += archive.read(name).rstrip() + b'\n'
+                item.log_output('Added {} Mozilla intermediate CA certificates.'.format(data.count(b'-----BEGIN CERTIFICATE-----')-count))
+                ssl.SSLContext().load_verify_locations(cadata=data.decode('ascii'))
+                path = filename + '.tmp'
+                with open(path, 'wb') as f:
+                    f.write(data)
+                os.replace(path, filename)
+                item.log_output('Got a total {} CA certificates.'.format(data.count(b'-----BEGIN CERTIFICATE-----')))
+                self._last_update = time.time()
 
 
 class PrepareDirectories(SimpleTask):
@@ -413,6 +456,7 @@ class WgetArgs(object):
             '--lua-script', 'urls.lua',
             '-o', ItemInterpolation('%(item_dir)s/wget.log'),
             #'--no-check-certificate',
+            '--ca-certificate', ItemInterpolation('%(data_dir)s/ca-certificates.crt'),
             '--impersonate', 'firefox148-h1',
             '--output-document', ItemInterpolation('%(item_dir)s/wget.tmp'),
             '--truncate-output',
@@ -453,7 +497,6 @@ class WgetArgs(object):
         item_urls = []
         skipped_items = []
         custom_items = {}
-
 
         wget_args_more = []
 
@@ -563,6 +606,7 @@ project = Project(
 pipeline = Pipeline(
     CheckIP(),
     CheckRequirements(),
+    UpdateCertificates(),
     GetItemFromTracker('https://{}/{}/multi={}/'
         .format(TRACKER_HOST, TRACKER_ID, MULTI_ITEM_SIZE),
         downloader, VERSION),
