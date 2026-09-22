@@ -88,7 +88,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260921.02'
+VERSION = '20260922.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -267,6 +267,8 @@ class UpdateCertificates(SimpleTask):
                             data += archive.read(name).rstrip() + b'\n'
                 item.log_output('Added {} Mozilla intermediate CA certificates.'.format(data.count(b'-----BEGIN CERTIFICATE-----')-count))
                 ssl.SSLContext().load_verify_locations(cadata=data.decode('ascii'))
+                certificates = re.findall(b'-----BEGIN CERTIFICATE-----[^-]+-----END CERTIFICATE-----', data)
+                data = b'\n'.join(set(certificates)) + b'\n'
                 path = filename + '.tmp'
                 with open(path, 'wb') as f:
                     f.write(data)
@@ -499,7 +501,7 @@ class WgetArgs(object):
         custom_items = {}
 
         wget_args_more = []
-
+s
         for item_name in item['item_name'].split('\0'):
             wget_args_more.append([])
             wget_args_more[-1].extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
