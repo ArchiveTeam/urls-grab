@@ -88,7 +88,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20260922.02'
+VERSION = '20260924.01'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -584,7 +584,10 @@ class WgetArgs(object):
             return realize(['sleep', '0'], item)
 
         if 'bind_address' in globals():
-            wget_args.extend(['--bind-address', globals()['bind_address']])
+            wget_args.extend([
+                '--bind-address', globals()['bind_address'],
+                '--bind-dns-address', globals()['bind_address']
+            ])
             print('')
             print('*** Wget will bind address at {0} ***'.format(
                 globals()['bind_address']))
