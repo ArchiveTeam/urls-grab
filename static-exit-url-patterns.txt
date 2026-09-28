@@ -24,6 +24,8 @@
 [%?&;][pP][hH][pP][sS][eE][sS][sS][iI][dD]=
 [%?&;]wtd=
 [%?&;]n?once=
+[%?&;]_wpnonce=
+[%?&;]_?csrf_?token=
 [%?&;][nN][oO][nN][cC][eE][_%-]?[tT][oO][kK][eE][nN]=
 [%?&;]_?ra?nd=
 [%?&;][sS]ession[iI][dD]=

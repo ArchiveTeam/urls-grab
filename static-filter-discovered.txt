@@ -96,6 +96,8 @@ UniqueDomainsSessionIdSharingApi
 [%?&;]force_sid=
 [%?&]_cid=.+&_cid=
 [%?&]action=session_preservation
+[%?&]add%-to%-cart=
+[%?&]add_to_wishlist=
 [%?&]go=https?://[^%?&]+[%?&]go=https?://
 [%?&]product_type_[0-9]+_zone_pt=.+&product_type_[0-9]+_zone_pt=
 [%?&]state_uuid=
@@ -374,7 +376,6 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+%.doubleclick%.net/.
 ^https?://[^/]+%.edarnuid%.imrworldwide%.com/
 ^https?://[^/]+%.es/conecta;
-^https?://[^/]+%.ibuybarbecues%.com/checkout/cart/add/
 ^https?://[^/]+%.ibuybarbecues%.com/wishlist/index/add/
 ^https?://[^/]+%.icm%.edu%.pl/.*search/article%.action
 ^https?://[^/]+%.ipshu%.com/
@@ -409,6 +410,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+/bangkokviews/?[a-z]+%.php%?
 ^https?://[^/]+/bangkokviews[a-z%._%-]*%.aspx?%?
 ^https?://[^/]+/checkout/[0-9]+/
+^https?://[^/]+/checkout/cart/add/
 ^https?://[^/]+/checkouts/cn/
 ^https?://[^/]+/idc_[0-9]+_index%.php
 ^https?://[^/]+/index%.php%?[0-9a-f]+=[0-9a-f]+$
@@ -489,7 +491,6 @@ UniqueDomainsSessionIdSharingApi
 ^https?://hotels%.ticino2025%.com/web/home/
 ^https?://hr%.pcl%.ac%.cn/wt/config/logo!img%?
 ^https?://iastarget%.com/loksabha%-videos/
-^https?://ibuybarbecues%.com/checkout/cart/add/
 ^https?://ibuybarbecues%.com/wishlist/index/add/
 ^https?://icon[eo]?s8%.[^/]+/.*%-%-fran%%C3%%A7ais%-%-fran%%C3%%A7ais%-%-
 ^https?://id%.atlassian%.com/login%?
@@ -511,6 +512,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://kfz%.[^/]+/wkz/controller;
 ^https?://kinhtethuongmai%.edu%.vn/index%.php%?second=cronjobs&p=[0-9a-zA-Z]+$
 ^https?://kuechenplaner%.[^/]+/cloud/
+^https?://l%.cdn%-fileserver%.com/bping%.php%?
 ^https?://lineit%.line%.me/.
 ^https?://lslaoi%.legalserver%.org/modules/matter/extern_intake%.php%?
 ^https?://makeitmoveitfx%.com/[^w][^?]*/%?ver=[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$
@@ -523,6 +525,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://minouchet%.com/[a-zA-Z0-9]
 ^https?://mma%.ft%.com
 ^https?://mob%.stc%.com%.sa/primary/
+^https?://mobtop%.com/[0-9]+%.gif%?
 ^https?://monc%.tlssite%.com/WebClientPrintAPI%.ashx%?.
 ^https?://monthsthingcase%.de/en/
 ^https?://muntha%.org/cgi%-bin/%?test=
