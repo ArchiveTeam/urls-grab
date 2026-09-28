@@ -993,7 +993,15 @@ remove_param = function(url, param_pattern)
   local newurl = url
   repeat
     url = newurl
-    newurl = string.gsub(url, "([%?&;])" .. param_pattern .. "=[^%?&;]*[%?&;]?", "%1")
+    newurl = string.gsub(
+      url, "([%?&;])" .. param_pattern .. "=[^%?&;]*([%?&;]?)",
+      function(a, b)
+        if a == ";" and b == "?" then
+          return b
+        end
+        return a
+      end
+    )
   until newurl == url
   return string.match(newurl, "^(.-)[%?&;]?$")
 end
