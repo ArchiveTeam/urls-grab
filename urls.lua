@@ -341,6 +341,15 @@ local filter_pattern_sets = {
   },{
     ["company-en"]="^https?://[^/]+%.[^%./]+%.[a-z]+/template/company/en[0-9]+/static/",
     ["uploads"]="^https?://[^/]+%.[^%./]+%.[a-z]+/uploads/images/[0-9]+%.jpg$"
+  },{
+    ["show"]="^https?://[^/]+/show/[0-9]+%.html$",
+    ["list"]="^https?://[^/]+/list/[0-9]+/$"
+  },{
+    ["news"]={
+      "^https?://[^/]+/news/[0-9]+%.html$",
+      "^https?://[^/]+/html/[0-9]+/[0-9]+%.html$"
+    },
+    ["newslist"]="^https?://[^/]+/newslist/[0-9]+/$"
   }},
   ["^http://[^/]+%.[^%./]+%.[a-z]+/"]={{
     ["numbers"]="^http://[0-9][0-9][0-9][0-9][0-9][0-9]%.[^%.]+%.[^%./]+/",
