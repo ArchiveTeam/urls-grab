@@ -384,6 +384,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+%.pl/.+:image/.+:image/
 ^https?://[^/]+%.plonter%.co%.il/.*[?&]cart=
 ^https?://[^/]+%.proxy%.guilin%.gov%.cn/
+^https?://[^/]+%.saljuu4dd%.[cn][oe][mt]/
 ^https?://[^/]+%.search%.yahoo%.com/_bv/v%.gif%?
 ^https?://[^/]+%.skinlookingyounger%.com/
 ^https?://[^/]+%.translate%.goog/
@@ -460,6 +461,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://consents%.prismamedia%.com/[^%?]+%?authId=
 ^https?://cse%.google%.com/cse%?cx=83d95a11b393b4737&
 ^https?://ctn[^/]*library%.org/.*dbtwpub%.dll%?
+^https?://cuartopoderdiario%.com%.ar/[^/%?]+/[^%?]+/[0-9a-z_%-]+%-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.?[a-z]*$
 ^https?://dealer%.navigation%.com/viewdata/
 ^https?://deltadevteam%.com/%?ver=
 ^https?://designellen%.be/image%.php%?E=[0-9a-zA-Z]-BAQHBvcnRmb2xpby9zbGlkZXIvUGhvdG9ncmFwaGljZGVzaWduZWxsZW4[0-9a-zA-Z=]-$
@@ -541,6 +543,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://os%.platformstud%.io/chat/[0-9a-f]+$
 ^https?://participant%.empower%-retirement%.com/.*no_?[oO]p%.?d?o?%?param=[0-9%.]+
 ^https?://plus%.google%.com/share%?
+^https?://portal%.webdepozit%.sk/webapp%-portal/eborn%-file;jsessionid=[^/;%?#]+%?id=[0-9]+$
 ^https?://portmillennium%.pl/[^%?]*%?d=[0-9]
 ^https?://printo%.it/accept%-cookies/
 ^https?://profs%.tvu%.ac%.ir/fa/teacher_db/id/id=0/token=[0-9a-z]+$
@@ -551,6 +554,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://rlv%.zcache%.[^/]+/svc/view
 ^https?://s2305%.[^/]+/handler%.php%?code=a?p?p?%-?ads%.txt&domain=
 ^https?://s3%.amazonaws%.com/files%.enjin%.com/
+^https?://saljuu4dd%.[cn][oe][mt]/
 ^https?://sas%.bpsecure%.com/[sS]as/.*[%?&]token=
 ^https?://saunamo%.fr/[a-z]+/cn/
 ^https?://sb%.scorecardresearch%.com/.
@@ -634,6 +638,8 @@ UniqueDomainsSessionIdSharingApi
 ^https?://www%.tecnm%.mx/dir_escolares/
 ^https?://www%.twitter%.com/intent/tweet[/%?]
 ^https?://www%.viralcovert%.com/%?arsae=
+^https?://www%.yanginguvenlik%.tr/ads/click%?ads=
+^https?://www%.yanginguvenlik%.tr/frontend/tema3/assets/[^%?]+%?v=MC4[0-9a-zA-Z%+/=%%]+$
 ^https?://x%.com/%?logout=
 ^https?://x%.com/home%?status=
 ^https?://x%.com/intent/tweet[/%?]
