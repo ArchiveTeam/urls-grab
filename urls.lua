@@ -23,7 +23,7 @@ local min_dedup_mb = 5
 local timestamp = nil
 
 local current_file = nil
-local current_file_html = nil
+local current_file_srcset_urls = nil
 local current_file_url = nil
 
 if urlparse == nil or http == nil or html_entities == nil then
@@ -114,6 +114,7 @@ local current_context = nil
 local bad_urls = {}
 local queued_urls = {[""]={}}
 local queued_custom_urls = {[""]={}}
+local queue_url_cache = {}
 local skip_parent_urls_check = {}
 local skip_parent_urls_checked = {}
 local skip_parent_urls = {}
@@ -786,15 +787,10 @@ find_path_loop = function(url, max_repetitions)
 end
 
 percent_encode = function(url)
-  temp = ""
-  for c in string.gmatch(url, "(.)") do
-    local b = string.byte(c)
-    if b < 32 or b > 126 then
-      c = string.format("%%%02X", b)
-    end
-    temp = temp .. c
-  end
-  return temp
+  local encoded_url = string.gsub(url, "([^\032-\126])", function(c)
+    return string.format("%%%02X", string.byte(c))
+  end)
+  return encoded_url
 end
 
 sorted_pairs = function(t)
@@ -856,6 +852,10 @@ queue_url = function(url, withcustom)
   end
   if not withcustom and current_settings and current_settings["deep_extract"] then
     withcustom = true
+  end
+  local cache_key = withcustom or false
+  if queue_url_cache[cache_key] and queue_url_cache[cache_key][url] then
+    return nil
   end
   local origurl = url
   --[[if string.match(url, "^http://")
@@ -962,6 +962,10 @@ queue_url = function(url, withcustom)
 --print("queuing", url)
     queue_with_context(target_project[shard], url)
   end
+  if not queue_url_cache[cache_key] then
+    queue_url_cache[cache_key] = {}
+  end
+  queue_url_cache[cache_key][origurl] = true
 end
 
 queue_monthly_url = function(url, comment)
@@ -1385,15 +1389,19 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
       string.match(url, "https?://[a-z]+%.[^%.]+%.[a-z]+/[a-z]+$")
       or string.match(url, "https?://[a-z]+%.[^%.]+%.[a-z]+/en/[a-z]+$")
     ) then
-    if current_file_html == nil then
-      current_file_html = read_file(current_file)
-    end
-    for srcset in string.gmatch(current_file_html, 'srcset="([^"]+)"') do
-      for srcset_url in string.gmatch(srcset, "([^,]+)") do
-        if string.match(url, "([a-z]+)$") == string.match(srcset_url, "^%s*([a-z]+)%s[^%s].-%s[0-9]+w$") then
-          return false
+    if current_file_srcset_urls == nil then
+      current_file_srcset_urls = {}
+      for srcset in string.gmatch(read_file(current_file), "srcset=\"([^\"]+)\"") do
+        for srcset_url in string.gmatch(srcset, "([^,]+)") do
+          srcset_url = string.match(srcset_url, "^%s*([a-z]+)%s[^%s].-%s[0-9]+w$")
+          if srcset_url then
+            current_file_srcset_urls[srcset_url] = true
+          end
         end
       end
+    end
+    if current_file_srcset_urls[string.match(url, "([a-z]+)$")] then
+      return false
     end
   end
 
@@ -2008,6 +2016,7 @@ end
 set_current_url = function(url)
   candidate_current = normalize_url(url)
   if candidate_current ~= current_url and urls[candidate_current] then
+    queue_url_cache = {}
     current_url = candidate_current
     current_settings = urls_settings[candidate_current]
     current_context = nil
@@ -2027,7 +2036,7 @@ end
 wget.callbacks.write_to_warc = function(url, http_stat)
   current_file = http_stat["local_file"]
   current_file_url = url["url"]
-  current_file_html = nil
+  current_file_srcset_urls = nil
   set_current_url(url["url"])
   if current_settings and not current_settings["random"] then
     queue_url(url["url"])
