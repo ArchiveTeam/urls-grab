@@ -88,7 +88,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20261012.02'
+VERSION = '20261012.03'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -539,9 +539,10 @@ class WgetArgs(object):
                     local url_site = string.match(url, "^https?://([^/:]+)")
                     local match = false
                     if url_site then
-                        url_site = url_site
+                        url_site = string.lower(string.match(url_site, "^(.-)%.*$"))
                         for _, site in pairs(sites) do
-                            if string.sub(url_site, -string.len(site)) == site then
+                            if url_site == site
+                              or string.sub(url_site, -string.len(site)-1) == "." .. site then
                                 match = "site " .. site
                             end
                         end

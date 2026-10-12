@@ -693,7 +693,7 @@ site_in_bloomfilter = function(action, s)
   if not domain then
     return false
   end
-  domain = domain .. "."
+  domain = string.lower(domain) .. "."
   local partial = ""
   local depth = 0
   while string.len(domain) > 0 do
