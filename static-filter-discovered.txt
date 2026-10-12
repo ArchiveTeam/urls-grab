@@ -549,6 +549,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://twitter%.com/home%?status=
 ^https?://twitter%.com/intent/tweet[/%?]
 ^https?://twitter%.com/share%?
+^https?://ub%.hsu%-hh%.de/DB=1/
 ^https?://univis%.univie%.ac%.at/ausschreibungstellensuche/
 ^https?://up%.khk%.cz/upd/_mapy/upd_akt%?
 ^https?://up%.kr%-kralovehradecky%.cz/upd/_mapy/upd_akt%?
