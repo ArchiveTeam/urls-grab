@@ -1735,6 +1735,12 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
             table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z]+/[^%s<>#\"'\\`{}%)%]]+)")
             table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z:]+)")
             table.insert(url_patterns, "([a-zA-Z0-9%-%.%z]+%.[a-zA-Z0-9%-%.%z:]+/[^%s<>#\"'\\`{}%)%]]+)")
+            if string.match(temp3, "[\128-\255]") then
+              table.insert(url_patterns, "([a-zA-Z0-9%-%.%z\128-\255]+%.[a-zA-Z0-9%-%.%z\128-\255]+)")
+              table.insert(url_patterns, "([a-zA-Z0-9%-%.%z\128-\255]+%.[a-zA-Z0-9%-%.%z\128-\255]+/[^%s<>#\"'\\`{}%)%]]+)")
+              table.insert(url_patterns, "([a-zA-Z0-9%-%.%z\128-\255]+%.[a-zA-Z0-9%-%.%z\128-\255:]+)")
+              table.insert(url_patterns, "([a-zA-Z0-9%-%.%z\128-\255]+%.[a-zA-Z0-9%-%.%z\128-\255:]+/[^%s<>#\"'\\`{}%)%]]+)")
+            end
           end
           for _, pattern in pairs(url_patterns) do
             for raw_newurl in string.gmatch(temp3, pattern) do
@@ -1764,20 +1770,23 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
                   newurl = string.lower(a) .. b
                   check(newurl)
                   check(html_entities.decode(newurl))
-                elseif string.match(newurl, "^[a-zA-Z0-9]") then
+                elseif string.match(newurl, "^[a-zA-Z0-9\128-\255]") then
                   if not string.find(newurl, "/") then
                     newurl = newurl .. "/"
                   end
                   local a, b = string.match(newurl, "^([^/]+)(/.*)$")
-                  newurl = string.lower(a) .. b
-                  local tld = string.match(newurl, "^[^/]+%.([a-z]+)[:/]")
-                  if not tld then
-                    tld = string.match(newurl, "^[^/]+%.(xn%-%-[a-z0-9]+)[:/]")
+                  local host, port = string.match(string.lower(a), "^([^:]+)(.*)$")
+                  if string.match(host, "[\128-\255]") then
+                    host = idn2.lookup(host)
                   end
-                  --print(newurl, tld, tlds[tld])
-                  if tld and tlds[tld] then
-                    check("http://" .. newurl)
-                    check("https://" .. newurl)
+                  if host then
+                    newurl = host .. port .. b
+                    local tld = string.match(newurl, "^[^/]+%.([a-z0-9%-]+)[:/]")
+                    --print(newurl, tld, tlds[tld])
+                    if tld and tlds[tld] then
+                      check("http://" .. newurl)
+                      check("https://" .. newurl)
+                    end
                   end
                 end
               end
