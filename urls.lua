@@ -2218,8 +2218,14 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       or string.match(url["url"], "^https?://(.+)")
     )
     if downloaded[newloc]
-      or string.match(newloc, "^magnet:") then
+      or string.match(newloc, "^magnet:")
+      or site_in_bloomfilter(BLOOMREJECT, newloc) then
       return wget.actions.EXIT
+    end
+    for _, pattern in pairs(filter_discovered) do
+      if string.match(newloc, pattern) then
+        return wget.actions.EXIT
+      end
     end
     local should_continue = false
     for _, pattern in pairs(nothing_on_3xx) do
