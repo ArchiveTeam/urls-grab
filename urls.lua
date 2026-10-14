@@ -1019,6 +1019,25 @@ remove_param = function(url, param_pattern)
   return string.match(newurl, "^(.-)[%?&;]?$")
 end
 
+queue_rewritten_urls = function(url)
+  if not url then
+    return nil
+  end
+  for replacement, patterns in pairs({
+    ["https://discord.com/api/v9/invites/%1"] = {
+      "^https?://discord%.gg/([^/%?#]+).*$",
+      "^https?://discord%.com/invite/([^/%?#]+).*$"
+    }
+  }) do
+    for _, pattern in pairs(patterns) do
+      local newurl = string.gsub(url, pattern, replacement)
+      if newurl ~= url then
+        queue_url(newurl)
+      end
+    end
+  end
+end
+
 queue_new_urls = function(url, withcustom)
   if not url then
     return nil
@@ -1240,6 +1259,7 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   local current_settings_any_domain = current_settings and current_settings["any_domain"]
   local same_domain = string.match(parenturl, "^(https?://[^/]+)") == string.match(url, "^(https?://[^/]+)")
 
+  queue_rewritten_urls(url)
   queue_services(url)
 
   if string.match(parenturl, "^https?://[^/]+%.gov%.?[a-z0-9%-]*/")
@@ -1611,6 +1631,7 @@ end
 wget.callbacks.get_urls = function(file, url, is_css, iri)
   local html = nil
 
+  queue_rewritten_urls(url)
   queue_services(url)
 
   if url then
