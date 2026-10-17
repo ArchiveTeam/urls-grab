@@ -3,6 +3,7 @@ local http = require("socket.http")
 local idn2 = require("idn2")
 local html_entities = require("htmlEntities")
 local cjson = require("cjson")
+local cjson_safe = require("cjson.safe")
 local minibloom = require("minibloom")
 
 local item_dir = os.getenv("item_dir")
@@ -850,6 +851,7 @@ queue_url = function(url, withcustom)
   if not url then
     return nil
   end
+  url = string.gsub(url, "^([hH][tT][tT][pP][sS]?:)", string.lower)
   if not withcustom and current_settings and current_settings["deep_extract"] then
     withcustom = true
   end
@@ -1065,23 +1067,67 @@ queue_new_urls = function(url, withcustom)
       queue_url(newurl, withcustom)
     end
   end
-  --[[for newurl in string.gmatch(url, "(https?%%3[aA]%%2[fF][^%?&;]+)") do
-    newurl = urlparse.unescape(newurl)
-    queue_url(newurl)
+  local candidates = {}
+  local value, rest = string.match(url, "[%?&]url=([^&#]+)(.*)")
+  while value do
+    for _, newurl in pairs({
+      value,
+      string.match(value .. rest, "^([^#]+)")
+    }) do
+      local decoded_url = urlparse.unescape(newurl)
+      if string.match(decoded_url, "^[a-zA-Z0-9_%-%.\128-\255]+%.[a-zA-Z0-9_\128-\255]") then
+        newurl = "http://" .. decoded_url
+      end
+      candidates[newurl] = true
+    end
+    value, rest = string.match(rest, "[%?&]url=([^&#]+)(.*)")
   end
-  for _, pattern in pairs({
-    ".(https?:/[^&%?;]+)",
-    ".(https?:/[^&%?]+)",
-    ".(https?:/[^&]+)",
-    ".(https?:/.+)"
-  }) do
+  local patterns = {
+    "([hH][tT][tT][pP][sS]?:?%%[^%?&;]+)",
+    "[%?&=#](%%[^%?&;]+)",
+    "[%?&=#](//[^&]+)",
+    "[%?&=#](//[^&]+&.*)",
+    ".([hH][tT][tT][pP][sS]?:/[^&]+)",
+    ".([hH][tT][tT][pP][sS]?:/[^&]+&.*)"
+  }
+  if string.find(url, "\\", 1, true) then
+    table.insert(patterns, "([hH][tT][tT][pP][sS]?:?\\[^&]+)")
+    table.insert(patterns, "([hH][tT][tT][pP][sS]?:?\\[^&]+&.*)")
+    table.insert(patterns, "[%?&=#](\\[^&]+)")
+    table.insert(patterns, "[%?&=#](\\[^&]+&.*)")
+  end
+  for _, pattern in pairs(patterns) do
     for newurl in string.gmatch(url, pattern) do
-      queue_url(newurl)
+      candidates[newurl] = true
+    end
+  end
+  for newurl in pairs(candidates) do
+    repeat
+      local previous_url = newurl
+      if string.match(newurl, "^[hH][tT][tT][pP][sS]?:?%%")
+        or string.match(newurl, "^%%") then
+        newurl = urlparse.unescape(newurl)
+      elseif string.match(newurl, "^[hH][tT][tT][pP][sS]?:?\\")
+        or string.match(newurl, "^\\") then
+        newurl = cjson_safe.decode("\"" .. newurl .. "\"")
+      elseif string.match(newurl, "^\"") then
+        newurl = cjson_safe.decode(newurl)
+      end
+    until not newurl or newurl == previous_url
+    if newurl then
+      if string.match(newurl, "^//[^/]") then
+        local scheme = string.match(url, "^([hH][tT][tT][pP][sS]?:)") or "http:"
+        newurl = scheme .. newurl
+      end
+      if newurl ~= url and string.match(newurl, "^[hH][tT][tT][pP][sS]?:/[^%s]+%.") then
+        queue_url(newurl, withcustom)
+      end
     end
   end
   if string.match(url, "^https?:/[^/]") then
-    queue_url(string.gsub(url, "^(https?:/)(.+)", "%1/%2"))
-  end]]
+    local newurl = string.gsub(url, "^(https?:/)(.+)", "%1/%2")
+    queue_url(newurl, withcustom)
+  end
 end
 
 report_bad_url = function(url)
