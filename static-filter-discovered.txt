@@ -413,6 +413,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://bibliotekanauki%.ceon%.pl/yadda/search/general%.action
 ^https?://bizgbi%.com:?[0-9]*/.
 ^https?://bs%.serving%-sys%.com/.
+^https?://bsky%.app/intent/compose%?
 ^https?://catalogue%.ni4os%.eu/[^%?&]*[%?&]wtd=
 ^https?://cdn%.discordapp%.com/attachments/[^?]+$
 ^https?://cdn%.jsdelivr%.net/webjars/
@@ -433,6 +434,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://edn%-sap%.daihatsu%.astra%.co%.id/index%.php%?t=.
 ^https?://edv%-sps%.de/.*[?&]ITServ=
 ^https?://etsy%.app%.link/[0-9a-zA-Z]+%?bid=
+^https?://europaplus%.ru/.-[&%?]text=.-&text=
 ^https?://extranet%.oga%-as%.fr/doc/_affiche_doc%.php
 ^https?://extranet%.ogaloirevelay%.fr/doc/_affiche_doc%.php%?a=
 ^https?://f%-mirai%-nyusyo%.jp/jidoclub/.
@@ -463,6 +465,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://image%.minne%.com/minne/mobile_app_product/
 ^https?://imageserver%.ebscohost%.com/branding/
 ^https?://img%.aktuality%.sk/foto/
+^https?://infotdf%.com/.-[&%?]title=.-&title=
 ^https?://interactive%.web%.insurance%.ca%.gov/apex_extprd/
 ^https?://interamt%.de/koop/app/
 ^https?://intranet%.aoggb%.com/logout/%?
@@ -479,6 +482,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://l%.cdn%-fileserver%.com/bping%.php%?
 ^https?://lineit%.line%.me/.
 ^https?://lslaoi%.legalserver%.org/modules/matter/extern_intake%.php%?
+^https?://m%.[^/]+/news/articleView%.html%?idxno=[0-9]+&t=.-&t=
 ^https?://makeitmoveitfx%.com/[^w][^?]*/%?ver=[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$
 ^https?://map%.hot%-map%.com/.*[?&]ctxi?=[a-z0-9]+
 ^https?://maps%.google%.com/maps.
@@ -497,6 +501,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://nbahaircuts%.com/[0-9]+/[0-9]+/
 ^https?://news%-[0-9a-z]+%.[^/%.]+%.pp%.ua/
 ^https?://nnakademia%.pl/login
+^https?://oc%.brcclx%.com/t%?
 ^https?://occupyoakland%.org/calendar/action~
 ^https?://odysseywiki%.com/
 ^https?://onlineservices%.osc%.state%.ny%.us/Enrollment/
@@ -545,6 +550,8 @@ UniqueDomainsSessionIdSharingApi
 ^https?://thecatsite%.com/search/[0-9]+/$
 ^https?://thptnguyenduc%.edu%.vn/images/%?demo=
 ^https?://trattoriaallelanghe%.com/[a-zA-Z0-9]
+^https?://tumblr%.com/like/
+^https?://tumblr%.com/reblog/
 ^https?://twitter%.com/%?logout=
 ^https?://twitter%.com/home%?status=
 ^https?://twitter%.com/intent/tweet[/%?]
@@ -575,8 +582,12 @@ UniqueDomainsSessionIdSharingApi
 ^https?://www%.amazon%.[a-z]+/
 ^https?://www%.anyplication%.com/[^%?]+%?ssid=
 ^https?://www%.audible%.[a-z]+%.?[a-z]*/.+pf_rd_p
+^https?://www%.bankrate%.com/finance/credit%-cards/pdp/[^/%?]+/%?aid=[^&]+&tid=
 ^https?://www%.baoshuwang%.net/book/
+^https?://www%.bdo%.com/insights/.-[&%?]text=.-&text=
+^https?://www%.bdo%.com/insights/.-[&%?]title=.-&title=
 ^https?://www%.betfox%.com%.gh/.*[%?&]referer_redirect=[0-9]
+^https?://www%.brushd%.com/blog%?tumbled=[0-9]+%?tumbled=
 ^https?://www%.buscape%.com%.br/
 ^https?://www%.casinotogether%.com/.*/[denfr]*en[denfr]*en[denfr]*en
 ^https?://www%.code%-brew%.com/[^%?]*%?var=[0-9]
@@ -599,13 +610,16 @@ UniqueDomainsSessionIdSharingApi
 ^https?://www%.rcbconline%-corporate%.com/fo/login%?x=
 ^https?://www%.teacherspayteachers%.com/browse/
 ^https?://www%.tecnm%.mx/dir_escolares/
+^https?://www%.threads%.[cn][oe][mt]/intent/post%?
+^https?://www%.tumblr%.com/like/
+^https?://www%.tumblr%.com/reblog/
 ^https?://www%.twitter%.com/intent/tweet[/%?]
 ^https?://www%.viralcovert%.com/%?arsae=
 ^https?://www%.yanginguvenlik%.tr/ads/click%?ads=
 ^https?://www%.yanginguvenlik%.tr/frontend/tema3/assets/[^%?]+%?v=MC4[0-9a-zA-Z%+/=%%]+$
 ^https?://x%.com/%?logout=
 ^https?://x%.com/home%?status=
-^https?://x%.com/intent/tweet[/%?]
+^https?://x%.com/intent/[a-z]+[/%?]
 ^https?://x%.com/share%?
 _e998d88
 arrFilter.+arrFilter
