@@ -1070,16 +1070,11 @@ queue_new_urls = function(url, withcustom)
   local candidates = {}
   local value, rest = string.match(url, "[%?&]url=([^&#]+)(.*)")
   while value do
-    for _, newurl in pairs({
-      value,
-      string.match(value .. rest, "^([^#]+)")
-    }) do
-      local decoded_url = urlparse.unescape(newurl)
-      if string.match(decoded_url, "^[a-zA-Z0-9_%-%.\128-\255]+%.[a-zA-Z0-9_\128-\255]") then
-        newurl = "http://" .. decoded_url
-      end
-      candidates[newurl] = true
+    local decoded_url = urlparse.unescape(value)
+    if string.match(decoded_url, "^[a-zA-Z0-9_%-%.\128-\255]+%.[a-zA-Z0-9_\128-\255]") then
+      value = "http://" .. decoded_url
     end
+    candidates[value] = true
     value, rest = string.match(rest, "[%?&]url=([^&#]+)(.*)")
   end
   local patterns = {
