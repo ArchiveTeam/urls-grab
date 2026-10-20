@@ -350,6 +350,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]+%.search%.yahoo%.com/_bv/v%.gif%?
 ^https?://[^/]+%.skinlookingyounger%.com/
 ^https?://[^/]+%.translate%.goog/
+^https?://[^/]+%.usersporn%.com/.-[&%?][Ll]ink_id=
 ^https?://[^/]+%.vn/.*%?[0-9a-zA-Z]+=[0-9a-zA-Z]/[0-9a-zA-Z%-]+%....$
 ^https?://[^/]+%.yahoo%.com/adcount.
 ^https?://[^/]+%.zurlan%.org/[^%.]+%.[a-z]+%?[0-9a-zA-Z]+=[0-9a-zA-Z]+%.html$
@@ -498,6 +499,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://monthsthingcase%.de/en/
 ^https?://muntha%.org/cgi%-bin/%?test=
 ^https?://muntha%.org/docs/%?test=
+^https?://natelinha%.uol%.com%.br/[^%?]+%.php[,&]
 ^https?://nbahaircuts%.com/[0-9]+/[0-9]+/
 ^https?://news%-[0-9a-z]+%.[^/%.]+%.pp%.ua/
 ^https?://nnakademia%.pl/login
@@ -532,6 +534,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://shaqhaf%.com/download/%d+/.*/%d%d%d%d%-%d%d%-%d%d%%20%d%d:%d%d:%d%d$
 ^https?://share%.flipboard%.com/.
 ^https?://shop%.flixbus%.[a-z%-%.]+/user/agency%-login%?
+^https?://shop%.mu%-mo%.net/avx/sv/list1%?.-&amp;amp;
 ^https?://sipd%-ri%.kemendagri%.go%.id/rpjpd/
 ^https?://sjuit%.ac%.tz/home%.php/
 ^https?://smetrics%.elsevier%.com/.
@@ -549,6 +552,8 @@ UniqueDomainsSessionIdSharingApi
 ^https?://tesiunam%.dgb%.unam%.mx/F/
 ^https?://thecatsite%.com/search/[0-9]+/$
 ^https?://thptnguyenduc%.edu%.vn/images/%?demo=
+^https?://timesmajira%.co%.tz/.-[&%?]amp;text=
+^https?://timesmajira%.co%.tz/.-[&%?]text=
 ^https?://trattoriaallelanghe%.com/[a-zA-Z0-9]
 ^https?://tumblr%.com/like/
 ^https?://tumblr%.com/reblog/
@@ -560,6 +565,8 @@ UniqueDomainsSessionIdSharingApi
 ^https?://univis%.univie%.ac%.at/ausschreibungstellensuche/
 ^https?://up%.khk%.cz/upd/_mapy/upd_akt%?
 ^https?://up%.kr%-kralovehradecky%.cz/upd/_mapy/upd_akt%?
+^https?://usersporn%.com/.-[&%?][Ll]ink_id=
+^https?://vastgoedjournaal%.nl/news/[^%?]+&amp;amp;
 ^https?://ventax%.io/[^%?]+%?crumb=
 ^https?://vettabanyo%.com/[a-zA-Z0-9]
 ^https?://visitlink%.net/.*web
