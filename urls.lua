@@ -1110,6 +1110,7 @@ queue_new_urls = function(url, withcustom)
       end
     until not newurl or newurl == previous_url
     if newurl then
+      newurl = string.match(newurl, "^([^\r\n]*)")
       newurl = string.gsub(newurl, "[%?&]+$", "")
       if string.match(newurl, "^//[^/]") then
         local scheme = string.match(url, "^([hH][tT][tT][pP][sS]?:)") or "http:"
