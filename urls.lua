@@ -1110,14 +1110,26 @@ queue_new_urls = function(url, withcustom)
       end
     until not newurl or newurl == previous_url
     if newurl then
-      newurl = string.match(newurl, "^([^\r\n]*)")
+      newurl = string.match(newurl, "^([^#\r\n]*)")
       newurl = string.gsub(newurl, "[%?&]+$", "")
       if string.match(newurl, "^//[^/]") then
         local scheme = string.match(url, "^([hH][tT][tT][pP][sS]?:)") or "http:"
         newurl = scheme .. newurl
       end
       if newurl ~= url and string.match(newurl, "^[hH][tT][tT][pP][sS]?:/[^%s]+%.") then
-        queue_url(newurl, withcustom)
+        local params = {}
+        local query = string.match(newurl, "%?(.*)") or ""
+        for key in string.gmatch("&" .. query, "[&;]([^&;=]+)=") do
+          key = urlparse.unescape(string.gsub(key, "%+", " "))
+          if params[key] and not string.match(key, "%[%]$") then
+            newurl = nil
+            break
+          end
+          params[key] = true
+        end
+        if newurl then
+          queue_url(newurl, withcustom)
+        end
       end
     end
   end
