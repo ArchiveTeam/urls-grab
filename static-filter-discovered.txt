@@ -99,6 +99,7 @@ UniqueDomainsSessionIdSharingApi
 [%?&;]action=session_preservation
 [%?&;]add%-to%-cart=
 [%?&;]add_to_wishlist=
+[%?&;]aff_cookie_id=
 [%?&;]force_sid=
 [%?&;]go=https?://[^%?&]+[%?&;]go=https?://
 [%?&;]idComment=[0-9]+%?idComment=
@@ -242,7 +243,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://[^/]*blogger%.com/blog%-this%.g%?
 ^https?://[^/]*blogger%.com/email%-post/
 ^https?://[^/]*blogger%.com/post%-edit%.g%?
-^https?://[^/]*blogger%.com/share%-post%.g%?
+^https?://[^/]*blogger%.com/share%-post[%.%?/]
 ^https?://[^/]*blogsicilia%.it/.*/[0-9]+$
 ^https?://[^/]*bticket%.es/[^%?&]*[%?&;]Cabecera=
 ^https?://[^/]*bticket%.es/[^%?&]*[%?&;]te=
