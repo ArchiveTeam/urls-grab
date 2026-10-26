@@ -88,7 +88,7 @@ WGET_AT_COMMAND = [WGET_AT]
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20261026.02'
+VERSION = '20261026.03'
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
 TRACKER_ID = 'urls'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -100,6 +100,14 @@ with open('static-filter-discovered.txt', 'r') as f:
 with open('static-reject-sites.txt', 'r') as f:
     REJECT_SITES = [l.strip() for l in f]
 EXTRACT_OUTLINKS = {}
+
+for filename, siteslist in [
+    ('data/bloomfilter_accept.bin', 'static-extract-outlinks-domains.txt'),
+    ('data/bloomfilter_reject.bin', 'static-reject-sites.txt')
+]:
+    if os.path.isfile(filename) \
+        and os.path.getmtime(filename) <= os.path.getmtime(siteslist):
+        os.remove(filename)
 
 ###########################################################################
 # This section defines project-specific tasks.
