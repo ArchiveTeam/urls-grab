@@ -16,6 +16,7 @@
 ' *%+ *[a-zA-Z0-9_%.]+ *%+ *'$
 ' *%+ *[a-zA-Z0-9_%.]+ *%+ *'%?=[0-9]+$
 '%%20%+%%20
+'%+si%+'
 /%${[^}]+}/
 /%%7B%%7B
 /%([a-zA-Z0-9]+%)/Default%.aspx
@@ -451,6 +452,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://facebook%.com/login%.php
 ^https?://facebook%.com/plugins/
 ^https?://farahpahlavi%.org/wp%-content/[^%?]+%?ver=
+^https?://finance%.yahoo%.com/[^%?]+%%7[Cc]l:
 ^https?://fishmealuae%.com/[a-zA-Z0-9]
 ^https?://flowcon%.co%.id/setting/.
 ^https?://fls%-[a-z%-]+%.amazon%.
@@ -501,6 +503,7 @@ UniqueDomainsSessionIdSharingApi
 ^https?://maps%.wikimedia%.org/img/osm%-intl.
 ^https?://marifa%.kaust%.edu%.sa/.-%%25252525252525
 ^https?://media%.discordapp%.net/attachments/[^?]+$
+^https?://melody%.su/catalog/[^%?]+&t=
 ^https?://meta3%.toolforge%.org/stalktoy/[0-9]+%.[0-9]+%.[0-9]+%.[0-9]+$
 ^https?://minouchet%.com/[a-zA-Z0-9]
 ^https?://mma%.ft%.com

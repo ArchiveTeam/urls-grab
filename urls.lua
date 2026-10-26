@@ -121,6 +121,7 @@ local skip_parent_urls_checked = {}
 local skip_parent_urls = {}
 local remove_params = {}
 local filter_discovered = {}
+local filter_cache = {}
 local exit_url_patterns = {}
 local page_requisite_patterns = {}
 --local duplicate_urls = {}
@@ -144,6 +145,14 @@ local filter_pattern_sets = {
     ["k8"]={
       "^https?://[kK]8",
       "^https?://[^/]+/pics/[kK]888"
+    }
+  }},
+  ["^https?://[^/]+%.[^%./]+%.cc/"]={{
+    ["mirages"]="/usr/themes/Mirages/",
+    ["tbxw"]="/usr/plugins/tbxw/js/zzz%.js",
+    ["component"]={
+      "/usr/plugins/AiSuite/assets/common/tjim_index%.js",
+      "/usr/plugins/activity/js/popup%-lottery%.js"
     }
   }},
   ["^https?://[a-z0-9]+%.[^%./]+%.de/pages/"]={{
@@ -717,6 +726,26 @@ site_in_bloomfilter = function(action, s)
   return false
 end
 
+is_filtered = function(url)
+  local cached = filter_cache[url]
+  if cached ~= nil then
+    return cached
+  end
+  local filtered = false
+  if site_in_bloomfilter(BLOOMREJECT, url) then
+    filtered = "bloom filter"
+  else
+    for _, pattern in pairs(filter_discovered) do
+      if string.match(url, pattern) then
+        filtered = pattern
+        break
+      end
+    end
+  end
+  filter_cache[url] = filtered
+  return filtered
+end
+
 kill_grab = function(item)
   io.stdout:write("Aborting crawling.\n")
   killgrab = true
@@ -1042,6 +1071,9 @@ end
 
 queue_new_urls = function(url, withcustom)
   if not url then
+    return nil
+  end
+  if is_filtered(url) then
     return nil
   end
   local newurl = string.gsub(url, "([%?&;])[aA][mM][pP];", "%1")
@@ -2313,13 +2345,8 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     )
     if downloaded[newloc]
       or string.match(newloc, "^magnet:")
-      or site_in_bloomfilter(BLOOMREJECT, newloc) then
+      or is_filtered(newloc) then
       return wget.actions.EXIT
-    end
-    for _, pattern in pairs(filter_discovered) do
-      if string.match(newloc, pattern) then
-        return wget.actions.EXIT
-      end
     end
     local should_continue = false
     for _, pattern in pairs(nothing_on_3xx) do
@@ -2456,21 +2483,11 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
           io.stdout:write("Queuing for parent URL " .. tostring(parent_url) .. ".\n")
           io.stdout:flush()
           for url, context in pairs(urls_list) do
-            local filtered = false
             local actual_url = custom_item_urls[url] or url
-            if site_in_bloomfilter(BLOOMREJECT, actual_url) then
-              io.stdout:write("Skipping item " .. url .. " due to bloom filter.\n")
+            local filtered = is_filtered(actual_url)
+            if filtered then
+              io.stdout:write("Skipping item " .. url .. " due to " .. filtered .. ".\n")
               io.stdout:flush()
-              filtered = true
-            else
-              for _, pattern in pairs(filter_discovered) do
-                if string.match(actual_url, pattern) then
-                  io.stdout:write("Skipping item " .. url .. " due to " .. pattern .. ".\n")
-                  io.stdout:flush()
-                  filtered = true
-                  break
-                end
-              end
             end
             if not filtered then
               io.stdout:write("Queuing URL " .. url .. ".\n")
