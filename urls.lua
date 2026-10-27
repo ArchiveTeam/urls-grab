@@ -553,6 +553,7 @@ local custom_item_urls = {}
 local maybe_discourse = {}
 local discourse_items = {[""]={}}
 local discord_refresh = {[""]={}}
+local truthsocial_urls = {["truthsocial-urls"]={}}
 
 local month_timestamp = os.date("%Y%m", timestamp)
 
@@ -1324,6 +1325,8 @@ queue_services = function(url)
     queue_imgur(rest)
   elseif domain == "discordapp.com" or domain == "discordapp.net" then
     queue_discordapp(url)
+  elseif domain == "truthsocial.com" then
+    truthsocial_urls["truthsocial-urls"][percent_encode(url)] = current_url
   elseif domain and (
     string.match(domain, "^blogger%.")
     or string.match(domain, "^blogspot%.")
@@ -2449,6 +2452,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["blogger-2uka2xphhn6ywzuc"] = blogger_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
     ["urls-custom-vwk867wl8xqgjed7"] = queued_custom_urls,
+    ["urls-stash-truthsocial-urls-4zlr4ahmq9gqwqsz"] = truthsocial_urls,
     ["ftp-urls-en2fk0pjyxljsf9"] = ftp_urls,
     --["urls-tor-f6eyk1zzl9ca5pqu"] = onion_urls,
     ["urls-all-tx2vacclx396i0h"] = urls_all,
