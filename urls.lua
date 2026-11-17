@@ -525,6 +525,7 @@ local filter_pattern_sets = {
 local imgur_items = {
   [""] = {}
 }
+local instagram_items = {[""]={}}
 local pastebin_items = {
   [""]={}
 }
@@ -1323,6 +1324,20 @@ queue_services = function(url)
     queue_mediafire(rest)
   elseif domain == "imgur.com" then
     queue_imgur(rest)
+  elseif domain == "instagram.com" then
+    local path = string.match(rest, "^([^%?]+)") .. "/"
+    for _, pattern in pairs({
+      "^/p/([0-9a-zA-Z_%-]+)/",
+      "^/reel/([0-9a-zA-Z_%-]+)/",
+      "^/[^/]+/p/([0-9a-zA-Z_%-]+)/",
+      "^/[^/]+/reel/([0-9a-zA-Z_%-]+)/"
+    }) do
+      local post = string.match(path, pattern)
+      if post then
+        instagram_items[""]["post:" .. post] = current_url
+        break
+      end
+    end
   elseif domain == "discordapp.com" or domain == "discordapp.net" then
     queue_discordapp(url)
   elseif domain == "truthsocial.com" then
@@ -2449,6 +2464,7 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
     ["pastebin-xa5xj5bx2no3qc1"] = pastebin_items,
     ["mediafire-9cmzz6b3jawqbih"] = mediafire_items,
     ["imgur-6fzz6lxvpk9kgug7"] = imgur_items,
+    ["instagram-jff0pjxhbmol4iqa"] = instagram_items,
     ["blogger-2uka2xphhn6ywzuc"] = blogger_items,
     ["urls-glx7ansh4e17aii"] = queued_urls,
     ["urls-custom-vwk867wl8xqgjed7"] = queued_custom_urls,
